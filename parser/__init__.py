@@ -3,21 +3,20 @@ from antlr4 import *
 from antlr4.tree.Tree import ParseTreeWalker
 from antlr4.error.ErrorListener import ErrorListener
 from antlr4.error.Errors import LexerNoViableAltException
-
 from parser.generated.FHIRPathLexer import FHIRPathLexer
 from parser.generated.FHIRPathParser import FHIRPathParser
-from parser.generated.FHIRPathListener import FHIRPathListener
+from parser.ASTPathListener import ASTPathListener
+
 
 def recover(self, e):
     raise e
 
-
 def parse(value): 
     textStream = InputStream(value)
 
-    pathListener = FHIRPathListener()
+    astPathListener = ASTPathListener()
     errorListener = ErrorListener()
-    
+
     lexer = FHIRPathLexer(textStream)
     lexer.recover = recover
     lexer.removeErrorListeners()
@@ -31,10 +30,10 @@ def parse(value):
     parser.addErrorListener(errorListener)
 
     walker = ParseTreeWalker()
-    walker.walk(pathListener, parser.expression())
+    walker.walk(astPathListener, parser.expression())
 
     return { 
-      'ast': None,
+      'ast': astPathListener.parentStack,
       'tokens': tokenStream.tokens
     }
 
