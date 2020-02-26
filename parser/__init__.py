@@ -11,7 +11,8 @@ from parser.ASTPathListener import ASTPathListener
 def recover(self, e):
     raise e
 
-def parse(value): 
+
+def parse(value):
     textStream = InputStream(value)
 
     astPathListener = ASTPathListener()
@@ -32,8 +33,4 @@ def parse(value):
     walker = ParseTreeWalker()
     walker.walk(astPathListener, parser.expression())
 
-    return { 
-      'ast': astPathListener.parentStack,
-      'tokens': tokenStream.tokens
-    }
-
+    return {"ast": astPathListener.parentStack, "tokens": tokenStream.tokens}
