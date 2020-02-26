@@ -1,5 +1,5 @@
 from antlr4.tree.Tree import TerminalNodeImpl
-from parser.generated.FHIRPathListener import FHIRPathListener
+from fhirpathpy.parser.generated.FHIRPathListener import FHIRPathListener
 
 
 class ASTPathListener(FHIRPathListener):

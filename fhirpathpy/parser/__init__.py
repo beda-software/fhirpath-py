@@ -3,9 +3,9 @@ from antlr4 import *
 from antlr4.tree.Tree import ParseTreeWalker
 from antlr4.error.ErrorListener import ErrorListener
 from antlr4.error.Errors import LexerNoViableAltException
-from parser.generated.FHIRPathLexer import FHIRPathLexer
-from parser.generated.FHIRPathParser import FHIRPathParser
-from parser.ASTPathListener import ASTPathListener
+from fhirpathpy.parser.generated.FHIRPathLexer import FHIRPathLexer
+from fhirpathpy.parser.generated.FHIRPathParser import FHIRPathParser
+from fhirpathpy.parser.ASTPathListener import ASTPathListener
 
 
 def recover(self, e):
