@@ -32,7 +32,7 @@ class ASTPathListener(FHIRPathListener):
 
             def newfunc(*args, **kwargs):
                 if name.startswith("enter"):
-                    self.pushNode(name, args[0])
+                    self.pushNode(name[5:], args[0])
 
                 if name.startswith("exit"):
                     self.popNode()
