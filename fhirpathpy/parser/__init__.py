@@ -8,7 +8,7 @@ from fhirpathpy.parser.generated.FHIRPathParser import FHIRPathParser
 from fhirpathpy.parser.ASTPathListener import ASTPathListener
 
 
-def recover(self, e):
+def recover(e):
     raise e
 
 
@@ -23,9 +23,7 @@ def parse(value):
     lexer.removeErrorListeners()
     lexer.addErrorListener(errorListener)
 
-    tokenStream = CommonTokenStream(lexer)
-
-    parser = FHIRPathParser(tokenStream)
+    parser = FHIRPathParser(CommonTokenStream(lexer))
     parser.buildParseTrees = True
     parser.removeErrorListeners()
     parser.addErrorListener(errorListener)
@@ -33,4 +31,4 @@ def parse(value):
     walker = ParseTreeWalker()
     walker.walk(astPathListener, parser.expression())
 
-    return {"ast": astPathListener.parentStack, "tokens": tokenStream.tokens}
+    return astPathListener.parentStack[0]
