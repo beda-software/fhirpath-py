@@ -1,0 +1,41 @@
+{
+  "children": [{
+    "type": "AdditiveExpression",
+    "text": "%v+2",
+    "terminalNodeText": ["+"],
+    "children": [{
+      "type": "TermExpression",
+      "text": "%v",
+      "terminalNodeText": [],
+      "children": [{
+        "type": "ExternalConstantTerm",
+        "text": "%v",
+        "terminalNodeText": [],
+        "children": [{
+          "type": "ExternalConstant",
+          "text": "%v",
+          "terminalNodeText": ["%"],
+          "children": [{
+            "type": "Identifier",
+            "text": "v",
+            "terminalNodeText": ["v"]
+          }]
+        }]
+      }]
+    }, {
+      "type": "TermExpression",
+      "text": "2",
+      "terminalNodeText": [],
+      "children": [{
+        "type": "LiteralTerm",
+        "text": "2",
+        "terminalNodeText": [],
+        "children": [{
+          "type": "NumberLiteral",
+          "text": "2",
+          "terminalNodeText": ["2"]
+        }]
+      }]
+    }]
+  }]
+}

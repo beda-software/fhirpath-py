@@ -1,0 +1,50 @@
+{
+  "children": [{
+    "type": "InvocationExpression",
+    "text": "Patient.name.given",
+    "terminalNodeText": ["."],
+    "children": [{
+      "type": "InvocationExpression",
+      "text": "Patient.name",
+      "terminalNodeText": ["."],
+      "children": [{
+        "type": "TermExpression",
+        "text": "Patient",
+        "terminalNodeText": [],
+        "children": [{
+          "type": "InvocationTerm",
+          "text": "Patient",
+          "terminalNodeText": [],
+          "children": [{
+            "type": "MemberInvocation",
+            "text": "Patient",
+            "terminalNodeText": [],
+            "children": [{
+              "type": "Identifier",
+              "text": "Patient",
+              "terminalNodeText": ["Patient"]
+            }]
+          }]
+        }]
+      }, {
+        "type": "MemberInvocation",
+        "text": "name",
+        "terminalNodeText": [],
+        "children": [{
+          "type": "Identifier",
+          "text": "name",
+          "terminalNodeText": ["name"]
+        }]
+      }]
+    }, {
+      "type": "MemberInvocation",
+      "text": "given",
+      "terminalNodeText": [],
+      "children": [{
+        "type": "Identifier",
+        "text": "given",
+        "terminalNodeText": ["given"]
+      }]
+    }]
+  }]
+}

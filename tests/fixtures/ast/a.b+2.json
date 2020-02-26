@@ -1,0 +1,55 @@
+{
+  "children": [{
+    "type": "AdditiveExpression",
+    "text": "a.b+2",
+    "terminalNodeText": ["+"],
+    "children": [{
+      "type": "InvocationExpression",
+      "text": "a.b",
+      "terminalNodeText": ["."],
+      "children": [{
+        "type": "TermExpression",
+        "text": "a",
+        "terminalNodeText": [],
+        "children": [{
+          "type": "InvocationTerm",
+          "text": "a",
+          "terminalNodeText": [],
+          "children": [{
+            "type": "MemberInvocation",
+            "text": "a",
+            "terminalNodeText": [],
+            "children": [{
+              "type": "Identifier",
+              "text": "a",
+              "terminalNodeText": ["a"]
+            }]
+          }]
+        }]
+      }, {
+        "type": "MemberInvocation",
+        "text": "b",
+        "terminalNodeText": [],
+        "children": [{
+          "type": "Identifier",
+          "text": "b",
+          "terminalNodeText": ["b"]
+        }]
+      }]
+    }, {
+      "type": "TermExpression",
+      "text": "2",
+      "terminalNodeText": [],
+      "children": [{
+        "type": "LiteralTerm",
+        "text": "2",
+        "terminalNodeText": [],
+        "children": [{
+          "type": "NumberLiteral",
+          "text": "2",
+          "terminalNodeText": ["2"]
+        }]
+      }]
+    }]
+  }]
+}
