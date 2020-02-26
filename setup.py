@@ -4,7 +4,7 @@ import os
 import re
 from io import open
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def get_version(package):
@@ -23,11 +23,11 @@ with open('README.md') as f:
 
 setup(
     name="fhirpathpy",
-    version="0.1",
+    version=version,
     description="FHIRPath implementation in Python",
     license='',
     project_urls={
         "Source Code": "https://github.com/beda-software/fhirpath-py",
     },
-    packages=['fhirpathpy']
+    packages=find_packages()
 )
