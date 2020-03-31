@@ -38,61 +38,38 @@ def existsMacro(coll, expr):
     return util.isEmpty(vec)
 
 
-def allMacro(coll, expr):
-    for i in range(0, coll):
-        if not util.isTrue(expr(coll[i])):
+def allMacro(colls, expr):
+    for coll in colls:
+        if not util.isTrue(expr(coll)):
             return [False]
 
     return [True]
 
 
+def extractBooleanValue(data):
+    value = util.valData(data)
+    if type(value) != bool:
+        raise Exception("Found type '" + type(data) + "' but was expecting bool")
+    return value
+
+
+def allTrueFn(items):
+    return [all(extractBooleanValue(item) for item in items)]
+
+
+def anyTrueFn(items):
+    return [any(extractBooleanValue(item) for item in items)]
+
+
+def allFalseFn(items):
+    return [all(not extractBooleanValue(item) for item in items)]
+
+
+def anyFalseFn(items):
+    return [any(not extractBooleanValue(item) for item in items)]
+
+
 """
-def _assertType(data, types, errorMsgPrefix):
-  val = this.valData(data)
-  if (types.indexOf(typeof val) < 0):
-    let typeList = types.length > 1 ? "one of "+types.join(", ") : types[0];
-    util.raiseError("Found type '"+(typeof data)+"' but was expecting " +
-      typeList, errorMsgPrefix)
-  return val
-
-
-def allTrueFn(x):
-  let rtn = true;
-  for (let i=0, len=x.length; i<len && rtn; ++i):
-    let xi = util.assertType(x[i], ["boolean"], "allTrue");
-    rtn = xi == true;
-  }
-  return [rtn];
-
-
-def anyTrueFn(x):
-  let rtn = false;
-  for (let i=0, len=x.length; i<len && !rtn; ++i):
-    let xi = util.assertType(x[i], ["boolean"], "anyTrue");
-    rtn = xi == true;
-  }
-  return [rtn];
-};
-
-def allFalseFn(x):
-  let rtn = true;
-  for (let i=0, len=x.length; i<len && rtn; ++i):
-    let xi = util.assertType(x[i], ["boolean"], "allFalse");
-    rtn = xi == false;
-  }
-  return [rtn];
-};
-
-def anyFalseFn(x):
-  let rtn = false;
-  for (let i=0, len=x.length; i<len && !rtn; ++i):
-    let xi = util.assertType(x[i], ["boolean"], "anyFalse");
-    rtn = xi == false;
-  }
-  return [rtn];
-};
-
-
 /**
  *  Returns a JSON version of the given object, but with keys of the object in
  *  sorted order (or at least a stable order).
@@ -124,7 +101,7 @@ function sortObjByKey(value):
 
 
 /**
- *  Returns true if coll1 is a subset of coll2.
+ *  Returns True if coll1 is a subset of coll2.
  */
 function subsetOf(coll1, coll2):
   let rtn = coll1.length <= coll2.length;
@@ -136,7 +113,7 @@ function subsetOf(coll1, coll2):
     for (let p=0, pLen=coll1.length; p<pLen && rtn; ++p):
       let obj1 = util.valData(coll1[p]);
       let obj1Str = orderedJsonStringify(obj1);
-      let found = false;
+      let found = False;
       if (p==0): // c2Hash is not yet built
         for (let i=0, len=coll2.length; i<len; ++i):
           // No early return from this loop, because we're building c2Hash.
