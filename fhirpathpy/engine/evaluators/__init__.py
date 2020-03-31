@@ -134,7 +134,7 @@ def TimeLiteral(ctx, parentData, node):
     return [nodes.FP_Time(timeStr)]
 
 
-def __memberReduce(model, key):
+def createReduceMemberInvocation(model, key):
     def func(acc, res):
         res = nodes.ResourceNode.makeResNode(res)
 
@@ -187,7 +187,7 @@ def MemberInvocation(ctx, parentData, node):
             )
             return mapped
 
-        return list(reduce(__memberReduce(model, key), parentData, []))
+        return list(reduce(createReduceMemberInvocation(model, key), parentData, []))
 
     return []
 
@@ -245,22 +245,25 @@ def PolarityExpression(ctx, parentData, node):
 
 
 evaluators = {
-    "MemberInvocation": MemberInvocation,
-    "Identifier": Identifier,
-    "BooleanLiteral": BooleanLiteral,
-    "NumberLiteral": NumberLiteral,
-    "ParamList": ParamList,
-    "StringLiteral": StringLiteral,
-    "ThisInvocation": ThisInvocation,
-    "NullLiteral": NullLiteral,
     "Functn": Functn,
+    "ParamList": ParamList,
+    "Identifier": Identifier,
+    # terms
+    "NullLiteral": NullLiteral,
+    "LiteralTerm": LiteralTerm,
+    "NumberLiteral": NumberLiteral,
+    "StringLiteral": StringLiteral,
+    "BooleanLiteral": BooleanLiteral,
+    "InvocationTerm": InvocationTerm,
+    "ParenthesizedTerm": ParenthesizedTerm,
+    # Invocations
+    "ThisInvocation": ThisInvocation,
+    "MemberInvocation": MemberInvocation,
     "FunctionInvocation": FunctionInvocation,
+    # expressions
     "PolarityExpression": PolarityExpression,
     "IndexerExpression": IndexerExpression,
     "MembershipExpression": AliasOpExpression({"contains": "containsOp", "in": "inOp"}),
-    "ParenthesizedTerm": ParenthesizedTerm,
-    "InvocationTerm": InvocationTerm,
-    "LiteralTerm": LiteralTerm,
     "TermExpression": TermExpression,
     "UnionExpression": UnionExpression,
     "InvocationExpression": InvocationExpression,
