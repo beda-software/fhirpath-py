@@ -119,7 +119,7 @@ def makeParam(ctx, parentData, nodeType, param):
         return res
 
     if isinstance(nodeType, list):
-        if len(res):
+        if len(res) == 0:
             return []
         else:
             nodeType = nodeType[0]
@@ -159,15 +159,15 @@ def infixInvoke(ctx, fnName, data, rawParams):
         params = []
 
         for i in range(0, paramsNumber):
-            tp = argTypes[i]
-            pr = rawParams[i]
-            params.append(makeParam(ctx, data, tp, pr))
+            argType = argTypes[i]
+            rawParam = rawParams[i]
+            params.append(makeParam(ctx, data, argType, rawParam))
 
         if "nullable" in invocation:
             if any(util.isNullable(x) for x in params):
                 return []
 
-        res = invocation["fn"](params[0], params[1])
+        res = invocation["fn"](*params)
         return util.arraify(res)
 
     print(fnName + " wrong arity: got " + paramsNumber)
