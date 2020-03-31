@@ -19,7 +19,6 @@ def infix_math_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
 
-"""
 @pytest.mark.parametrize(("resource", "path", "expected"), [
     # or
     ({"a": True, "b": True}, "a or b", [True]),
@@ -40,7 +39,6 @@ def infix_math_functions_test(resource, path, expected):
 ])
 def simple_logic_expressions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
-"""
 
 
 @pytest.mark.parametrize(
@@ -95,10 +93,7 @@ def string_functions_test(resource, path, expected):
     [
         ({"list": []}, "list.single()", []),
         ({"list": [1]}, "list.single()", [1]),
-        # ({"list": [1, 2]}, "list.single()", [1]),
-        # ({"list": []}, "list.first()", [2]),
         ({"list": [2, 3]}, "list.first()", [2]),
-        # ({"list": []}, "list.last()", [2]),
         ({"list": [2, 3]}, "list.last()", [3]),
         ({"list": [1, 2, 3, 4]}, "list.tail()", [2, 3, 4]),
         ({"list": [1, 2, 3, 4]}, "list.take(2)", [1, 2]),
@@ -113,7 +108,39 @@ def filtering_functions_test(resource, path, expected):
 
 @pytest.mark.parametrize(
     ("resource", "path", "expected"),
-    [({"a": 42.0}, "a > 40", [True]), ({"a": 42.0}, "a < 40", [False]),],
+    [
+        ({"a": 42.0}, "a > 40", [True]), 
+        ({"a": 42.0}, "a >= 40", [True]), 
+        ({"a": 42.0}, "a < 40", [False]),
+        ({"a": 42.0}, "a <= 40", [False]),
+    ],
 )
 def equality_functions_test(resource, path, expected):
+    assert evaluate(resource, path) == expected
+
+
+@pytest.mark.parametrize(
+    ("resource", "path", "expected"),
+    [
+        ({"a": []}, "a.empty()", [True]), 
+        ({"a": True}, "a.not()", [False]), 
+        ({"a": [0.0, 1.0, 2.0]}, "a.all($this > 0)", [False]), 
+        ({"a": [0.0, 1.0, 2.0]}, "a.all($this >= 0)", [True]), 
+        # true
+        ({"a": [True, True]}, "a.allTrue()", [True]), 
+        ({"a": [True, False]}, "a.allTrue()", [False]), 
+        ({"a": [False, False]}, "a.allTrue()", [False]), 
+        ({"a": [True, True]}, "a.anyTrue()", [True]), 
+        ({"a": [True, False]}, "a.anyTrue()", [True]), 
+        ({"a": [False, False]}, "a.anyTrue()", [False]), 
+        # false
+        ({"a": [True, True]}, "a.allFalse()", [False]), 
+        ({"a": [True, False]}, "a.allFalse()", [False]), 
+        ({"a": [False, False]}, "a.allFalse()", [True]), 
+        ({"a": [True, True]}, "a.anyFalse()", [False]), 
+        ({"a": [True, False]}, "a.anyFalse()", [True]), 
+        ({"a": [False, False]}, "a.anyFalse()", [True]), 
+    ],
+)
+def existence_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
