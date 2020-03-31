@@ -93,11 +93,11 @@ def typecheck(a, b):
         if rtn is None:
             raise Exception(
                 'Type of "'
-                + a
+                + str(a)
                 + '" ('
                 + lClass.__name__
                 + ') did not match type of "'
-                + b
+                + str(b)
                 + '" ('
                 + rClass.__name__
                 + "). InequalityExpression"
