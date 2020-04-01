@@ -21,7 +21,7 @@ def equivalence(x, y):
     if util.isEmpty(x) or util.isEmpty(y):
         return []
 
-    return deepEqual(x, y, {fuzzy: true})
+    return deepEqual(x, y)
 
 
 def equal(a, b):
