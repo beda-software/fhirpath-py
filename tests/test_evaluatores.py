@@ -19,24 +19,27 @@ def infix_math_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
 
-@pytest.mark.parametrize(("resource", "path", "expected"), [
-    # or
-    ({"a": True, "b": True}, "a or b", [True]),
-    ({"a": True, "b": False}, "a or b", [True]),
-    ({"a": False, "b": False}, "a or b", [False]),
-    # and
-    ({"a": True, "b": True}, "a and b", [True]),
-    ({"a": True, "b": False}, "a and b", [False]),
-    ({"a": False, "b": False}, "a and b", [False]),
-    # xor
-    ({"a": True, "b": True}, "a xor b", [False]),
-    ({"a": True, "b": False}, "a xor b", [True]),
-    ({"a": False, "b": False}, "a xor b", [False]),
-    # implies
-    ({"a": True, "b": True}, "a implies b", [True]),
-    ({"a": True, "b": False}, "a implies b", [False]),
-    ({"a": False, "b": False}, "a implies b", [True]),
-])
+@pytest.mark.parametrize(
+    ("resource", "path", "expected"),
+    [
+        # or
+        ({"a": True, "b": True}, "a or b", [True]),
+        ({"a": True, "b": False}, "a or b", [True]),
+        ({"a": False, "b": False}, "a or b", [False]),
+        # and
+        ({"a": True, "b": True}, "a and b", [True]),
+        ({"a": True, "b": False}, "a and b", [False]),
+        ({"a": False, "b": False}, "a and b", [False]),
+        # xor
+        ({"a": True, "b": True}, "a xor b", [False]),
+        ({"a": True, "b": False}, "a xor b", [True]),
+        ({"a": False, "b": False}, "a xor b", [False]),
+        # implies
+        ({"a": True, "b": True}, "a implies b", [True]),
+        ({"a": True, "b": False}, "a implies b", [False]),
+        ({"a": False, "b": False}, "a implies b", [True]),
+    ],
+)
 def simple_logic_expressions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
@@ -95,6 +98,8 @@ def string_functions_test(resource, path, expected):
         ({"list": [1]}, "list.single()", [1]),
         ({"list": [2, 3]}, "list.first()", [2]),
         ({"list": [2, 3]}, "list.last()", [3]),
+        # ({"list": [{"list": {"attr":1}}]}, "list.repeat(attr)", [1]),
+        # ({"list": [{"attr": True}, {"attr": True}]}, "list.repeat(attr)", [3]),
         ({"list": [1, 2, 3, 4]}, "list.tail()", [2, 3, 4]),
         ({"list": [1, 2, 3, 4]}, "list.take(2)", [1, 2]),
         ({"list": [1, 2, 3, 4]}, "list.skip(2)", [3, 4]),
@@ -109,10 +114,16 @@ def filtering_functions_test(resource, path, expected):
 @pytest.mark.parametrize(
     ("resource", "path", "expected"),
     [
-        ({"a": 42.0}, "a > 40", [True]), 
-        ({"a": 42.0}, "a >= 40", [True]), 
-        ({"a": 42.0}, "a < 40", [False]),
-        ({"a": 42.0}, "a <= 40", [False]),
+        ({"a": 42.0}, "a > 42", [False]),
+        ({"a": 42.0}, "a >= 42", [True]),
+        ({"a": 42.0}, "a < 42", [False]),
+        ({"a": 42.0}, "a <= 42", [True]),
+        ({"a": 42.0}, "a != 41.0", [True]),
+        ({"a": 42.0}, "a != 42.0", [False]),
+        ({"a": 42.0}, "a = 41.0", [False]),
+        ({"a": 42.0}, "a = 42.0", [True]),
+        ({"a": 42.0}, "a ~ 42", [True]),
+        ({"a": 42.0}, "a !~ 42", [False]),
     ],
 )
 def equality_functions_test(resource, path, expected):
@@ -122,25 +133,67 @@ def equality_functions_test(resource, path, expected):
 @pytest.mark.parametrize(
     ("resource", "path", "expected"),
     [
-        ({"a": []}, "a.empty()", [True]), 
-        ({"a": True}, "a.not()", [False]), 
-        ({"a": [0.0, 1.0, 2.0]}, "a.all($this > 0)", [False]), 
-        ({"a": [0.0, 1.0, 2.0]}, "a.all($this >= 0)", [True]), 
+        # list
+        ({"a": [1, 2, 3]}, "a.exists()", [True]),
+        ({"a": [3.0, 4.0, 5.0]}, "a.exists($this > 1.0)", [True]),
+        ({"a": [0.0, 1.0]}, "a.exists($this > 1.0)", [False]),
+        ({"a": []}, "a.empty()", [True]),
+        ({"a": True}, "a.not()", [False]),
+        ({"a": [1, 2, 3], "b": [1, 2, 3, 4]}, "a.subsetOf(b)", [True]),
+        ({"a": [1, 2, 3], "b": [1, 2, 3, 4]}, "b.subsetOf(a)", [False]),
+        ({"a": [1, 2, 3], "b": [1, 2, 3, 4]}, "a.supersetOf(b)", [False]),
+        ({"a": [1, 2, 3], "b": [1, 2, 3, 4]}, "b.supersetOf(a)", [True]),
+        ({"a": [0.0, 1.0, 2.0]}, "a.all($this > 0)", [False]),
+        ({"a": [0.0, 1.0, 2.0]}, "a.all($this >= 0)", [True]),
         # true
-        ({"a": [True, True]}, "a.allTrue()", [True]), 
-        ({"a": [True, False]}, "a.allTrue()", [False]), 
-        ({"a": [False, False]}, "a.allTrue()", [False]), 
-        ({"a": [True, True]}, "a.anyTrue()", [True]), 
-        ({"a": [True, False]}, "a.anyTrue()", [True]), 
-        ({"a": [False, False]}, "a.anyTrue()", [False]), 
+        ({"a": [True, True]}, "a.allTrue()", [True]),
+        ({"a": [True, False]}, "a.allTrue()", [False]),
+        ({"a": [False, False]}, "a.allTrue()", [False]),
+        ({"a": [True, True]}, "a.anyTrue()", [True]),
+        ({"a": [True, False]}, "a.anyTrue()", [True]),
+        ({"a": [False, False]}, "a.anyTrue()", [False]),
         # false
-        ({"a": [True, True]}, "a.allFalse()", [False]), 
-        ({"a": [True, False]}, "a.allFalse()", [False]), 
-        ({"a": [False, False]}, "a.allFalse()", [True]), 
-        ({"a": [True, True]}, "a.anyFalse()", [False]), 
-        ({"a": [True, False]}, "a.anyFalse()", [True]), 
-        ({"a": [False, False]}, "a.anyFalse()", [True]), 
+        ({"a": [True, True]}, "a.allFalse()", [False]),
+        ({"a": [True, False]}, "a.allFalse()", [False]),
+        ({"a": [False, False]}, "a.allFalse()", [True]),
+        ({"a": [True, True]}, "a.anyFalse()", [False]),
+        ({"a": [True, False]}, "a.anyFalse()", [True]),
+        ({"a": [False, False]}, "a.anyFalse()", [True]),
     ],
 )
 def existence_functions_test(resource, path, expected):
+    assert evaluate(resource, path) == expected
+
+
+@pytest.mark.parametrize(
+    ("resource", "path", "expected"),
+    [
+        ({}, "iif(true, 'a', 'b')", ["a"]),
+        ({"a": {"b": [1, 2, 3]}}, "a.b.trace()", [1, 2, 3]),
+        ({"a": True}, "a.toInteger()", [1]),
+        ({"a": False}, "a.toInteger()", [0]),
+        ({"a": True}, "a.toDecimal()", [1.0]),
+        ({"a": False}, "a.toDecimal()", [0.0]),
+        ({"a": False}, "a.toString()", ["False"]),
+        ({"a": 101.99}, "a.toString()", ["101.99"]),
+        # toDateTime
+        # toTime
+    ],
+)
+def misc_functions_test(resource, path, expected):
+    assert evaluate(resource, path) == expected
+
+
+@pytest.mark.parametrize(
+    ("resource", "path", "expected"),
+    [
+        ({"numbers": [1, 2], "booleans": [True]}, "numbers | booleans", [1, 2]),
+        (
+            {"numbers": [1, 2], "booleans": [True, False]},
+            "numbers.combine(booleans)",
+            [1, 2, True, False],
+        ),
+    ],
+)
+def combining_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
