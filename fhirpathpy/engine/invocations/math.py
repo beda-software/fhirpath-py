@@ -73,11 +73,11 @@ def plus(xs, ys):
     y = util.valData(ys[0])
 
     """
-  In the future, this and other functions might need to return ResourceNode
-  to preserve the type information (integer vs decimal, and maybe decimal
-  vs string if decimals are represented as strings), in order to support
-  "as" and "is", but that support is deferred for now.
-  """
+    In the future, this and other functions might need to return ResourceNode
+    to preserve the type information (integer vs decimal, and maybe decimal
+    vs string if decimals are represented as strings), in order to support
+    "as" and "is", but that support is deferred for now.
+    """
     if type(x) == str and type(y) == str:
         return x + y
 
