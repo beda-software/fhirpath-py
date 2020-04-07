@@ -1,5 +1,6 @@
 import json
 import fhirpathpy.engine.util as util
+import fhirpathpy.engine.nodes as nodes
 import fhirpathpy.engine.invocations.filtering as filtering
 
 """
@@ -30,12 +31,12 @@ def notFn(x):
     return []
 
 
-def existsMacro(coll, expr):
+def existsMacro(coll, expr=None):
     vec = coll
-    if expr:
+    if expr is not None:
         return existsMacro(filtering.whereMacro(coll, expr))
 
-    return util.isEmpty(vec)
+    return not util.isEmpty(vec)
 
 
 def allMacro(colls, expr):
@@ -69,92 +70,20 @@ def anyFalseFn(items):
     return [any(not extractBooleanValue(item) for item in items)]
 
 
-"""
-/**
- *  Returns a JSON version of the given object, but with keys of the object in
- *  sorted order (or at least a stable order).
- *  From: https://stackoverflow.com/a/35810961/360782
- */
-function orderedJsonStringify(obj):
-  return JSON.stringify(sortObjByKey(obj));
-}
+def subsetOf(coll1, coll2):
+    return all(item in coll2 for item in coll1)
 
-/**
- *  If given value is an object, returns a new object with the properties added
- *  in sorted order, and handles nested objects.  Otherwise, returns the given
- *  value.
- *  From: https://stackoverflow.com/a/35810961/360782
- */
-function sortObjByKey(value):
-  return (typeof value == 'object') ?
-    (Array.isArray(value) ?
-      value.map(sortObjByKey) :
-      Object.keys(value).sort().reduce(
-        (o, key) => {
-          const v = value[key];
-          o[key] = sortObjByKey(v);
-          return o;
-        }, {})
-    ) :
-    value;
-}
-
-
-/**
- *  Returns True if coll1 is a subset of coll2.
- */
-function subsetOf(coll1, coll2):
-  let rtn = coll1.length <= coll2.length;
-  if (rtn):
-    // This requires a deep-equals comparision of every object in coll1,
-    // against each object in coll2.
-    // Optimize by building a hashmap of JSON versions of the objects.
-    var c2Hash = {};
-    for (let p=0, pLen=coll1.length; p<pLen && rtn; ++p):
-      let obj1 = util.valData(coll1[p]);
-      let obj1Str = orderedJsonStringify(obj1);
-      let found = False;
-      if (p==0): // c2Hash is not yet built
-        for (let i=0, len=coll2.length; i<len; ++i):
-          // No early return from this loop, because we're building c2Hash.
-          let obj2 = util.valData(coll2[i]);
-          let obj2Str = orderedJsonStringify(obj2);
-          c2Hash[obj2Str] = obj2;
-          found = found || (obj1Str == obj2Str);
-        }
-      }
-      else
-        found = !!c2Hash[obj1Str];
-      rtn = found;
-    }
-  }
-  return rtn;
-}
 
 def subsetOfFn(coll1, coll2):
-  return [subsetOf(coll1, coll2)];
-};
+    return [subsetOf(coll1, coll2)]
+
 
 def supersetOfFn(coll1, coll2):
-  return [subsetOf(coll2, coll1)];
-};
-"""
+    return [subsetOf(coll2, coll1)]
 
 
 def distinctFn(x):
-    unique = []
-    # Since this requires a deep equals, use a hash table (on JSON strings)
-    # for efficiency.
-    if len(x) > 0:
-        uniqueHash = {}
-        for i in range(0, len(x)):
-            xObj = x[i]
-            xStr = json.dumps(xObj)
-            if not xStr in uniqueHash:
-                unique.append(xObj)
-                uniqueHash[xStr] = xObj
-
-    return unique
+    return list(set(x))
 
 
 def isDistinctFn(x):
