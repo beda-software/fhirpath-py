@@ -96,7 +96,16 @@ class FP_TimeBase:
 
 # TODO
 class FP_Time:
-    pass
+    @staticmethod
+    def checkString(value):
+        """
+        Tests str to see if it is convertible to a DateTime.
+        * @return If str is convertible to a DateTime, returns an FP_DateTime otherwise returns None
+        """
+        d = FP_Time(value)
+        if not d._getMatchData():
+            return None
+        return d
 
 
 # TODO
@@ -108,9 +117,9 @@ class FP_DateTime:
     @staticmethod
     def checkString(value):
         """
-    Tests str to see if it is convertible to a DateTime.
-    * @return If str is convertible to a DateTime, returns an FP_DateTime otherwise returns None
-    """
+        Tests str to see if it is convertible to a DateTime.
+        * @return If str is convertible to a DateTime, returns an FP_DateTime otherwise returns None
+        """
         d = FP_DateTime(value)
         if not d._getMatchData():
             return None
@@ -139,6 +148,14 @@ class ResourceNode:
 
         self.path = path
         self.data = data
+
+    def __eq__(self, value):
+        if isinstance(value, ResourceNode):
+            return self.data == value.data
+        return self.data == value
+
+    def __hash__(self):
+        return self.data
 
     def toJSON(self):
         return json.dumps(self.data)
