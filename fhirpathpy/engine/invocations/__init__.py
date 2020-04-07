@@ -4,23 +4,25 @@ import fhirpathpy.engine.invocations.filtering as filtering
 import fhirpathpy.engine.invocations.strings as strings
 import fhirpathpy.engine.invocations.combining as combining
 import fhirpathpy.engine.invocations.math as math
+import fhirpathpy.engine.invocations.misc as misc
 import fhirpathpy.engine.invocations.equality as equality
 import fhirpathpy.engine.invocations.logic as logic
 
 invocations = {
     "empty": {"fn": existence.emptyFn},
     "not": {"fn": existence.notFn},
-    # 'exists':       {'fn': existence.existsMacro,   'arity': {0: [], 1: ["Expr"]}},
-    'all':          {'fn': existence.allMacro,      'arity': {1: ["Expr"]}},
-    'allTrue':      {'fn': existence.allTrueFn},
-    'anyTrue':      {'fn': existence.anyTrueFn},
-    'allFalse':     {'fn': existence.allFalseFn},
-    'anyFalse':     {'fn': existence.anyFalseFn},
-    # 'subsetOf':     {'fn': existence.subsetOfFn,    'arity': {1: ["AnyAtRoot"]}},
-    # 'supersetOf':   {'fn': existence.supersetOfFn,  'arity': {1: ["AnyAtRoot"]}},
+    "exists": {"fn": existence.existsMacro, "arity": {0: [], 1: ["Expr"]}},
+    "all": {"fn": existence.allMacro, "arity": {1: ["Expr"]}},
+    "allTrue": {"fn": existence.allTrueFn},
+    "anyTrue": {"fn": existence.anyTrueFn},
+    "allFalse": {"fn": existence.allFalseFn},
+    "anyFalse": {"fn": existence.anyFalseFn},
+    "subsetOf": {"fn": existence.subsetOfFn, "arity": {1: ["AnyAtRoot"]}},
+    "supersetOf": {"fn": existence.supersetOfFn, "arity": {1: ["AnyAtRoot"]}},
     "isDistinct": {"fn": existence.isDistinctFn},
     "distinct": {"fn": existence.distinctFn},
     "count": {"fn": existence.countFn},
+    "repeat": {"fn": filtering.repeatMacro, "arity": {1: ["Expr"]}},
     "where": {"fn": filtering.whereMacro, "arity": {1: ["Expr"]}},
     "select": {"fn": filtering.selectMacro, "arity": {1: ["Expr"]}},
     "single": {"fn": filtering.singleFn},
@@ -31,11 +33,11 @@ invocations = {
     "take": {"fn": filtering.takeFn, "arity": {1: ["Integer"]}},
     "skip": {"fn": filtering.skipFn, "arity": {1: ["Integer"]}},
     "combine": {"fn": combining.combineFn, "arity": {1: ["AnyAtRoot"]}},
-    # iif:          {fn: misc.iifMacro,    arity: {3: ["Expr", "Expr", "Expr"]}},
-    # trace:        {fn: misc.traceFn,     arity: {0: [], 1: ["String"]}},
-    # toInteger:    {fn: misc.toInteger},
-    # toDecimal:    {fn: misc.toDecimal},
-    # toString:     {fn: misc.toString},
+    "iif": {"fn": misc.iifMacro, "arity": {3: ["Expr", "Expr", "Expr"]}},
+    "trace": {"fn": misc.traceFn, "arity": {0: [], 1: ["String"]}},
+    "toInteger": {"fn": misc.toInteger},
+    "toDecimal": {"fn": misc.toDecimal},
+    "toString": {"fn": misc.toString},
     # toDateTime:   {fn: misc.toDateTime},
     # toTime:       {fn: misc.toTime},
     "indexOf": {"fn": strings.indexOf, "arity": {1: ["String"]}},
@@ -65,10 +67,10 @@ invocations = {
     "truncate": {"fn": math.truncate},
     # now:            {fn: datetime.now },
     # today:          {fn: datetime.today },
-    # repeat:          {fn: filtering.repeatMacro, arity: {1: ["Expr"]}},
+    #
     # children:        {fn: navigation.children },
     # descendants:     {fn: navigation.descendants },
-    # "|":          {fn: combining.unionOp,   arity: {2: ["Any", "Any"]}},
+    "|": {"fn": combining.unionOp, "arity": {2: ["Any", "Any"]}},
     "=": {"fn": equality.equal, "arity": {2: ["Any", "Any"]}, "nullable": True},
     "!=": {"fn": equality.unequal, "arity": {2: ["Any", "Any"]}, "nullable": True},
     "~": {"fn": equality.equival, "arity": {2: ["Any", "Any"]}},
