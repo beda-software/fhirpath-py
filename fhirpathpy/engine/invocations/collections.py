@@ -1,5 +1,4 @@
 import json
-from fhirpathpy.engine.invocations.deepEqual import deepEqual
 
 """ 
 This file holds code to hande the FHIRPath Math functions.
@@ -12,7 +11,7 @@ def containsImpl(a, b):
         return True
 
     for i in range(0, len(a)):
-        if deepEqual(a[i], b[0]):
+        if a[i] == b[0]:
             return True
 
     return False
