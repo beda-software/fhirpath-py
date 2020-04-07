@@ -60,7 +60,7 @@ def doInvoke(ctx, fnName, data, rawParams):
         raise Exception(fnName + " expects no params")
 
     paramsNumber = 0
-    if not util.isEmpty(rawParams):
+    if isinstance(rawParams, list):
         paramsNumber = len(rawParams)
 
     if not paramsNumber in invocation["arity"]:
@@ -105,7 +105,7 @@ def makeParam(ctx, parentData, nodeType, param):
         return func
 
     if nodeType == "AnyAtRoot":
-        return doEval(ctx, ctx.dataRoot, param)
+        return doEval(ctx, ctx["dataRoot"], param)
 
     if nodeType == "Identifier":
         if param.type == "TermExpression":
