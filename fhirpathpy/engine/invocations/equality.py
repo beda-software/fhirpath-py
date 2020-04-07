@@ -1,6 +1,5 @@
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
-from fhirpathpy.engine.invocations.deepEqual import deepEqual
 
 """
 This file holds code to hande the FHIRPath Math functions.
@@ -9,40 +8,35 @@ This file holds code to hande the FHIRPath Math functions.
 
 def equality(x, y):
     if util.isEmpty(x) or util.isEmpty(y):
-        return []
+        return False
 
-    return deepEqual(x, y)
+    return x == y
 
 
 def equivalence(x, y):
     if util.isEmpty(x) and util.isEmpty(y):
-        return [True]
+        return True
 
     if util.isEmpty(x) or util.isEmpty(y):
-        return []
+        return False
 
-    return deepEqual(x, y)
+    return x == y
 
 
 def equal(a, b):
-    return equality(a, b)
+    return [equality(a, b)]
 
 
 def unequal(a, b):
-    eq = equality(a, b)
-
-    if eq is None:
-        return None
-
-    return not eq
+    return [not equality(a, b)]
 
 
 def equival(a, b):
-    return equivalence(a, b)
+    return [equivalence(a, b)]
 
 
 def unequival(a, b):
-    return not equivalence(a, b)
+    return [not equivalence(a, b)]
 
 
 def checkLength(value):
