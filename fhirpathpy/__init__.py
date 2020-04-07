@@ -39,7 +39,7 @@ def applyParsedPath(resource, parsedPath, context={}, model=None):
             return list(map(visit, data))
 
         if isinstance(data, dict) and not isinstance(data, FP_Type):
-            for key, value in data.iteritems():
+            for key, value in data.items():
                 data[key] = visit(value)
 
         return data
