@@ -13,7 +13,7 @@ def isNumber(value):
 
 
 def isCapitalized(x):
-    return isinstance(x, list) and x[0] == x[0].upper()
+    return isinstance(x, str) and x[0] == x[0].upper()
 
 
 def isEmpty(x):
