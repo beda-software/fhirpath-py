@@ -138,7 +138,9 @@ def createReduceMemberInvocation(model, key):
     def func(acc, res):
         res = nodes.ResourceNode.makeResNode(res)
 
-        childPath = ""  # res['path'] + '.' + key # TODO
+        childPath = ""
+        if res.path is not None:
+            childPath = res.path + "." + key
 
         if model:
             defPath = model["pathsDefinedElsewhere"][childPath]
@@ -179,7 +181,6 @@ def MemberInvocation(ctx, parentData, node):
     model = ctx["model"]
 
     if isinstance(parentData, list):
-
         if util.isCapitalized(key):
             filtered = list(filter(lambda x: x["resourceType"] == key, parentData))
             mapped = list(
