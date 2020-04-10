@@ -2,6 +2,7 @@ import fhirpathpy.engine.invocations.collections as collections
 import fhirpathpy.engine.invocations.existence as existence
 import fhirpathpy.engine.invocations.filtering as filtering
 import fhirpathpy.engine.invocations.strings as strings
+import fhirpathpy.engine.invocations.navigation as navigation
 import fhirpathpy.engine.invocations.combining as combining
 import fhirpathpy.engine.invocations.math as math
 import fhirpathpy.engine.invocations.misc as misc
@@ -68,8 +69,8 @@ invocations = {
     # now:            {fn: datetime.now },
     # today:          {fn: datetime.today },
     #
-    # children:        {fn: navigation.children },
-    # descendants:     {fn: navigation.descendants },
+    "children": {"fn": navigation.children},
+    "descendants": {"fn": navigation.descendants},
     "|": {"fn": combining.unionOp, "arity": {2: ["Any", "Any"]}},
     "=": {"fn": equality.equal, "arity": {2: ["Any", "Any"]}, "nullable": True},
     "!=": {"fn": equality.unequal, "arity": {2: ["Any", "Any"]}, "nullable": True},

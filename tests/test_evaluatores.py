@@ -197,3 +197,20 @@ def misc_functions_test(resource, path, expected):
 )
 def combining_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
+
+
+@pytest.mark.parametrize(
+    ("resource", "path", "expected"),
+    [
+        ({"a": {"b": {"c": [1, 2, 3]}}}, "a.children()", [{"c": [1, 2, 3]}]),
+        ({"a": {"b": {"c": [1, 2, 3]}}}, "a.children().children()", [1, 2, 3]),
+        ({"a": {"b": [1, 2, 3]}}, "a.descendants()", [1, 2, 3]),
+        (
+            {"a": {"b": {"c": [1, 2, 3]}}},
+            "a.descendants()",
+            [{"c": [1, 2, 3]}, 1, 2, 3],
+        ),
+    ],
+)
+def path_functions_test(resource, path, expected):
+    assert evaluate(resource, path) == expected
