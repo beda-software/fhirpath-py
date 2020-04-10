@@ -143,7 +143,7 @@ class ResourceNode:
     If data is a resource (maybe a contained resource) reset the path
     information to the resource type.
     """
-        if hasattr(data, "resourceType"):
+        if type(data) == dict and "resourceType" in data:
             path = data["resourceType"]
 
         self.path = path
@@ -161,7 +161,7 @@ class ResourceNode:
         return json.dumps(self.data)
 
     @staticmethod
-    def makeResNode(data, path=""):
+    def makeResNode(data, path=None):
         if isinstance(data, ResourceNode):
             return data
         return ResourceNode(data, path)
