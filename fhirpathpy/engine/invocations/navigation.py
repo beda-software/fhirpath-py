@@ -16,7 +16,6 @@ def createReduceChildren(ctx={}):
         if isinstance(data, dict):
             for prop in data.keys():
                 value = data[prop]
-                print("value", value)
                 childPath = ""
                 if res.path is not None:
                     childPath = res.path + "." + prop
@@ -29,7 +28,6 @@ def createReduceChildren(ctx={}):
                     acc = acc + mapped
                 else:
                     acc.append(makeResNode(value, childPath))
-        print("acc", acc)
         return acc
 
     return func
