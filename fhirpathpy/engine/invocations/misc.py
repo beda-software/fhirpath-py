@@ -10,23 +10,23 @@ intRegex = re.compile(r"^[+-]?\d+$")
 numRegex = re.compile(r"^[+-]?\d+(\.\d+)?$")
 
 
-def iifMacro(data, cond, ok, fail):
-    if util.isTrue(cond(data)):
+def iif_macro(data, cond, ok, fail):
+    if util.is_true(cond(data)):
         return ok(data)
 
     return fail(data)
 
 
-def traceFn(x, label=""):
+def trace_fn(x, label=""):
     # print("TRACE:[" + label + "]", json.dumps(x))
     return x
 
 
-def toInteger(coll):
+def to_integer(coll):
     if len(coll) != 1:
         return []
 
-    value = util.valData(coll[0])
+    value = util.get_data(coll[0])
 
     if value == False:
         return 0
@@ -34,7 +34,7 @@ def toInteger(coll):
     if value == True:
         return 1
 
-    if util.isNumber(value):
+    if util.is_number(value):
         if int(value) == value:
             return value
 
@@ -49,11 +49,11 @@ def toInteger(coll):
     return []
 
 
-def toDecimal(coll):
+def to_decimal(coll):
     if len(coll) != 1:
         return []
 
-    value = util.valData(coll[0])
+    value = util.get_data(coll[0])
 
     if value == False:
         return 0
@@ -61,7 +61,7 @@ def toDecimal(coll):
     if value == True:
         return 1.0
 
-    if util.isNumber(value):
+    if util.is_number(value):
         return value
 
     if type(value) == str:
@@ -73,11 +73,11 @@ def toDecimal(coll):
     return []
 
 
-def toString(coll):
+def to_string(coll):
     if len(coll) != 1:
         return []
 
-    value = util.valData(coll[0])
+    value = util.get_data(coll[0])
     return str(value)
 
 
@@ -85,16 +85,16 @@ def toString(coll):
 # @param timeType The string name of a class for a time type (e.g. "FP_DateTime").
 
 
-def toDateTime(coll):
+def to_date_time(coll):
     ln = len(coll)
     rtn = []
     if ln > 1:
-        raise Exception("toDateTime called for a collection of length " + ln)
+        raise Exception("to_date_time called for a collection of length " + ln)
 
     if ln == 1:
-        value = util.valData(coll[0])
+        value = util.get_data(coll[0])
 
-        t = nodes.FP_DateTime.checkString(value)
+        t = nodes.FP_DateTime.check_string(value)
 
         if t:
             rtn[0] = t
@@ -102,16 +102,16 @@ def toDateTime(coll):
     return rtn
 
 
-def toTime(coll):
+def to_time(coll):
     ln = len(coll)
     rtn = []
     if ln > 1:
-        raise Exception("toTime called for a collection of length " + ln)
+        raise Exception("to_time called for a collection of length " + ln)
 
     if ln == 1:
-        value = util.valData(coll[0])
+        value = util.get_data(coll[0])
 
-        t = nodes.FP_Time.checkString(value)
+        t = nodes.FP_Time.check_string(value)
 
         if t:
             rtn[0] = t

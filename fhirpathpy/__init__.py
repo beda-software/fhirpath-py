@@ -1,6 +1,6 @@
 from fhirpathpy.parser import parse
-from fhirpathpy.engine import doEval
-from fhirpathpy.engine.util import arraify, valData
+from fhirpathpy.engine import do_eval
+from fhirpathpy.engine.util import arraify, get_data
 from fhirpathpy.engine.nodes import FP_Type
 
 __title__ = "fhirpathpy"
@@ -13,12 +13,12 @@ __copyright__ = "Copyright 2020 beda.software"
 VERSION = __version__
 
 
-def applyParsedPath(resource, parsedPath, context={}, model=None):
+def apply_parsed_path(resource, parsedPath, context={}, model=None):
     # constants.reset();
     dataRoot = arraify(resource)
 
     """
-    doEval takes a "ctx" object, and we store things in that as we parse, so we
+    do_eval takes a "ctx" object, and we store things in that as we parse, so we
     need to put user-provided variable data in a sub-object, ctx['vars'].
     Set up default standard variables, and allow override from the variables.
     However, we'll keep our own copy of dataRoot for internal processing.
@@ -27,13 +27,13 @@ def applyParsedPath(resource, parsedPath, context={}, model=None):
 
     ctx = {"dataRoot": dataRoot, "vars": vars.update(context), "model": model}
 
-    node = doEval(ctx, dataRoot, parsedPath["children"][0])
+    node = do_eval(ctx, dataRoot, parsedPath["children"][0])
 
     # Resolve any internal "ResourceNode" instances.  Continue to let FP_Type
     # subclasses through.
 
     def visit(node):
-        data = valData(node)
+        data = get_data(node)
 
         if isinstance(node, list):
             return list(map(visit, data))
@@ -49,40 +49,40 @@ def applyParsedPath(resource, parsedPath, context={}, model=None):
 
 def evaluate(resource, path, context={}, model=None):
     """ 
-  Evaluates the "path" FHIRPath expression on the given resource, using data
-  from "context" for variables mentioned in the "path" expression.
+    Evaluates the "path" FHIRPath expression on the given resource, using data
+    from "context" for variables mentioned in the "path" expression.
 
-  Parameters: 
-  resource (dict|list): FHIR resource, bundle as js object or array of resources This resource will be modified by this function to add type information.
-  path (string): fhirpath expression, sample 'Patient.name.given'
-  context (dict): a hash of variable name/value pairs.
-  model (dict): The "model" data object specific to a domain, e.g. R4.
+    Parameters: 
+    resource (dict|list): FHIR resource, bundle as js object or array of resources This resource will be modified by this function to add type information.
+    path (string): fhirpath expression, sample 'Patient.name.given'
+    context (dict): a hash of variable name/value pairs.
+    model (dict): The "model" data object specific to a domain, e.g. R4.
 
-  Returns: 
-  int: Description of return value 
+    Returns: 
+    int: Description of return value 
 
-  """
+    """
     node = parse(path)
-    return applyParsedPath(resource, node, context, model)
+    return apply_parsed_path(resource, node, context, model)
 
 
 def compile(path, model=None):
     """ 
-  Returns a function that takes a resource and an optional context hash (see
-  "evaluate"), and returns the result of evaluating the given FHIRPath
-  expression on that resource.  The advantage of this function over "evaluate"
-  is that if you have multiple resources, the given FHIRPath expression will
-  only be parsed once.
+    Returns a function that takes a resource and an optional context hash (see
+    "evaluate"), and returns the result of evaluating the given FHIRPath
+    expression on that resource.  The advantage of this function over "evaluate"
+    is that if you have multiple resources, the given FHIRPath expression will
+    only be parsed once.
 
-  Parameters: 
-  path (string) - the FHIRPath expression to be parsed.
-  model (dict) - The "model" data object specific to a domain, e.g. R4.
+    Parameters: 
+    path (string) - the FHIRPath expression to be parsed.
+    model (dict) - The "model" data object specific to a domain, e.g. R4.
 
-  For example, you could pass in the result of require("fhirpath/fhir-context/r4")
-  """
+    For example, you could pass in the result of require("fhirpath/fhir-context/r4")
+    """
     node = parse(path)
 
     def func(resource, context={}):
-        return applyParsedPath(resource, node, context, model)
+        return apply_parsed_path(resource, node, context, model)
 
     return func

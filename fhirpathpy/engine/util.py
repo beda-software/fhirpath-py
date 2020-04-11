@@ -2,40 +2,40 @@ from functools import reduce
 from fhirpathpy.engine.nodes import ResourceNode
 
 
-def valData(value):
+def get_data(value):
     if isinstance(value, ResourceNode):
         return value.data
     return value
 
 
-def isNumber(value):
+def is_number(value):
     return isinstance(value, (int, float, complex)) and not isinstance(value, bool)
 
 
-def isCapitalized(x):
+def is_capitalized(x):
     return isinstance(x, str) and x[0] == x[0].upper()
 
 
-def isEmpty(x):
+def is_empty(x):
     return isinstance(x, list) and len(x) == 0
 
 
-def isSome(x):
-    return x is not None and not isEmpty(x)
+def is_some(x):
+    return x is not None and not is_empty(x)
 
 
-def isNullable(x):
-    return x is None or isEmpty(x)
+def is_nullable(x):
+    return x is None or is_empty(x)
 
 
-def isTrue(x):
+def is_true(x):
     return x == True or isinstance(x, list) and len(x) == 1 and x[0] == True
 
 
 def arraify(x):
     if isinstance(x, list):
         return x
-    if isSome(x):
+    if is_some(x):
         return [x]
     return []
 

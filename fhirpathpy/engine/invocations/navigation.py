@@ -2,15 +2,15 @@ from functools import reduce
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 
-makeResNode = nodes.ResourceNode.makeResNode
+create_node = nodes.ResourceNode.create_node
 
 
-def createReduceChildren(ctx={}):
+def create_reduce_children(ctx={}):
     model = {}  # @TODO use ctx
 
     def func(acc, res):
-        data = util.valData(res)
-        res = makeResNode(res)
+        data = util.get_data(res)
+        res = create_node(res)
         if isinstance(data, list):
             data = dict((i, data[i]) for i in range(0, len(data)))
         if isinstance(data, dict):
@@ -24,17 +24,17 @@ def createReduceChildren(ctx={}):
                         childPath = model["pathsDefinedElsewhere"][childPath]
 
                 if isinstance(value, list):
-                    mapped = list(map(lambda n: makeResNode(n, childPath), value))
+                    mapped = list(map(lambda n: create_node(n, childPath), value))
                     acc = acc + mapped
                 else:
-                    acc.append(makeResNode(value, childPath))
+                    acc.append(create_node(value, childPath))
         return acc
 
     return func
 
 
 def children(coll):
-    return reduce(createReduceChildren(), coll, [])
+    return reduce(create_reduce_children(), coll, [])
 
 
 def descendants(coll):

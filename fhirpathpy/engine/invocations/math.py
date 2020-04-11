@@ -8,21 +8,21 @@ Adds the math functions to the given FHIRPath engine.
 """
 
 
-def isEmpty(x):
-    if util.isNumber(x):
+def is_empty(x):
+    if util.is_number(x):
         return False
     return len(x) == 0
 
 
-def ensureNumberSingleton(x):
-    data = util.valData(x)
-    if not util.isNumber(data):
+def ensure_number_singleton(x):
+    data = util.get_data(x)
+    if not util.is_number(data):
         if not isinstance(data, list) or len(data) != 1:
             raise Exception("Expected list with number, but got " + json.dumps(data))
 
-        value = util.valData(data[0])
+        value = util.get_data(data[0])
 
-        if not util.isNumber(value):
+        if not util.is_number(value):
             raise Exception("Expected number, but got " + json.dumps(x))
 
         return value
@@ -35,10 +35,10 @@ def amp(x="", y=""):
 
 def minus(xs, ys):
     if len(xs) == 1 and len(ys) == 1:
-        x = util.valData(xs[0])
-        y = util.valData(ys[0])
+        x = util.get_data(xs[0])
+        y = util.get_data(ys[0])
 
-        if util.isNumber(x) and util.isNumber(y):
+        if util.is_number(x) and util.is_number(y):
             return x - y
 
         if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
@@ -69,8 +69,8 @@ def plus(xs, ys):
     if len(xs) != 1 or len(ys) != 1:
         raise Exception("Cannot " + json.dumps(xs) + " + " + json.dumps(ys))
 
-    x = util.valData(xs[0])
-    y = util.valData(ys[0])
+    x = util.get_data(xs[0])
+    y = util.get_data(ys[0])
 
     """
     In the future, this and other functions might need to return ResourceNode
@@ -81,7 +81,7 @@ def plus(xs, ys):
     if type(x) == str and type(y) == str:
         return x + y
 
-    if util.isNumber(x) and util.isNumber(y):
+    if util.is_number(x) and util.is_number(y):
         return x + y
 
     if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
@@ -89,57 +89,57 @@ def plus(xs, ys):
 
 
 def abs(x):
-    if isEmpty(x):
+    if is_empty(x):
         return []
-    num = ensureNumberSingleton(x)
+    num = ensure_number_singleton(x)
     return math.fabs(num)
 
 
 def ceiling(x):
-    if isEmpty(x):
+    if is_empty(x):
         return []
-    num = ensureNumberSingleton(x)
+    num = ensure_number_singleton(x)
     return math.ceil(num)
 
 
 def exp(x):
-    if isEmpty(x):
+    if is_empty(x):
         return []
-    num = ensureNumberSingleton(x)
+    num = ensure_number_singleton(x)
     return math.exp(num)
 
 
 def floor(x):
-    if isEmpty(x):
+    if is_empty(x):
         return []
-    num = ensureNumberSingleton(x)
+    num = ensure_number_singleton(x)
     return math.floor(num)
 
 
 def ln(x):
-    if isEmpty(x):
+    if is_empty(x):
         return []
 
-    num = ensureNumberSingleton(x)
+    num = ensure_number_singleton(x)
     return math.log(num)
 
 
 def log(x, base):
-    if isEmpty(x) or isEmpty(base):
+    if is_empty(x) or is_empty(base):
         return []
 
-    num = ensureNumberSingleton(x)
-    num2 = ensureNumberSingleton(base)
+    num = ensure_number_singleton(x)
+    num2 = ensure_number_singleton(base)
 
     return math.log(num, num2)
 
 
 def power(x, degree):
-    if isEmpty(x) or isEmpty(degree):
+    if is_empty(x) or is_empty(degree):
         return []
 
-    num = ensureNumberSingleton(x)
-    num2 = ensureNumberSingleton(degree)
+    num = ensure_number_singleton(x)
+    num2 = ensure_number_singleton(degree)
 
     if num < 0 or math.floor(num2) != num2:
         return []
@@ -148,24 +148,24 @@ def power(x, degree):
 
 
 def rround(x, acc):
-    if isEmpty(x):
+    if is_empty(x):
         return []
 
-    num = ensureNumberSingleton(x)
-    if isEmpty(acc):
+    num = ensure_number_singleton(x)
+    if is_empty(acc):
         return round(num)
 
-    num2 = ensureNumberSingleton(acc)
+    num2 = ensure_number_singleton(acc)
     degree = math.pow(10, num2)
 
     return round(num * degree) / degree
 
 
 def sqrt(x):
-    if isEmpty(x):
+    if is_empty(x):
         return []
 
-    num = ensureNumberSingleton(x)
+    num = ensure_number_singleton(x)
     if num < 0:
         return []
 
@@ -173,7 +173,7 @@ def sqrt(x):
 
 
 def truncate(x):
-    if isEmpty(x):
+    if is_empty(x):
         return []
-    num = ensureNumberSingleton(x)
+    num = ensure_number_singleton(x)
     return math.trunc(num)

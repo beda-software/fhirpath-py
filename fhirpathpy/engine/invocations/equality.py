@@ -1,3 +1,4 @@
+import json
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 
@@ -7,17 +8,17 @@ This file holds code to hande the FHIRPath Math functions.
 
 
 def equality(x, y):
-    if util.isEmpty(x) or util.isEmpty(y):
+    if util.is_empty(x) or util.is_empty(y):
         return False
 
     return x == y
 
 
 def equivalence(x, y):
-    if util.isEmpty(x) and util.isEmpty(y):
+    if util.is_empty(x) and util.is_empty(y):
         return True
 
-    if util.isEmpty(x) or util.isEmpty(y):
+    if util.is_empty(x) or util.is_empty(y):
         return False
 
     return x == y
@@ -39,34 +40,34 @@ def unequival(a, b):
     return [not equivalence(a, b)]
 
 
-def checkLength(value):
+def check_length(value):
     if len(value) > 1:
         raise Exception(
             "Was expecting no more than one element but got "
-            + json.dumps(a)
+            + json.dumps(value)
             + ". Singleton was expected"
         )
 
 
 def typecheck(a, b):
     """
-  Checks that the types of a and b are suitable for comparison in an
-  inequality expression.  It is assumed that a check has already been made
-  that there is at least one value in a and b.
+    Checks that the types of a and b are suitable for comparison in an
+    inequality expression.  It is assumed that a check has already been made
+    that there is at least one value in a and b.
 
-  Parameters: 
-  a (list) - the left side of the inequality expression (which should be an array of one value)
-  b (list) -  the right side of the inequality expression (which should be an array of one value)
+    Parameters: 
+    a (list) - the left side of the inequality expression (which should be an array of one value)
+    b (list) -  the right side of the inequality expression (which should be an array of one value)
 
-  returns the singleton values of the arrays a, and b.  If one was an FP_Type and the other was convertible, the coverted value will be retureed
-  """
+    returns the singleton values of the arrays a, and b.  If one was an FP_Type and the other was convertible, the coverted value will be retureed
+    """
     rtn = None
 
-    checkLength(a)
-    checkLength(b)
+    check_length(a)
+    check_length(b)
 
-    a = util.valData(a[0])
-    b = util.valData(b[0])
+    a = util.get_data(a[0])
+    b = util.get_data(b[0])
 
     lClass = a.__class__
     rClass = b.__class__
@@ -76,11 +77,11 @@ def typecheck(a, b):
 
         # TODO refactor
         if lClass == str and (rClass == nodes.FP_DateTime or rClass == nodes.FP_Time):
-            d = rClass.checkString(a)  # TODO
+            d = rClass.check_string(a)  # TODO
             if d is not None:
                 rtn = [d, b]
         elif rClass == str and (lClass == nodes.FP_DateTime or lClass == nodes.FP_Time):
-            d = lClass.checkString(b)  # TODO
+            d = lClass.check_string(b)  # TODO
             if d is not None:
                 rtn = [a, d]
 

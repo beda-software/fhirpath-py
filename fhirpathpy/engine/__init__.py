@@ -5,66 +5,66 @@ from fhirpathpy.engine.evaluators import evaluators
 from fhirpathpy.engine.invocations import invocations
 
 
-def checkIntegerParam(val):
-    data = util.valData(val)
+def check_integer_param(val):
+    data = util.get_data(val)
     if int(data) != data:
         raise Exception("Expected integer, got: " + json.dumps(data))
     return data
 
 
-def checkNumberParam(val):
-    data = util.valData(val)
+def check_number_param(val):
+    data = util.get_data(val)
     if not isinstance(data, numbers.Number):
         raise Exception("Expected number, got: " + json.dumps(data))
     return data
 
 
-def checkBooleanParam(val):
-    data = util.valData(val)
+def check_boolean_param(val):
+    data = util.get_data(val)
     if data == True or data == False:
         return data
     raise Exception("Expected boolean, got: " + json.dumps(data))
 
 
-def checkStringParam(val):
-    data = util.valData(val)
+def check_string_param(val):
+    data = util.get_data(val)
     if not isinstance(data, str):
         raise Exception("Expected string, got: " + json.dumps(data))
     return data
 
 
-def doEval(ctx, parentData, node):
-    nodeType = node["type"]
+def do_eval(ctx, parentData, node):
+    node_type = node["type"]
 
-    if nodeType in evaluators:
-        evaluator = evaluators.get(nodeType)
+    if node_type in evaluators:
+        evaluator = evaluators.get(node_type)
         return evaluator(ctx, parentData, node)
 
-    raise Exception("No " + nodeType + " evaluator ")
+    raise Exception("No " + node_type + " evaluator ")
 
 
-def doInvoke(ctx, fnName, data, rawParams):
-    if isinstance(fnName, list) and len(fnName) == 1:
-        fnName = fnName[0]
+def doInvoke(ctx, fn_name, data, rawParams):
+    if isinstance(fn_name, list) and len(fn_name) == 1:
+        fn_name = fn_name[0]
 
-    if type(fnName) != str or not fnName in invocations:
-        raise Exception("Not implemented: " + str(fnName))
+    if type(fn_name) != str or not fn_name in invocations:
+        raise Exception("Not implemented: " + str(fn_name))
 
-    invocation = invocations[fnName]
+    invocation = invocations[fn_name]
 
     if not "arity" in invocation:
-        if rawParams is None or util.isEmpty(rawParams):
+        if rawParams is None or util.is_empty(rawParams):
             res = invocation["fn"](util.arraify(data))
             return util.arraify(res)
 
-        raise Exception(fnName + " expects no params")
+        raise Exception(fn_name + " expects no params")
 
     paramsNumber = 0
     if isinstance(rawParams, list):
         paramsNumber = len(rawParams)
 
     if not paramsNumber in invocation["arity"]:
-        print(fnName + " wrong arity: got " + str(paramsNumber))
+        print(fn_name + " wrong arity: got " + str(paramsNumber))
         return []
 
     params = []
@@ -73,12 +73,12 @@ def doInvoke(ctx, fnName, data, rawParams):
     for i in range(0, paramsNumber):
         tp = argTypes[i]
         pr = rawParams[i]
-        params.append(makeParam(ctx, data, tp, pr))
+        params.append(make_param(ctx, data, tp, pr))
 
     params.insert(0, data)
 
     if "nullable" in invocation:
-        if any(util.isNullable(x) for x in params):
+        if any(util.is_nullable(x) for x in params):
             return []
 
     res = invocation["fn"](*params)
@@ -86,68 +86,68 @@ def doInvoke(ctx, fnName, data, rawParams):
     return util.arraify(res)
 
 
-paramCheckTable = {
-    "Integer": checkIntegerParam,
-    "Number": checkNumberParam,
-    "Boolean": checkBooleanParam,
-    "String": checkStringParam,
+param_check_table = {
+    "Integer": check_integer_param,
+    "Number": check_number_param,
+    "Boolean": check_boolean_param,
+    "String": check_string_param,
 }
 
 
-def makeParam(ctx, parentData, nodeType, param):
+def make_param(ctx, parentData, node_type, param):
     ctx["currentData"] = parentData
 
-    if nodeType == "Expr":
+    if node_type == "Expr":
 
         def func(data):
-            return doEval(ctx, util.arraify(data), param)
+            return do_eval(ctx, util.arraify(data), param)
 
         return func
 
-    if nodeType == "AnyAtRoot":
-        return doEval(ctx, ctx["dataRoot"], param)
+    if node_type == "AnyAtRoot":
+        return do_eval(ctx, ctx["dataRoot"], param)
 
-    if nodeType == "Identifier":
+    if node_type == "Identifier":
         if param.type == "TermExpression":
             return param.text
 
         raise Exception("Expected identifier node, got " + json.dumps(param))
 
-    res = doEval(ctx, parentData, param)
+    res = do_eval(ctx, parentData, param)
 
-    if nodeType == "Any":
+    if node_type == "Any":
         return res
 
-    if isinstance(nodeType, list):
+    if isinstance(node_type, list):
         if len(res) == 0:
             return []
         else:
-            nodeType = nodeType[0]
+            node_type = node_type[0]
 
     if len(res) > 1:
         raise Exception(
             "Unexpected collection"
             + json.dumps(res)
             + "; expected singleton of type "
-            + nodeType
+            + node_type
         )
 
     if len(res) == 0:
         return []
 
-    if nodeType not in paramCheckTable:
-        raise Exception("Implement me for " + nodeType)
+    if node_type not in param_check_table:
+        raise Exception("Implement me for " + node_type)
 
-    check = paramCheckTable[nodeType]
+    check = param_check_table[node_type]
 
     return check(res[0])
 
 
-def infixInvoke(ctx, fnName, data, rawParams):
-    if not fnName in invocations or not "fn" in invocations[fnName]:
-        raise Exception("Not implemented " + fnName)
+def infix_invoke(ctx, fn_name, data, rawParams):
+    if not fn_name in invocations or not "fn" in invocations[fn_name]:
+        raise Exception("Not implemented " + fn_name)
 
-    invocation = invocations[fnName]
+    invocation = invocations[fn_name]
     paramsNumber = len(rawParams)
 
     if paramsNumber != 2:
@@ -161,14 +161,14 @@ def infixInvoke(ctx, fnName, data, rawParams):
         for i in range(0, paramsNumber):
             argType = argTypes[i]
             rawParam = rawParams[i]
-            params.append(makeParam(ctx, data, argType, rawParam))
+            params.append(make_param(ctx, data, argType, rawParam))
 
         if "nullable" in invocation:
-            if any(util.isNullable(x) for x in params):
+            if any(util.is_nullable(x) for x in params):
                 return []
 
         res = invocation["fn"](*params)
         return util.arraify(res)
 
-    print(fnName + " wrong arity: got " + paramsNumber)
+    print(fn_name + " wrong arity: got " + paramsNumber)
     return []

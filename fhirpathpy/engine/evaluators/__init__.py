@@ -7,54 +7,54 @@ import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 
 
-def BooleanLiteral(ctx, parentData, node):
+def boolean_literal(ctx, parentData, node):
     if node["text"] == "true":
         return [True]
     return [False]
 
 
-def NumberLiteral(ctx, parentData, node):
+def number_literal(ctx, parentData, node):
     return [float(node["text"])]
 
 
-def Identifier(ctx, parentData, node):
+def identifier(ctx, parentData, node):
     return [re.sub(r"(^\"|\"$)", "", node["text"])]
 
 
-def InvocationTerm(ctx, parentData, node):
-    return engine.doEval(ctx, parentData, node["children"][0])
+def invocation_term(ctx, parentData, node):
+    return engine.do_eval(ctx, parentData, node["children"][0])
 
 
-def InvocationExpression(ctx, parentData, node):
+def invocation_expression(ctx, parentData, node):
     return list(
         reduce(
-            lambda accumulator, children: engine.doEval(ctx, accumulator, children),
+            lambda accumulator, children: engine.do_eval(ctx, accumulator, children),
             node["children"],
             parentData,
         )
     )
 
 
-def ParamList(ctx, parentData, node):
+def param_list(ctx, parentData, node):
     # we do not eval param list because sometimes it should be passed as
     # lambda/macro (for example in case of where(...)
     return node
 
 
-def UnionExpression(ctx, parentData, node):
-    return engine.infixInvoke(ctx, "|", parentData, node["children"])
+def union_expression(ctx, parentData, node):
+    return engine.infix_invoke(ctx, "|", parentData, node["children"])
 
 
-def ThisInvocation(ctx, parentData, node):
+def this_invocation(ctx, parentData, node):
     return util.arraify(ctx["currentData"])
 
 
-def OpExpression(ctx, parentData, node):
+def op_expression(ctx, parentData, node):
     op = node["terminalNodeText"][0]
-    return engine.infixInvoke(ctx, op, parentData, node["children"])
+    return engine.infix_invoke(ctx, op, parentData, node["children"])
 
 
-def AliasOpExpression(mapFn):
+def alias_op_expression(mapFn):
     def func(ctx, parentData, node):
         op = node["terminalNodeText"][0]
 
@@ -64,33 +64,33 @@ def AliasOpExpression(mapFn):
             )
 
         alias = mapFn[op]
-        return engine.infixInvoke(ctx, alias, parentData, node["children"])
+        return engine.infix_invoke(ctx, alias, parentData, node["children"])
 
     return func
 
 
-def TermExpression(ctx, parentData, node):
-    return engine.doEval(ctx, parentData, node["children"][0])
+def term_expression(ctx, parentData, node):
+    return engine.do_eval(ctx, parentData, node["children"][0])
 
 
-def NullLiteral():
+def null_literal():
     return []
 
 
-def ParenthesizedTerm(ctx, parentData, node):
-    return engine.doEval(ctx, parentData, node["children"][0])
+def parenthesized_term(ctx, parentData, node):
+    return engine.do_eval(ctx, parentData, node["children"][0])
 
 
-def LiteralTerm(ctx, parentData, node):
+def literal_term(ctx, parentData, node):
     term = node["children"][0]
 
     if term:
-        return engine.doEval(ctx, parentData, term)
+        return engine.do_eval(ctx, parentData, term)
 
     return [node["text"]]
 
 
-def StringLiteral(ctx, parentData, node):
+def string_literal(ctx, parentData, node):
     # Remove the beginning and ending quotes.
     rtn = re.sub(r"^['\"]|['\"]$", "", node["text"])
 
@@ -112,7 +112,7 @@ def StringLiteral(ctx, parentData, node):
     return [rtn]
 
 
-def QuantityLiteral(ctx, parentData, node):
+def quantity_literal(ctx, parentData, node):
     valueNode = node["children"][0]
     value = float(valueNode["terminalNodeText"][0])
     unitNode = valueNode["children"][0]
@@ -124,19 +124,19 @@ def QuantityLiteral(ctx, parentData, node):
     return [nodes.FP_Quantity(value, unit)]
 
 
-def DateTimeLiteral(ctx, parentData, node):
+def date_time_literal(ctx, parentData, node):
     dateStr = node["text"][:1]
     return [nodes.FP_DateTime(dateStr)]
 
 
-def TimeLiteral(ctx, parentData, node):
+def time_literal(ctx, parentData, node):
     timeStr = node["text"][:1]
     return [nodes.FP_Time(timeStr)]
 
 
-def createReduceMemberInvocation(model, key):
+def create_reduce_member_invocation(model, key):
     def func(acc, res):
-        res = nodes.ResourceNode.makeResNode(res)
+        res = nodes.ResourceNode.create_node(res)
 
         childPath = ""
         if res.path is not None:
@@ -162,45 +162,45 @@ def createReduceMemberInvocation(model, key):
         else:
             toAdd = res.data[key]
 
-        if util.isSome(toAdd):
+        if util.is_some(toAdd):
             if isinstance(toAdd, list):
                 mapped = list(
-                    map(lambda x: nodes.ResourceNode.makeResNode(x, childPath), toAdd)
+                    map(lambda x: nodes.ResourceNode.create_node(x, childPath), toAdd)
                 )
                 acc = acc + mapped
             else:
-                acc.append(nodes.ResourceNode.makeResNode(toAdd, childPath))
+                acc.append(nodes.ResourceNode.create_node(toAdd, childPath))
             return acc
         return acc
 
     return func
 
 
-def MemberInvocation(ctx, parentData, node):
-    key = engine.doEval(ctx, parentData, node["children"][0])[0]
+def member_invocation(ctx, parentData, node):
+    key = engine.do_eval(ctx, parentData, node["children"][0])[0]
     model = ctx["model"]
 
     if isinstance(parentData, list):
-        if util.isCapitalized(key):
+        if util.is_capitalized(key):
             filtered = list(filter(lambda x: x["resourceType"] == key, parentData))
             mapped = list(
-                map(lambda x: nodes.ResourceNode.makeResNode(x, key), filtered)
+                map(lambda x: nodes.ResourceNode.create_node(x, key), filtered)
             )
             return mapped
 
-        return list(reduce(createReduceMemberInvocation(model, key), parentData, []))
+        return list(reduce(create_reduce_member_invocation(model, key), parentData, []))
 
     return []
 
 
-def IndexerExpression(ctx, parentData, node):
+def indexer_expression(ctx, parentData, node):
     coll_node = node["children"][0]
     idx_node = node["children"][1]
 
-    coll = engine.doEval(ctx, parentData, coll_node)
-    idx = engine.doEval(ctx, parentData, idx_node)
+    coll = engine.do_eval(ctx, parentData, coll_node)
+    idx = engine.do_eval(ctx, parentData, idx_node)
 
-    if util.isEmpty(idx):
+    if util.is_empty(idx):
         return []
 
     idxNum = int(idx[0])
@@ -211,32 +211,32 @@ def IndexerExpression(ctx, parentData, node):
     return []
 
 
-def Functn(ctx, parentData, node):
-    return list(map(lambda x: engine.doEval(ctx, parentData, x), node["children"]))
+def functn(ctx, parentData, node):
+    return list(map(lambda x: engine.do_eval(ctx, parentData, x), node["children"]))
 
 
-def FunctionInvocation(ctx, parentData, node):
-    args = engine.doEval(ctx, parentData, node["children"][0])
-    fnName = args[0]
+def function_invocation(ctx, parentData, node):
+    args = engine.do_eval(ctx, parentData, node["children"][0])
+    fn_name = args[0]
     args = args[1:]
 
-    rawParams = None
+    raw_params = None
     if isinstance(args, list) and len(args) > 0 and "children" in args[0]:
-        rawParams = args[0]["children"]
+        raw_params = args[0]["children"]
 
-    return engine.doInvoke(ctx, fnName, parentData, rawParams)
+    return engine.doInvoke(ctx, fn_name, parentData, raw_params)
 
 
-def PolarityExpression(ctx, parentData, node):
+def polarity_expression(ctx, parentData, node):
     sign = node["terminalNodeText"][0]
-    rtn = engine.doEval(ctx, parentData, node["children"][0])
+    rtn = engine.do_eval(ctx, parentData, node["children"][0])
 
     if len(rtn) != 1:  # not yet in spec, but per Bryn Rhodes
         raise Exception(
             "Unary " + sign + " can only be applied to an individual number."
         )
 
-    if not util.isNumber(rtn[0]):
+    if not util.is_number(rtn[0]):
         raise Exception("Unary " + sign + " can only be applied to a number.")
 
     if sign == "-":
@@ -246,34 +246,36 @@ def PolarityExpression(ctx, parentData, node):
 
 
 evaluators = {
-    "Functn": Functn,
-    "ParamList": ParamList,
-    "Identifier": Identifier,
+    "Functn": functn,
+    "ParamList": param_list,
+    "Identifier": identifier,
     # terms
-    "NullLiteral": NullLiteral,
-    "LiteralTerm": LiteralTerm,
-    "NumberLiteral": NumberLiteral,
-    "StringLiteral": StringLiteral,
-    "BooleanLiteral": BooleanLiteral,
-    "InvocationTerm": InvocationTerm,
-    "ParenthesizedTerm": ParenthesizedTerm,
+    "NullLiteral": null_literal,
+    "LiteralTerm": literal_term,
+    "NumberLiteral": number_literal,
+    "StringLiteral": string_literal,
+    "BooleanLiteral": boolean_literal,
+    "InvocationTerm": invocation_term,
+    "ParenthesizedTerm": parenthesized_term,
     # Invocations
-    "ThisInvocation": ThisInvocation,
-    "MemberInvocation": MemberInvocation,
-    "FunctionInvocation": FunctionInvocation,
+    "ThisInvocation": this_invocation,
+    "MemberInvocation": member_invocation,
+    "FunctionInvocation": function_invocation,
     # expressions
-    "PolarityExpression": PolarityExpression,
-    "IndexerExpression": IndexerExpression,
-    "MembershipExpression": AliasOpExpression({"contains": "containsOp", "in": "inOp"}),
-    "TermExpression": TermExpression,
-    "UnionExpression": UnionExpression,
-    "InvocationExpression": InvocationExpression,
-    "InequalityExpression": OpExpression,
-    "AdditiveExpression": OpExpression,
-    "MultiplicativeExpression": OpExpression,
-    "EqualityExpression": OpExpression,
-    "OrExpression": OpExpression,
-    "ImpliesExpression": OpExpression,
-    "AndExpression": OpExpression,
-    "XorExpression": OpExpression,
+    "PolarityExpression": polarity_expression,
+    "IndexerExpression": indexer_expression,
+    "MembershipExpression": alias_op_expression(
+        {"contains": "containsOp", "in": "inOp"}
+    ),
+    "TermExpression": term_expression,
+    "UnionExpression": union_expression,
+    "InvocationExpression": invocation_expression,
+    "InequalityExpression": op_expression,
+    "AdditiveExpression": op_expression,
+    "MultiplicativeExpression": op_expression,
+    "EqualityExpression": op_expression,
+    "OrExpression": op_expression,
+    "ImpliesExpression": op_expression,
+    "AndExpression": op_expression,
+    "XorExpression": op_expression,
 }

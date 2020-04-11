@@ -5,7 +5,7 @@ This file holds code to hande the FHIRPath Math functions.
 """
 
 
-def containsImpl(a, b):
+def contains_impl(a, b):
     # b is assumed to have one element and it tests whether b[0] is in a
     if len(b) == 0:
         return True
@@ -27,7 +27,7 @@ def contains(a, b):
             "Expected singleton on right side of contains, got " + json.dumps(b)
         )
 
-    return containsImpl(a, b)
+    return contains_impl(a, b)
 
 
 def inn(a, b):
@@ -38,4 +38,4 @@ def inn(a, b):
     if len(a) > 1:
         raise Exception("Expected singleton on right side of in, got " + json.dumps(b))
 
-    return containsImpl(b, a)
+    return contains_impl(b, a)
