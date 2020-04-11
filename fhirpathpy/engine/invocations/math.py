@@ -11,7 +11,7 @@ Adds the math functions to the given FHIRPath engine.
 def is_empty(x):
     if util.is_number(x):
         return False
-    return len(x) == 0
+    return util.is_empty(x)
 
 
 def ensure_number_singleton(x):
