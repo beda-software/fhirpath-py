@@ -5,7 +5,7 @@ This file holds code to hande the FHIRPath Math functions.
 """
 
 
-def contains_impl(a, b):
+def contains_impl(ctx, a, b):
     # b is assumed to have one element and it tests whether b[0] is in a
     if len(b) == 0:
         return True
@@ -17,7 +17,7 @@ def contains_impl(a, b):
     return False
 
 
-def contains(a, b):
+def contains(ctx, a, b):
     if len(b) == 0:
         return []
     if len(a) == 0:
@@ -30,7 +30,7 @@ def contains(a, b):
     return contains_impl(a, b)
 
 
-def inn(a, b):
+def inn(ctx, a, b):
     if len(a) == 0:
         return []
     if len(b) == 0:

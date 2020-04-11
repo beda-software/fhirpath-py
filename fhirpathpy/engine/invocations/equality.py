@@ -7,14 +7,14 @@ This file holds code to hande the FHIRPath Math functions.
 """
 
 
-def equality(x, y):
+def equality(ctx, x, y):
     if util.is_empty(x) or util.is_empty(y):
         return False
 
     return x == y
 
 
-def equivalence(x, y):
+def equivalence(ctx, x, y):
     if util.is_empty(x) and util.is_empty(y):
         return True
 
@@ -24,20 +24,20 @@ def equivalence(x, y):
     return x == y
 
 
-def equal(a, b):
-    return [equality(a, b)]
+def equal(ctx, a, b):
+    return [equality(ctx, a, b)]
 
 
-def unequal(a, b):
-    return [not equality(a, b)]
+def unequal(ctx, a, b):
+    return [not equality(ctx, a, b)]
 
 
-def equival(a, b):
-    return [equivalence(a, b)]
+def equival(ctx, a, b):
+    return [equivalence(ctx, a, b)]
 
 
-def unequival(a, b):
-    return [not equivalence(a, b)]
+def unequival(ctx, a, b):
+    return [not equivalence(ctx, a, b)]
 
 
 def check_length(value):
@@ -104,7 +104,7 @@ def typecheck(a, b):
     return [a, b]
 
 
-def lt(a, b):
+def lt(ctx, a, b):
     if len(a) == 0 or len(b) == 0:
         return []
 
@@ -118,7 +118,7 @@ def lt(a, b):
     return a0 < b0
 
 
-def gt(a, b):
+def gt(ctx, a, b):
     if len(a) == 0 or len(b) == 0:
         return []
 
@@ -132,7 +132,7 @@ def gt(a, b):
     return a0 > b0
 
 
-def lte(a, b):
+def lte(ctx, a, b):
     if len(a) == 0 or len(b) == 0:
         return []
 
@@ -146,7 +146,7 @@ def lte(a, b):
     return a0 <= b0
 
 
-def gte(a, b):
+def gte(ctx, a, b):
     if len(a) == 0 or len(b) == 0:
         return []
 

@@ -9,21 +9,21 @@ import fhirpathpy.engine.util as util
 """
 
 
-def where_macro(data, expr):
+def where_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
     return util.flatten([x for x in data if expr(x)[0]])
 
 
-def select_macro(data, expr):
+def select_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
     return util.flatten([x for x in data if expr(x)])
 
 
-def repeat_macro(data, expr):
+def repeat_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
@@ -45,7 +45,7 @@ def repeat_macro(data, expr):
 
 
 # TODO: behavior on object?
-def single_fn(x):
+def single_fn(ctx, x):
     if len(x) == 1:
         return x
 
@@ -56,28 +56,28 @@ def single_fn(x):
     return {"$status": "error", "$error": "Expected single"}
 
 
-def first_fn(x):
+def first_fn(ctx, x):
     return x[0]
 
 
-def last_fn(x):
+def last_fn(ctx, x):
     return x[-1]
 
 
-def tail_fn(x):
+def tail_fn(ctx, x):
     return x[1:]
 
 
-def take_fn(x, n):
+def take_fn(ctx, x, n):
     return x[: int(n)]
 
 
-def skip_fn(x, n):
+def skip_fn(ctx, x, n):
     return x[int(n) :]
 
 
 # TODO test
-def check_fhir_type(x, tp):
+def check_fhir_type(ctx, x, tp):
     if type(x) == tp:
         return True
 
@@ -90,5 +90,5 @@ def check_fhir_type(x, tp):
     return False
 
 
-def of_type_fn(coll, type):
+def of_type_fn(ctx, coll, type):
     return list(filter(lambda x: check_fhir_type(util.get_data(x), type), coll))  # TODO

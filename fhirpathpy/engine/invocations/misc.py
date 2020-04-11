@@ -10,19 +10,19 @@ intRegex = re.compile(r"^[+-]?\d+$")
 numRegex = re.compile(r"^[+-]?\d+(\.\d+)?$")
 
 
-def iif_macro(data, cond, ok, fail):
+def iif_macro(ctx, data, cond, ok, fail):
     if util.is_true(cond(data)):
         return ok(data)
 
     return fail(data)
 
 
-def trace_fn(x, label=""):
+def trace_fn(ctx, x, label=""):
     # print("TRACE:[" + label + "]", json.dumps(x))
     return x
 
 
-def to_integer(coll):
+def to_integer(ctx, coll):
     if len(coll) != 1:
         return []
 
@@ -49,7 +49,7 @@ def to_integer(coll):
     return []
 
 
-def to_decimal(coll):
+def to_decimal(ctx, coll):
     if len(coll) != 1:
         return []
 
@@ -73,7 +73,7 @@ def to_decimal(coll):
     return []
 
 
-def to_string(coll):
+def to_string(ctx, coll):
     if len(coll) != 1:
         return []
 
@@ -85,7 +85,7 @@ def to_string(coll):
 # @param timeType The string name of a class for a time type (e.g. "FP_DateTime").
 
 
-def to_date_time(coll):
+def to_date_time(ctx, coll):
     ln = len(coll)
     rtn = []
     if ln > 1:
@@ -102,7 +102,7 @@ def to_date_time(coll):
     return rtn
 
 
-def to_time(coll):
+def to_time(ctx, coll):
     ln = len(coll)
     rtn = []
     if ln > 1:

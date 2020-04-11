@@ -43,7 +43,7 @@ def do_eval(ctx, parentData, node):
     raise Exception("No " + node_type + " evaluator ")
 
 
-def doInvoke(ctx, fn_name, data, rawParams):
+def doInvoke(ctx, fn_name, data, raw_params):
     if isinstance(fn_name, list) and len(fn_name) == 1:
         fn_name = fn_name[0]
 
@@ -53,15 +53,15 @@ def doInvoke(ctx, fn_name, data, rawParams):
     invocation = invocations[fn_name]
 
     if not "arity" in invocation:
-        if rawParams is None or util.is_empty(rawParams):
-            res = invocation["fn"](util.arraify(data))
+        if raw_params is None or util.is_empty(raw_params):
+            res = invocation["fn"](ctx, util.arraify(data))
             return util.arraify(res)
 
         raise Exception(fn_name + " expects no params")
 
     paramsNumber = 0
-    if isinstance(rawParams, list):
-        paramsNumber = len(rawParams)
+    if isinstance(raw_params, list):
+        paramsNumber = len(raw_params)
 
     if not paramsNumber in invocation["arity"]:
         print(fn_name + " wrong arity: got " + str(paramsNumber))
@@ -72,10 +72,11 @@ def doInvoke(ctx, fn_name, data, rawParams):
 
     for i in range(0, paramsNumber):
         tp = argTypes[i]
-        pr = rawParams[i]
+        pr = raw_params[i]
         params.append(make_param(ctx, data, tp, pr))
 
     params.insert(0, data)
+    params.insert(0, ctx)
 
     if "nullable" in invocation:
         if any(util.is_nullable(x) for x in params):
@@ -143,12 +144,12 @@ def make_param(ctx, parentData, node_type, param):
     return check(res[0])
 
 
-def infix_invoke(ctx, fn_name, data, rawParams):
+def infix_invoke(ctx, fn_name, data, raw_params):
     if not fn_name in invocations or not "fn" in invocations[fn_name]:
         raise Exception("Not implemented " + fn_name)
 
     invocation = invocations[fn_name]
-    paramsNumber = len(rawParams)
+    paramsNumber = len(raw_params)
 
     if paramsNumber != 2:
         raise Exception("Infix invoke should have arity 2")
@@ -156,11 +157,11 @@ def infix_invoke(ctx, fn_name, data, rawParams):
     argTypes = invocation["arity"][paramsNumber]
 
     if argTypes is not None:
-        params = []
+        params = [ctx]
 
         for i in range(0, paramsNumber):
             argType = argTypes[i]
-            rawParam = rawParams[i]
+            rawParam = raw_params[i]
             params.append(make_param(ctx, data, argType, rawParam))
 
         if "nullable" in invocation:

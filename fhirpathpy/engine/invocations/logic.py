@@ -1,4 +1,4 @@
-def or_op(a, b):
+def or_op(ctx, a, b):
     if isinstance(b, list):
         if a == True:
             return True
@@ -14,7 +14,7 @@ def or_op(a, b):
     return a or b
 
 
-def and_op(a, b):
+def and_op(ctx, a, b):
     if isinstance(b, list):
         if a == True:
             return []
@@ -31,7 +31,7 @@ def and_op(a, b):
     return a and b
 
 
-def xor_op(a, b):
+def xor_op(ctx, a, b):
     # If a or b are arrays, they must be the empty set.
     # In that case, the result is always the empty set.
     if isinstance(a, list) or isinstance(b, list):
@@ -40,7 +40,7 @@ def xor_op(a, b):
     return (a and not b) or (not a and b)
 
 
-def implies_op(a, b):
+def implies_op(ctx, a, b):
     if isinstance(b, list):
         if a == True:
             return []

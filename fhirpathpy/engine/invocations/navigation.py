@@ -5,8 +5,8 @@ import fhirpathpy.engine.nodes as nodes
 create_node = nodes.ResourceNode.create_node
 
 
-def create_reduce_children(ctx={}):
-    model = {}  # @TODO use ctx
+def create_reduce_children(ctx):
+    model = ctx["model"]
 
     def func(acc, res):
         data = util.get_data(res)
@@ -33,15 +33,15 @@ def create_reduce_children(ctx={}):
     return func
 
 
-def children(coll):
-    return reduce(create_reduce_children(), coll, [])
+def children(ctx, coll):
+    return reduce(create_reduce_children(ctx), coll, [])
 
 
-def descendants(coll):
+def descendants(ctx, coll):
     res = []
-    ch = children(coll)
+    ch = children(ctx, coll)
     while len(ch) > 0:
         res = res + ch
-        ch = children(ch)
+        ch = children(ctx, ch)
 
     return res

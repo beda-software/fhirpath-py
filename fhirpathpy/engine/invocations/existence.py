@@ -9,17 +9,17 @@ This file holds code to hande the FHIRPath Existence functions
 """
 
 
-def empty_fn(value):
+def empty_fn(ctx, value):
     return util.is_empty(value)
 
 
-def count_fn(value):
+def count_fn(ctx, value):
     if isinstance(value, list):
         return len(value)
     return 0
 
 
-def not_fn(x):
+def not_fn(ctx, x):
     if len(x) != 1:
         return []
 
@@ -31,15 +31,15 @@ def not_fn(x):
     return []
 
 
-def exists_macro(coll, expr=None):
+def exists_macro(ctx, coll, expr=None):
     vec = coll
     if expr is not None:
-        return exists_macro(filtering.where_macro(coll, expr))
+        return exists_macro(ctx, filtering.where_macro(ctx, coll, expr))
 
     return not util.is_empty(vec)
 
 
-def all_macro(colls, expr):
+def all_macro(ctx, colls, expr):
     for coll in colls:
         if not util.is_true(expr(coll)):
             return [False]
@@ -54,37 +54,37 @@ def extract_boolean_value(data):
     return value
 
 
-def all_true_fn(items):
+def all_true_fn(ctx, items):
     return [all(extract_boolean_value(item) for item in items)]
 
 
-def any_true_fn(items):
+def any_true_fn(ctx, items):
     return [any(extract_boolean_value(item) for item in items)]
 
 
-def all_false_fn(items):
+def all_false_fn(ctx, items):
     return [all(not extract_boolean_value(item) for item in items)]
 
 
-def any_false_fn(items):
+def any_false_fn(ctx, items):
     return [any(not extract_boolean_value(item) for item in items)]
 
 
-def subset_of(coll1, coll2):
+def subset_of(ctx, coll1, coll2):
     return all(item in coll2 for item in coll1)
 
 
-def subset_of_fn(coll1, coll2):
-    return [subset_of(coll1, coll2)]
+def subset_of_fn(ctx, coll1, coll2):
+    return [subset_of(ctx, coll1, coll2)]
 
 
-def superset_of_fn(coll1, coll2):
-    return [subset_of(coll2, coll1)]
+def superset_of_fn(ctx, coll1, coll2):
+    return [subset_of(ctx, coll2, coll1)]
 
 
-def distinct_fn(x):
+def distinct_fn(ctx, x):
     return list(set(x))
 
 
-def isdistinct_fn(x):
-    return [len(x) == len(distinct_fn(x))]
+def isdistinct_fn(ctx, x):
+    return [len(x) == len(distinct_fn(ctx, x))]
