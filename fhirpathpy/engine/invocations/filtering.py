@@ -13,17 +13,14 @@ def where_macro(data, expr):
     if not isinstance(data, list):
         return []
 
-    filtered = list(filter(lambda x: expr(x)[0], data))
-    return util.flatten(filtered)
+    return util.flatten([x for x in data if expr(x)[0]])
 
 
 def select_macro(data, expr):
     if not isinstance(data, list):
         return []
 
-    mapped = list(filter(lambda x: expr(x), data))
-
-    return util.flatten(mapped)
+    return util.flatten([x for x in data if expr(x)])
 
 
 def repeat_macro(data, expr):
@@ -94,4 +91,4 @@ def check_fhir_type(x, tp):
 
 
 def of_type_fn(coll, type):
-    return list(filter(lambda x: check_fhir_type(util.get_data(x), type), coll))
+    return list(filter(lambda x: check_fhir_type(util.get_data(x), type), coll))  # TODO

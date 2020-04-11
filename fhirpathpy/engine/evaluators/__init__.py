@@ -164,9 +164,7 @@ def create_reduce_member_invocation(model, key):
 
         if util.is_some(toAdd):
             if isinstance(toAdd, list):
-                mapped = list(
-                    map(lambda x: nodes.ResourceNode.create_node(x, childPath), toAdd)
-                )
+                mapped = [nodes.ResourceNode.create_node(x, childPath) for x in toAdd]
                 acc = acc + mapped
             else:
                 acc.append(nodes.ResourceNode.create_node(toAdd, childPath))
@@ -182,10 +180,9 @@ def member_invocation(ctx, parentData, node):
 
     if isinstance(parentData, list):
         if util.is_capitalized(key):
-            filtered = list(filter(lambda x: x["resourceType"] == key, parentData))
-            mapped = list(
-                map(lambda x: nodes.ResourceNode.create_node(x, key), filtered)
-            )
+            filtered = [x for x in parentData if x["resourceType"] == key]
+            mapped = [nodes.ResourceNode.create_node(x, key) for x in filtered]
+
             return mapped
 
         return list(reduce(create_reduce_member_invocation(model, key), parentData, []))
@@ -205,14 +202,14 @@ def indexer_expression(ctx, parentData, node):
 
     idxNum = int(idx[0])
 
-    if coll is not None and util.isSome(idxNum) and len(coll) > idxNum and idxNum >= 0:
+    if coll is not None and util.is_some(idxNum) and len(coll) > idxNum and idxNum >= 0:
         return [coll[idxNum]]
 
     return []
 
 
 def functn(ctx, parentData, node):
-    return list(map(lambda x: engine.do_eval(ctx, parentData, x), node["children"]))
+    return [engine.do_eval(ctx, parentData, x) for x in node["children"]]
 
 
 def function_invocation(ctx, parentData, node):

@@ -36,7 +36,7 @@ def apply_parsed_path(resource, parsedPath, context={}, model=None):
         data = get_data(node)
 
         if isinstance(node, list):
-            return list(map(visit, data))
+            return [visit(item) for item in data]
 
         if isinstance(data, dict) and not isinstance(data, FP_Type):
             for key, value in data.items():

@@ -24,7 +24,7 @@ def create_reduce_children(ctx={}):
                         childPath = model["pathsDefinedElsewhere"][childPath]
 
                 if isinstance(value, list):
-                    mapped = list(map(lambda n: create_node(n, childPath), value))
+                    mapped = [create_node(n, childPath) for n in value]
                     acc = acc + mapped
                 else:
                     acc.append(create_node(value, childPath))
