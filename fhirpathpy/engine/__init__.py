@@ -64,8 +64,7 @@ def doInvoke(ctx, fn_name, data, raw_params):
         paramsNumber = len(raw_params)
 
     if not paramsNumber in invocation["arity"]:
-        print(fn_name + " wrong arity: got " + str(paramsNumber))
-        return []
+        raise Exception(fn_name + " wrong arity: got " + str(paramsNumber))
 
     params = []
     argTypes = invocation["arity"][paramsNumber]
