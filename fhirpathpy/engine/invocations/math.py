@@ -1,4 +1,3 @@
-import json
 import math
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
@@ -18,12 +17,12 @@ def ensure_number_singleton(x):
     data = util.get_data(x)
     if not util.is_number(data):
         if not isinstance(data, list) or len(data) != 1:
-            raise Exception("Expected list with number, but got " + json.dumps(data))
+            raise Exception("Expected list with number, but got " + str(data))
 
         value = util.get_data(data[0])
 
         if not util.is_number(value):
-            raise Exception("Expected number, but got " + json.dumps(x))
+            raise Exception("Expected number, but got " + str(x))
 
         return value
     return data
@@ -44,7 +43,7 @@ def minus(ctx, xs, ys):
         if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
             return x.plus(nodes.FP_Quantity(-y.value, y.unit))
 
-    raise Exception("Cannot " + json.dumps(xs) + " - " + json.dumps(ys))
+    raise Exception("Cannot " + str(xs) + " - " + str(ys))
 
 
 def mul(ctx, x, y):
@@ -67,7 +66,7 @@ def mod(ctx, x, y):
 # Actually, "minus" is now also polymorphic
 def plus(ctx, xs, ys):
     if len(xs) != 1 or len(ys) != 1:
-        raise Exception("Cannot " + json.dumps(xs) + " + " + json.dumps(ys))
+        raise Exception("Cannot " + str(xs) + " + " + str(ys))
 
     x = util.get_data(xs[0])
     y = util.get_data(ys[0])
