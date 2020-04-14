@@ -1,5 +1,4 @@
 import re
-import json
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 
@@ -18,7 +17,7 @@ def iif_macro(ctx, data, cond, ok, fail):
 
 
 def trace_fn(ctx, x, label=""):
-    # print("TRACE:[" + label + "]", json.dumps(x))
+    print("TRACE:[" + label + "]", str(x))
     return x
 
 
