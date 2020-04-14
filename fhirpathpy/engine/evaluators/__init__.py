@@ -14,7 +14,10 @@ def boolean_literal(ctx, parentData, node):
 
 
 def number_literal(ctx, parentData, node):
-    return [float(node["text"])]
+    float_number = float(node["text"])
+    int_number = int(float_number)
+
+    return [int_number] if float_number == int_number else [float_number]
 
 
 def identifier(ctx, parentData, node):
