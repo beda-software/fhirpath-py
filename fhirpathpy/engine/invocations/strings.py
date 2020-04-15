@@ -1,14 +1,15 @@
 import re
-import json
 import fhirpathpy.engine.util as util
 
 
 def ensure_string_singleton(x):
-    d = util.get_data(x[0])
-    if len(x) == 1 and type(d) == str:
-        return d
+    if len(x) == 1:
+        d = util.get_data(x[0])
+        if type(d) == str:
+            return d
+        raise Exception("Expected string, but got " + str(d))
 
-    raise Exception("Expected string, but got " + json.dumps(d))
+    raise Exception("Expected string, but got " + str(x))
 
 
 def index_of(ctx, coll, substr):
@@ -16,10 +17,14 @@ def index_of(ctx, coll, substr):
     return string.index(substr)
 
 
-def substring(ctx, coll, start, length):
-    start = int(start)
-    length = int(length)
+def substring(ctx, coll, start, length=None):
     string = ensure_string_singleton(coll)
+    start = int(start)
+
+    if length is None:
+        return string[start:]
+
+    length = int(length)
     return string[start : start + length]
 
 
