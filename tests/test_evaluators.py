@@ -189,7 +189,7 @@ def misc_functions_test(resource, path, expected):
 @pytest.mark.parametrize(
     ("resource", "path", "expected"),
     [
-        ({"numbers": [1, 2], "booleans": [True]}, "numbers | booleans", [1, 2]),
+        ({"numbers": [1, 2], "booleans": [True]}, "numbers | booleans", [1, 2, True]),
         (
             {"numbers": [1, 2], "booleans": [True, False]},
             "numbers.combine(booleans)",
