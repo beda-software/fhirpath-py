@@ -9,11 +9,19 @@ import fhirpathpy.engine.util as util
 """
 
 
+def check_macro_expr(expr, x):
+    result = expr(x)
+    if len(result) > 0:
+        return expr(x)[0]
+
+    return False
+
+
 def where_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
-    return util.flatten([x for x in data if expr(x)[0]])
+    return util.flatten([x for x in data if check_macro_expr(expr, x)])
 
 
 def select_macro(ctx, data, expr):
@@ -57,22 +65,32 @@ def single_fn(ctx, x):
 
 
 def first_fn(ctx, x):
+    if len(x) == 0:
+        return []
     return x[0]
 
 
 def last_fn(ctx, x):
+    if len(x) == 0:
+        return []
     return x[-1]
 
 
 def tail_fn(ctx, x):
+    if len(x) == 0:
+        return []
     return x[1:]
 
 
 def take_fn(ctx, x, n):
+    if len(x) == 0:
+        return []
     return x[: int(n)]
 
 
 def skip_fn(ctx, x, n):
+    if len(x) == 0:
+        return []
     return x[int(n) :]
 
 
