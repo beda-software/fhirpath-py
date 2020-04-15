@@ -23,7 +23,7 @@ def contains(ctx, a, b):
     if len(b) > 1:
         raise Exception("Expected singleton on right side of contains, got " + str(b))
 
-    return contains_impl(a, b)
+    return contains_impl(ctx, a, b)
 
 
 def inn(ctx, a, b):
@@ -34,4 +34,4 @@ def inn(ctx, a, b):
     if len(a) > 1:
         raise Exception("Expected singleton on right side of in, got " + str(b))
 
-    return contains_impl(b, a)
+    return contains_impl(ctx, b, a)
