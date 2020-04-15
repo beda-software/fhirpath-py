@@ -93,6 +93,26 @@ def literal_term(ctx, parentData, node):
     return [node["text"]]
 
 
+# TODO
+def external_constant_term(ctx, parentData, node):
+    extConstant = node["children"][0]
+    extIdentifier = extConstant["children"][0]
+    varName = identifier(ctx, parentData, extIdentifier)[0]
+
+    if not varName in ctx["vars"]:
+        return []
+
+    value = ctx["vars"][varName]
+
+    # For convenience, we all variable values to be passed in without their array
+    # wrapper.  However, when evaluating, we need to put the array back in.
+
+    if not isinstance(value, list):
+        return [value]
+
+    return value
+
+
 def string_literal(ctx, parentData, node):
     # Remove the beginning and ending quotes.
     rtn = re.sub(r"^['\"]|['\"]$", "", node["text"])
