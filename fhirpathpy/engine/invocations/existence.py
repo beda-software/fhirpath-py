@@ -83,6 +83,15 @@ def superset_of_fn(ctx, coll1, coll2):
 
 
 def distinct_fn(ctx, x):
+    if all([isinstance(v, nodes.ResourceNode) for v in x]):
+        data = [v.data for v in x]
+        unique = []
+        for x in data:
+            if x not in unique:
+                unique.append(x)
+        
+        return [nodes.ResourceNode.create_node(item) for item in unique]
+
     return list(set(x))
 
 
