@@ -1,0 +1,24 @@
+tests:
+  - desc: '6.4.2 |'
+  - expression: 'coll | coll2'
+    result:
+      - a: 1
+      - a: 2
+      - a: 3
+      - a: 4
+      - a: 5
+
+subject:
+  el:
+    a: 2
+  not_el:
+    a: 4
+  coll2:
+    - a: 3
+    - a: 4
+    - a: 5
+  coll:
+    - a: 1
+    - a: 2
+    - a: 3
+  emptycoll: []
