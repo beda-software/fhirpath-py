@@ -1,0 +1,50 @@
+tests:
+  - desc: '** Unioning colls'
+    expression: Functions.attrdouble | Functions.coll1.colltrue.attr
+    result: [1, 2, true]
+
+subject:
+  resourceType: Functions
+  attrempty: []
+  attrtrue: true
+  attrfalse: false
+  attrsingle:
+    - 1
+  attrdouble:
+    - 1
+    - 2
+  attrobject:
+    a: 1
+    b: 2
+    repeatingAttr: 5
+  repeatingAttr:
+    repeatingAttr:
+      a: 1
+    a: 2
+  coll1:
+    - coll2:
+        - attr: 1
+        - attr: 2
+        - attr: 3
+    - coll2:
+        - attr: 4
+        - attr: 5
+    - colltrue:
+        - attr: true
+        - attr: true
+        - attr: true
+    - collwithfalse:
+        - attr: false
+        - attr: true
+    - collfalse:
+        - attr: false
+        - attr: false
+    - mixed:
+        - attr: true
+        - attr: false
+        - attr: 'test string'
+        - attr: 999
+        - attr: 3.14159
+        - attr: '@2015-02-04T14:34:28Z'
+        - attr: '@T14:34:28+09:00'
+        - attr: 4 days
