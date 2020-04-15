@@ -3,16 +3,9 @@ import yaml
 import pytest
 import itertools
 
-import tests.context.r4 as r4
-import tests.context.stu3 as stu3
-
+from tests.context import models
+from tests.resources import resources
 from fhirpathpy import evaluate
-
-
-models = {
-    "r4": r4.model,
-    "stu3": stu3.model,
-}
 
 
 def pytest_collect_file(parent, path):
@@ -55,15 +48,22 @@ class YamlFile(pytest.File):
 
 
 class YamlItem(pytest.Item):
-    def __init__(self, name, parent, test, resource):
+    def __init__(self, name, parent, test, resource=None):
         super().__init__(name, parent)
 
         self.test = test
         self.resource = resource
 
     def runtest(self):
-        model = models[self.test["model"]] if "model" in self.test else None
+        
         expression = self.test["expression"]
+        resource = self.resource
+
+        model = models[self.test["model"]] if "model" in self.test else None
+
+        if 'inputfile' in self.test:
+            if self.test['inputfile'] in resources:
+                resource = resources[self.test['inputfile']]
 
         context = {}
 
