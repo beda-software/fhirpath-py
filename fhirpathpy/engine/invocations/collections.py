@@ -1,5 +1,3 @@
-import json
-
 """ 
 This file holds code to hande the FHIRPath Math functions.
 """
@@ -23,9 +21,7 @@ def contains(ctx, a, b):
     if len(a) == 0:
         return False
     if len(b) > 1:
-        raise Exception(
-            "Expected singleton on right side of contains, got " + json.dumps(b)
-        )
+        raise Exception("Expected singleton on right side of contains, got " + str(b))
 
     return contains_impl(a, b)
 
@@ -36,6 +32,6 @@ def inn(ctx, a, b):
     if len(b) == 0:
         return False
     if len(a) > 1:
-        raise Exception("Expected singleton on right side of in, got " + json.dumps(b))
+        raise Exception("Expected singleton on right side of in, got " + str(b))
 
     return contains_impl(b, a)
