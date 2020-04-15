@@ -26,8 +26,6 @@ def create_reduce_children(ctx):
                 if (
                     isinstance(model, dict)
                     and "pathsDefinedElsewhere" in model
-                    and isinstance(value, (int, str))
-                    and value in model["pathsDefinedElsewhere"]
                     and childPath in model["pathsDefinedElsewhere"]
                 ):
                     childPath = model["pathsDefinedElsewhere"][childPath]
