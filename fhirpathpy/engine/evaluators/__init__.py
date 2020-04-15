@@ -145,25 +145,35 @@ def create_reduce_member_invocation(model, key):
         if res.path is not None:
             childPath = res.path + "." + key
 
-        if model:
-            defPath = model["pathsDefinedElsewhere"][childPath]
-            if defPath:
-                childPath = defPath
+        if (
+            model is not None
+            and "pathsDefinedElsewhere" in model
+            and childPath in model["pathsDefinedElsewhere"]
+        ):
+            childPath = model["pathsDefinedElsewhere"][childPath]
 
         actualTypes = None
-        if model and model["choiceTypePaths"]:
+
+        if (
+            model is not None
+            and "choiceTypePaths" in model
+            and childPath in model["choiceTypePaths"]
+        ):
             actualTypes = model["choiceTypePaths"][childPath]
+
+        toAdd = None
 
         if isinstance(actualTypes, list):
             # Use actualTypes to find the field's value
             for actualType in actualTypes:
                 field = key + actualType
-                toAdd = res.data[field]
-                if toAdd:
+                if isinstance(res.data, (dict, list)) and field in res.data:
+                    toAdd = res.data[field]
                     childPath = actualType
                     break
         else:
-            toAdd = res.data[key]
+            if isinstance(res.data, (dict, list)) and key in res.data:
+                toAdd = res.data[key]
 
         if util.is_some(toAdd):
             if isinstance(toAdd, list):
@@ -255,8 +265,10 @@ evaluators = {
     "NumberLiteral": number_literal,
     "StringLiteral": string_literal,
     "BooleanLiteral": boolean_literal,
+    "QuantityLiteral": quantity_literal,
     "InvocationTerm": invocation_term,
     "ParenthesizedTerm": parenthesized_term,
+    "ExternalConstantTerm": external_constant_term,
     # Invocations
     "ThisInvocation": this_invocation,
     "MemberInvocation": member_invocation,
