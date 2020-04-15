@@ -72,7 +72,9 @@ def typecheck(a, b):
     lClass = a.__class__
     rClass = b.__class__
 
-    if lClass != rClass:
+    areNumbers = util.is_number(a) and util.is_number(b)
+
+    if lClass != rClass and not areNumbers:
         d = None
 
         # TODO refactor
