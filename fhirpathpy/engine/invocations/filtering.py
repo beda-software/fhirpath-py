@@ -94,7 +94,6 @@ def skip_fn(ctx, x, n):
     return x[int(n) :]
 
 
-# TODO test
 def check_fhir_type(ctx, x, tp):
     if type(x) == tp:
         return True
@@ -108,5 +107,5 @@ def check_fhir_type(ctx, x, tp):
     return False
 
 
-def of_type_fn(ctx, coll, type):
-    return list(filter(lambda x: check_fhir_type(util.get_data(x), type), coll))  # TODO
+def of_type_fn(ctx, coll, tp):
+    return list(filter(lambda x: check_fhir_type(ctx, util.get_data(x), tp), coll))
