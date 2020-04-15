@@ -108,8 +108,8 @@ def make_param(ctx, parentData, node_type, param):
         return do_eval(ctx, ctx["dataRoot"], param)
 
     if node_type == "Identifier":
-        if param.type == "TermExpression":
-            return param.text
+        if param['type'] == "TermExpression":
+            return param['text']
 
         raise Exception("Expected identifier node, got " + json.dumps(param))
 
