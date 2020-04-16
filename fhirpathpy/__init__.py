@@ -24,9 +24,9 @@ def apply_parsed_path(resource, parsedPath, context={}, model=None):
     However, we'll keep our own copy of dataRoot for internal processing.
     """
     vars = {"context": resource, "ucum": "http://unitsofmeasure.org"}
+    vars.update(context)
 
-    ctx = {"dataRoot": dataRoot, "vars": vars.update(context), "model": model}
-
+    ctx = {"dataRoot": dataRoot, "vars": vars, "model": model}
     node = do_eval(ctx, dataRoot, parsedPath["children"][0])
 
     # Resolve any internal "ResourceNode" instances.  Continue to let FP_Type
