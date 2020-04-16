@@ -14,7 +14,7 @@ def ensure_string_singleton(x):
 
 def index_of(ctx, coll, substr):
     string = ensure_string_singleton(coll)
-    return string.index(substr)
+    return string.find(substr)
 
 
 def substring(ctx, coll, start, length=None):
