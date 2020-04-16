@@ -1,7 +1,6 @@
 import json
 import yaml
 import pytest
-import itertools
 
 from tests.context import models
 from tests.resources import resources
@@ -41,7 +40,9 @@ class YamlFile(pytest.File):
 
     def collect_test(self, test, subject):
         name = test["desc"] if "desc" in test else ""
-        if "expression" in test:
+        is_disabled = "disable" in test and test["disable"]
+
+        if "expression" in test and not is_disabled:
             yield YamlItem.from_parent(
                 self, name=name, test=test, resource=subject,
             )
@@ -55,23 +56,20 @@ class YamlItem(pytest.Item):
         self.resource = resource
 
     def runtest(self):
-        
+
         expression = self.test["expression"]
         resource = self.resource
 
         model = models[self.test["model"]] if "model" in self.test else None
 
-        if 'inputfile' in self.test:
-            if self.test['inputfile'] in resources:
-                resource = resources[self.test['inputfile']]
+        if "inputfile" in self.test:
+            if self.test["inputfile"] in resources:
+                resource = resources[self.test["inputfile"]]
 
         context = {}
 
         if "error" in self.test and self.test["error"]:
             with pytest.raises(Exception):
-                evaluate(self.resource, expression, context, model)
+                evaluate(resource, expression, context, model)
         else:
-            assert (
-                evaluate(self.resource, expression, context, model)
-                == self.test["result"]
-            )
+            assert evaluate(resource, expression, context, model) == self.test["result"]
