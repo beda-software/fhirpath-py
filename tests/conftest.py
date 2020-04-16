@@ -43,9 +43,16 @@ class YamlFile(pytest.File):
         is_disabled = "disable" in test and test["disable"]
 
         if "expression" in test and not is_disabled:
-            yield YamlItem.from_parent(
-                self, name=name, test=test, resource=subject,
-            )
+            if isinstance(test['expression'], list):
+                for expression in test['expression']:
+                    test['expression'] = expression
+                    yield YamlItem.from_parent(
+                        self, name=name, test=test, resource=subject,
+                    )
+            else:
+                yield YamlItem.from_parent(
+                    self, name=name, test=test, resource=subject,
+                )
 
 
 class YamlItem(pytest.Item):
