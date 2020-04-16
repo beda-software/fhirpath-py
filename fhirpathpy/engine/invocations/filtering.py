@@ -95,14 +95,20 @@ def skip_fn(ctx, x, n):
 
 
 def check_fhir_type(ctx, x, tp):
-    if type(x) == tp:
+    if tp == "string" and type(x) == str:
         return True
 
-    if tp == "integer":
-        return int(x) == x
+    if tp == "boolean" and type(x) == bool:
+        return True
 
-    if tp == "decimal":
-        return isinstance(x, numbers.Number)
+    if tp == "object":
+        return isinstance(x, dict)
+
+    if tp == "integer" and type(x) == int:
+        return True
+
+    if tp == "decimal" and (type(x) == int or type(x) == float):
+        return True
 
     return False
 
