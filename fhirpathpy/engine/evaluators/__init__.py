@@ -94,10 +94,10 @@ def literal_term(ctx, parentData, node):
 
 
 # TODO
-def external_constant_term(ctx, parentData, node):
-    extConstant = node["children"][0]
-    extIdentifier = extConstant["children"][0]
-    varName = identifier(ctx, parentData, extIdentifier)[0]
+def external_constant_term(ctx, parent_data, node):
+    ext_constant = node["children"][0]
+    ext_identifier = ext_constant["children"][0]
+    varName = identifier(ctx, parent_data, ext_identifier)[0]
 
     if not varName in ctx["vars"]:
         return []
