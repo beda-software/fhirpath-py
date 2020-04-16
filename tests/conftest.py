@@ -43,9 +43,9 @@ class YamlFile(pytest.File):
         is_disabled = "disable" in test and test["disable"]
 
         if "expression" in test and not is_disabled:
-            if isinstance(test['expression'], list):
-                for expression in test['expression']:
-                    test['expression'] = expression
+            if isinstance(test["expression"], list):
+                for expression in test["expression"]:
+                    test["expression"] = expression
                     yield YamlItem.from_parent(
                         self, name=name, test=test, resource=subject,
                     )
@@ -73,10 +73,18 @@ class YamlItem(pytest.Item):
             if self.test["inputfile"] in resources:
                 resource = resources[self.test["inputfile"]]
 
-        context = {}
+        variables = {"resource": resource}
+
+        if "context" in self.test:
+            variables["context"] = evaluate(resource, self.test["context"])[0]
+
+        if "variables" in self.test:
+            variables.update(self.test["variables"])
 
         if "error" in self.test and self.test["error"]:
             with pytest.raises(Exception):
-                evaluate(resource, expression, context, model)
+                evaluate(resource, expression, variables, model)
         else:
-            assert evaluate(resource, expression, context, model) == self.test["result"]
+            assert (
+                evaluate(resource, expression, variables, model) == self.test["result"]
+            )
