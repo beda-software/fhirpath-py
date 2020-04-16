@@ -28,7 +28,7 @@ def select_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
-    return util.flatten([x for x in data if expr(x)])
+    return util.flatten([expr(x) for x in data])
 
 
 def repeat_macro(ctx, data, expr):
