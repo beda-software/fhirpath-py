@@ -27,5 +27,6 @@ setup(
     description="FHIRPath implementation in Python",
     license="",
     project_urls={"Source Code": "https://github.com/beda-software/fhirpath-py",},
+    install_requires=["antlr4-python3-runtime==4.8"],
     packages=find_packages(),
 )
