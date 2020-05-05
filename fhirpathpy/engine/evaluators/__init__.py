@@ -76,7 +76,7 @@ def term_expression(ctx, parentData, node):
     return engine.do_eval(ctx, parentData, node["children"][0])
 
 
-def null_literal():
+def null_literal(ctx, parentData, node):
     return []
 
 
