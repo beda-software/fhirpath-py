@@ -1,6 +1,7 @@
 import fhirpathpy.engine.invocations.collections as collections
 import fhirpathpy.engine.invocations.existence as existence
 import fhirpathpy.engine.invocations.filtering as filtering
+import fhirpathpy.engine.invocations.subsetting as subsetting
 import fhirpathpy.engine.invocations.strings as strings
 import fhirpathpy.engine.invocations.navigation as navigation
 import fhirpathpy.engine.invocations.combining as combining
@@ -33,6 +34,7 @@ invocations = {
     "tail": {"fn": filtering.tail_fn},
     "take": {"fn": filtering.take_fn, "arity": {1: ["Integer"]}},
     "skip": {"fn": filtering.skip_fn, "arity": {1: ["Integer"]}},
+    "intersect": {"fn": subsetting.intersect_fn, "arity": {1: ["AnyAtRoot"]}},
     "combine": {"fn": combining.combine_fn, "arity": {1: ["AnyAtRoot"]}},
     "iif": {"fn": misc.iif_macro, "arity": {3: ["Expr", "Expr", "Expr"]}},
     "trace": {"fn": misc.trace_fn, "arity": {0: [], 1: ["String"]}},
