@@ -114,6 +114,17 @@ def filtering_functions_test(resource, path, expected):
 @pytest.mark.parametrize(
     ("resource", "path", "expected"),
     [
+        ({"list_1": [1, 2, 3, 4], "list_2": [3, 5]}, "list_1.intersect([list_2])", [3]),
+        ({"list_1": [1, 2, 3, 4], "list_2": [0, 10]}, "list_1.intersect(list_2)", []),
+    ],
+)
+def subsetting_functions_test(resource, path, expected):
+    assert evaluate(resource, path) == expected
+
+
+@pytest.mark.parametrize(
+    ("resource", "path", "expected"),
+    [
         ({"a": 42}, "a > 42", [False]),
         ({"a": 42}, "a >= 42", [True]),
         ({"a": 42}, "a < 42", [False]),
