@@ -1,7 +1,9 @@
+import datetime
 import math
 import pytest
 
 from fhirpathpy import evaluate
+from fhirpathpy.engine.invocations.constants import constants
 
 
 @pytest.mark.parametrize(
@@ -190,11 +192,15 @@ def existence_functions_test(resource, path, expected):
         ({"a": False}, "a.toDecimal()", [0]),
         ({"a": False}, "a.toString()", ["False"]),
         ({"a": 101.99}, "a.toString()", ["101.99"]),
-        # toDateTime
-        # toTime
+        ({}, "now()", ["2020-08-20T17:52:15+03:00"]),
+        ({}, "today()", ["2020-08-20"]),
+        ({}, "timeOfDay()", ["17:52:15"]),
     ],
 )
 def misc_functions_test(resource, path, expected):
+    # Monkeypatching for Constants.nowDate
+    tz = datetime.timezone(datetime.timedelta(seconds=10800))
+    constants.nowDate = datetime.datetime(year=2020, month=8, day=20, hour=17, minute=52, second=15, tzinfo=tz)
     assert evaluate(resource, path) == expected
 
 

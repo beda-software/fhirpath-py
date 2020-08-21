@@ -9,6 +9,7 @@ import fhirpathpy.engine.invocations.math as math
 import fhirpathpy.engine.invocations.misc as misc
 import fhirpathpy.engine.invocations.equality as equality
 import fhirpathpy.engine.invocations.logic as logic
+import fhirpathpy.engine.invocations.datetime as datetime
 
 invocations = {
     "empty": {"fn": existence.empty_fn},
@@ -68,9 +69,9 @@ invocations = {
     "round": {"fn": math.rround, "arity": {1: ["Number"]}},
     "sqrt": {"fn": math.sqrt},
     "truncate": {"fn": math.truncate},
-    # now:            {fn: datetime.now },
-    # today:          {fn: datetime.today },
-    #
+    "now": {"fn": datetime.now},
+    "today": {"fn": datetime.today},
+    "timeOfDay": {"fn": datetime.timeOfDay},
     "children": {"fn": navigation.children},
     "descendants": {"fn": navigation.descendants},
     "|": {"fn": combining.union_op, "arity": {2: ["Any", "Any"]}},

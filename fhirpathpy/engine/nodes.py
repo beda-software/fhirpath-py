@@ -1,4 +1,12 @@
 import json
+import re
+
+dateFormat = '([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])'
+dateRe = '%s)?)?' % dateFormat
+
+timeRE = '([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]+)?'
+
+dateTimeRE = '%s(T%s(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?' % (dateFormat, timeRE)
 
 
 class FP_Type:
@@ -89,29 +97,27 @@ class FP_Quantity(FP_Type):
 
 
 # TODO
-class FP_TimeBase:
-    pass
+class FP_TimeBase(FP_Type):
+
+    def __init__(self, timeStr):
+        self.asStr = timeStr
+        self.timeMatchData = None
+
+    def _getMatchData(self, regEx):
+        if not self.timeMatchData:
+            self.timeMatchData = re.match(regEx, self.asStr).group(0)
+        return self.timeMatchData
 
 
 # TODO
-class FP_Time:
-    @staticmethod
-    def check_string(value):
-        """
-        Tests str to see if it is convertible to a DateTime.
-        * @return If str is convertible to a DateTime, returns an FP_DateTime otherwise returns None
-        """
-        d = FP_Time(value)
-        if not d._getMatchData():
-            return None
-        return d
+class FP_DateTime(FP_TimeBase):
 
+    def __init__(self, timeStr):
+        super(FP_DateTime, self).__init__(timeStr)
+        self.timeMatchData = self._getMatchData()
 
-# TODO
-class FP_DateTime:
-    # TODO
-    def _getMatchData(self, data):
-        pass
+    def _getMatchData(self, regEx=dateTimeRE):
+        return super(FP_DateTime, self)._getMatchData(regEx)
 
     @staticmethod
     def check_string(value):
@@ -120,6 +126,50 @@ class FP_DateTime:
         * @return If str is convertible to a DateTime, returns an FP_DateTime otherwise returns None
         """
         d = FP_DateTime(value)
+        if not d._getMatchData():
+            return None
+        return d
+
+
+# TODO
+class FP_Date(FP_TimeBase):
+
+    def __init__(self, timeStr):
+        super(FP_Date, self).__init__(timeStr)
+        self.timeMatchData = self._getMatchData()
+
+    def _getMatchData(self, regEx=dateRe):
+        return super(FP_Date, self)._getMatchData(regEx)
+
+    @staticmethod
+    def check_string(value):
+        """
+        Tests str to see if it is convertible to a DateTime.
+        * @return If str is convertible to a DateTime, returns an FP_Date otherwise returns None
+        """
+        d = FP_Date(value)
+        if not d._getMatchData():
+            return None
+        return d
+
+
+# TODO
+class FP_Time(FP_TimeBase):
+
+    def __init__(self, timeStr):
+        super(FP_Time, self).__init__(timeStr)
+        self.timeMatchData = self._getMatchData()
+
+    def _getMatchData(self, regEx=timeRE):
+        return super(FP_Time, self)._getMatchData(regEx)
+
+    @staticmethod
+    def check_string(value):
+        """
+        Tests str to see if it is convertible to a DateTime.
+        * @return If str is convertible to a DateTime, returns an FP_Time otherwise returns None
+        """
+        d = FP_Time(value)
         if not d._getMatchData():
             return None
         return d
