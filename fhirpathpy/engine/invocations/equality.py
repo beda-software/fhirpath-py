@@ -5,11 +5,15 @@ import fhirpathpy.engine.nodes as nodes
 """
 This file holds code to hande the FHIRPath Math functions.
 """
+DATETIME_NODES_LIST = [nodes.FP_DateTime, nodes.FP_Time]
 
 
 def equality(ctx, x, y):
     if util.is_empty(x) or util.is_empty(y):
         return False
+
+    if type(x[0]) in DATETIME_NODES_LIST or type(y[0]) in DATETIME_NODES_LIST:
+        return datetime_equality(ctx, x, y)
 
     return x == y
 
@@ -21,23 +25,40 @@ def equivalence(ctx, x, y):
     if util.is_empty(x) or util.is_empty(y):
         return False
 
+    if type(x[0]) in DATETIME_NODES_LIST or type(y[0]) in DATETIME_NODES_LIST:
+        return datetime_equality(ctx, x, y)
+
     return x == y
 
 
+def datetime_equality(ctx, x, y):
+    datetime_x = x[0]
+    datetime_y = y[0]
+    if type(datetime_x) not in DATETIME_NODES_LIST:
+        datetime_x = nodes.FP_TimeBase.check_string(datetime_x)
+    if type(datetime_y) not in DATETIME_NODES_LIST:
+        datetime_y = nodes.FP_TimeBase.check_string(datetime_y)
+    return datetime_x.equals(datetime_y)
+
+
 def equal(ctx, a, b):
-    return [equality(ctx, a, b)]
+    equality_result = equality(ctx, a, b)
+    return [equality_result] if equality_result is not None else []
 
 
 def unequal(ctx, a, b):
-    return [not equality(ctx, a, b)]
+    equality_result = equality(ctx, a, b)
+    return [not equality_result] if equality_result is not None else []
 
 
 def equival(ctx, a, b):
-    return [equivalence(ctx, a, b)]
+    equivalence_result = equivalence(ctx, a, b)
+    return [equivalence_result] if equivalence(ctx, a, b) is not None else [False]
 
 
 def unequival(ctx, a, b):
-    return [not equivalence(ctx, a, b)]
+    equivalence_result = equivalence(ctx, a, b)
+    return [not equivalence_result] if equivalence(ctx, a, b) is not None else [True]
 
 
 def check_length(value):
@@ -55,7 +76,7 @@ def typecheck(a, b):
     inequality expression.  It is assumed that a check has already been made
     that there is at least one value in a and b.
 
-    Parameters: 
+    Parameters:
     a (list) - the left side of the inequality expression (which should be an array of one value)
     b (list) -  the right side of the inequality expression (which should be an array of one value)
 

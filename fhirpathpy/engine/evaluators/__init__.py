@@ -148,12 +148,12 @@ def quantity_literal(ctx, parentData, node):
 
 
 def date_time_literal(ctx, parentData, node):
-    dateStr = node["text"][:1]
+    dateStr = node["text"][1:]
     return [nodes.FP_DateTime(dateStr)]
 
 
 def time_literal(ctx, parentData, node):
-    timeStr = node["text"][:1]
+    timeStr = node["text"][2:]
     return [nodes.FP_Time(timeStr)]
 
 
@@ -286,6 +286,8 @@ evaluators = {
     "StringLiteral": string_literal,
     "BooleanLiteral": boolean_literal,
     "QuantityLiteral": quantity_literal,
+    "DateTimeLiteral": date_time_literal,
+    "TimeLiteral": time_literal,
     "InvocationTerm": invocation_term,
     "ParenthesizedTerm": parenthesized_term,
     "ExternalConstantTerm": external_constant_term,
