@@ -107,7 +107,7 @@ class FP_TimeBase(FP_Type):
     ]
 
     def __init__(self, timeStr):
-        self.asStr = timeStr
+        self.asStr = timeStr if isinstance(timeStr, str) else None
         self.timeMatchData = None
 
     def getMatchStr(self):
@@ -127,11 +127,8 @@ class FP_TimeBase(FP_Type):
             if type(self) == FP_DateTime:
                 matchGroupsIndices = FP_DateTime.matchGroupsIndices
                 for matchGroupsIndex in matchGroupsIndices:
-                    try:
-                        if matchGroups[matchGroupsIndex['index']]:
-                            result_prec += 1
-                    except IndexError:
-                        break
+                    if len(matchGroups) >= matchGroupsIndex['index']:
+                        result_prec += 1
                 return result_prec
             elif type(self) == FP_Time:
                 return 3
@@ -140,10 +137,8 @@ class FP_TimeBase(FP_Type):
 
     def _getMatchData(self, regEx):
         if not self.timeMatchData:
-            try:
+            if self.asStr:
                 self.timeMatchData = re.match(regEx, self.asStr)
-            except TypeError:
-                self.timeMatchData = None
         return self.timeMatchData
 
     def getDateTimeInt(self, maxPrecision=6):
@@ -155,11 +150,11 @@ class FP_TimeBase(FP_Type):
             matchGroups = self.getMatchGroups()
             if type(self) == FP_DateTime:
                 matchGroupsIndices = FP_DateTime.matchGroupsIndices
-                try:
-                    for prec in range(maxPrecision):
-                        integer_result += int(matchGroups[matchGroupsIndices[prec]['index']]) * self.datetime_multipliers[prec]['value']
-                except IndexError:
-                    pass
+                for prec in range(maxPrecision):
+                    if len(matchGroups) >= matchGroupsIndices[prec]['index']:
+                        integer_result += int(matchGroups[matchGroupsIndices[prec]['index']]) * \
+                                          self.datetime_multipliers[prec]['value']
+
             elif type(self) == FP_Time:
                 matchGroupsIndices = FP_Time.matchGroupsIndices
                 integer_result += int(matchGroups[matchGroupsIndices[0]['index']]) * (60 * 60)
@@ -200,11 +195,10 @@ class FP_TimeBase(FP_Type):
                 lessPrecMatchGroups = otherMatchGroups if thisPrec >= otherPrec else thisMatchGroups
                 matchGroupsIndices = otherDateTime.__class__.matchGroupsIndices
                 for matchGroupsIndex in matchGroupsIndices:
-                    try:
+                    if len(morePrecMatchGroups) >= matchGroupsIndex['index'] and len(lessPrecMatchGroups) >= matchGroupsIndex['index']:
                         if morePrecMatchGroups[matchGroupsIndex['index']] != lessPrecMatchGroups[matchGroupsIndex['index']]:
                             return False
-                    except IndexError:
-                        return None
+                return None
 
     def compare(self, otherDateTime=None):
         if type(otherDateTime) != type(self):
