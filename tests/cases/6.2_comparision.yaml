@@ -153,6 +153,7 @@ tests:
         expression: '@2018 < @2019'
         result: [true]
     - 'group:  DateTime':
+# TODO: Expression like @2018-12-21T12:01 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc: Same date, same time
 #        expression: '@2018-12-21T12:01 > @2018-12-21T12:01'
 #        result: [false]
@@ -183,6 +184,7 @@ tests:
       - desc: Comparison with later Date from resource
         expression: '@2018-12-21 < date'
         result: [true]
+# TODO: Expression like @2018-12-21T12:02+02:00 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc: Comparison with later DateTime from resource
 #        expression: '@2018-12-21T12:02+02:00 < dateTime'
 #        result: [true]

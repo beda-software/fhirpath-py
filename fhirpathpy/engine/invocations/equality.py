@@ -43,22 +43,22 @@ def datetime_equality(ctx, x, y):
 
 def equal(ctx, a, b):
     equality_result = equality(ctx, a, b)
-    return [equality_result] if equality_result is not None else []
+    return util.arraify(equality_result)
 
 
 def unequal(ctx, a, b):
-    equality_result = equality(ctx, a, b)
-    return [not equality_result] if equality_result is not None else []
+    unequality_result = not equality(ctx, a, b)
+    return util.arraify(unequality_result)
 
 
 def equival(ctx, a, b):
     equivalence_result = equivalence(ctx, a, b)
-    return [equivalence_result] if equivalence(ctx, a, b) is not None else [False]
+    return util.arraify(equivalence_result, instead_none=False)
 
 
 def unequival(ctx, a, b):
-    equivalence_result = equivalence(ctx, a, b)
-    return [not equivalence_result] if equivalence(ctx, a, b) is not None else [True]
+    unequivalence_result = not equivalence(ctx, a, b)
+    return util.arraify(unequivalence_result, instead_none=True)
 
 
 def check_length(value):

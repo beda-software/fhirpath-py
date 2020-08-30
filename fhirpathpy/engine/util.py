@@ -32,12 +32,12 @@ def is_true(x):
     return x == True or isinstance(x, list) and len(x) == 1 and x[0] == True
 
 
-def arraify(x):
+def arraify(x, instead_none=None):
     if isinstance(x, list):
         return x
     if is_some(x):
         return [x]
-    return []
+    return [] if not instead_none else [instead_none]
 
 
 def flatten(x):

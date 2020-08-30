@@ -65,6 +65,7 @@ tests:
       expression: "1.01 = 1.02"
       result: [false]
 
+# TODO: This test doesn't return right value. Commented while coding DateTime features
 #    - desc: 'decimal values should not be compared beyond the maximum precision'
 #      expression: '0.1 + 0.1 + 0.1 = 0.3'
 #      result: [true]
@@ -184,6 +185,7 @@ tests:
         expression: '@2018-02-02T11 = @2018-02-02T11'
         result: [true]
 
+# TODO: Expression like @2018-02-02T11 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc:  'DateTime literal compared with different DateTime (hour)'
 #        expression: '@2018-02-02T11 = @2018-02-02T12'
 #        result: [false]
@@ -277,6 +279,7 @@ tests:
         expression: "@2018 = 'zzz'"
         result: [false]
 
+# TODO: Expression like @T10:04:23-04:00 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc: 'Time literal compared with same time in different timezone'
 #        expression: "@T10:04:23-04:00 = @T18:04:23+04:00"
 #        result: [true]
@@ -314,6 +317,7 @@ tests:
         expression: "@T12:34:46 = %context"
         result: [false]
 
+# TODO: Expression like @T12 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc: "Time literal compared with different precision time in resource"
 #        context: "time1"
 #        expression: "@T12 = %context"
@@ -333,6 +337,7 @@ tests:
 
   # For primitives
 
+# TODO: This tests doesn't return right value. Commented while coding DateTime features
 #    - desc: '* string: the strings must be the same while ignoring case and normalizing whitespace.'
 #      expression: "'ab c' ~ 'Ab  C'"
 #      result: [true]
@@ -412,6 +417,7 @@ tests:
         expression: '@2018-02-02 ~ %context'
         result: [false]
 
+# TODO: Expression like @T10:04:23-04:00 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc: 'Time literal compared with same time in different timezone'
 #        expression: '@T10:04:23-04:00 ~ @T18:04:23+04:00'
 #        result: [true]
@@ -438,6 +444,7 @@ tests:
         expression: '@T12:35:46 ~ %context'
         result: [false]
 
+# TODO: Expression like @T12:34:46.123 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc: 'Time literal compared with different precision time in resource'
 #        context: 'time1'
 #        expression: '@T12:34:46.123 ~ %context'
@@ -452,6 +459,7 @@ tests:
   # Note that this implies that if the collections have a different number of
   # items to compare, the result will be false.
 
+# TODO: This tests doesn't return right value. Commented while coding DateTime features
 #    - desc: '* For complex types, equivalence requires all child properties to be equivalent, recursively.'
 #      expression: "Ops.complex ~ Ops.complexsimilar"
 #      result: [true]
@@ -570,6 +578,7 @@ tests:
         expression: '@2018-02-02 != %context'
         result: []
 
+# TODO: Expression like @T10:04:23-04:00 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc: 'Time literal compared with same time in different timezone'
 #        expression: '@T10:04:23-04:00 != @T18:04:23+04:00'
 #        result: [false]
@@ -596,6 +605,7 @@ tests:
         expression: '@T12:35:46 != %context'
         result: [true]
 
+# TODO: Expression like @T12:34 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc: 'Time literal compared with different precision time in resource (1)'
 #        context: 'time1'
 #        expression: '@T12:34 != %context'
@@ -640,6 +650,7 @@ tests:
         expression: '@2018-02-02 !~ %context'
         result: [true]
 
+# TODO: Expression like @T10:04:23-04:00 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc: 'Time literal compared with same time in different timezone'
 #        expression: '@T10:04:23-04:00 !~ @T18:04:23+04:00'
 #        result: [false]
@@ -685,6 +696,7 @@ tests:
 
   # For primitives
 
+# TODO: This tests doesn't return right value. Commented while coding DateTime features
 #    - desc: '* string: the strings must be the same while ignoring case and normalizing whitespace.'
 #      expression: "'ab c' !~ 'Ab  C'"
 #      result: [false]

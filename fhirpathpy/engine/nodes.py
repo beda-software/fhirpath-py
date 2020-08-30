@@ -95,6 +95,16 @@ class FP_Quantity(FP_Type):
 
 # TODO
 class FP_TimeBase(FP_Type):
+    # Multipliers need to convert DateTime object to seconds int
+    datetime_multipliers = [
+        {"key": "year", "value": (365 * 12 * 24 * 60 * 60)},
+        {"key": "month", "value": (12 * 24 * 60 * 60)},
+        {"key": "day", "value": (24 * 60 * 60)},
+        {"key": "hour", "value": (60 * 60)},
+        {"key": "minute", "value": 60},
+        {"key": "second", "value": 1},
+        {"key": "tz", "value": (60 * 60)}
+    ]
 
     def __init__(self, timeStr):
         self.asStr = timeStr
@@ -137,18 +147,17 @@ class FP_TimeBase(FP_Type):
         return self.timeMatchData
 
     def getDateTimeInt(self, maxPrecision=6):
+        """
+        :return: If self.timeMatchData returns DateTime object converted to seconds int, else returns None
+        """
         if self.timeMatchData:
             integer_result = 0
             matchGroups = self.getMatchGroups()
             if type(self) == FP_DateTime:
                 matchGroupsIndices = FP_DateTime.matchGroupsIndices
-                # Multipliers for datetime to seconds converting
-                datetime_multipliers = [
-                    (365 * 12 * 24 * 60 * 60), (12 * 24 * 60 * 60), (24 * 60 * 60), (60 * 60), 60, 1, (60 * 60)
-                ]
                 try:
                     for prec in range(maxPrecision):
-                        integer_result += int(matchGroups[matchGroupsIndices[prec]['index']]) * datetime_multipliers[prec]
+                        integer_result += int(matchGroups[matchGroupsIndices[prec]['index']]) * self.datetime_multipliers[prec]['value']
                 except IndexError:
                     pass
             elif type(self) == FP_Time:
@@ -243,9 +252,9 @@ class FP_DateTime(FP_TimeBase):
 
     def __init__(self, timeStr):
         super(FP_DateTime, self).__init__(timeStr)
-        self.timeMatchData = self._getMatchData()
+        self.timeMatchData = self._getMatchData(dateTimeRE)
 
-    def _getMatchData(self, regEx=dateTimeRE):
+    def _getMatchData(self, regEx):
         return super(FP_DateTime, self)._getMatchData(regEx)
 
     @staticmethod
@@ -271,9 +280,9 @@ class FP_Time(FP_TimeBase):
 
     def __init__(self, timeStr):
         super(FP_Time, self).__init__(timeStr)
-        self.timeMatchData = self._getMatchData()
+        self.timeMatchData = self._getMatchData(timeRE)
 
-    def _getMatchData(self, regEx=timeRE):
+    def _getMatchData(self, regEx):
         return super(FP_Time, self)._getMatchData(regEx)
 
     @staticmethod
