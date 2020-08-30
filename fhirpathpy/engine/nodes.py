@@ -230,9 +230,9 @@ class FP_TimeBase(FP_Type):
             or FP_Time otherwise returns None
         """
         d = FP_DateTime(value)
-        if not d._getMatchData():
+        if not d._getMatchData(dateTimeRE):
             d = FP_Time(value)
-            if not d._getMatchData():
+            if not d._getMatchData(timeRE):
                 return None
         return d
 
@@ -264,7 +264,7 @@ class FP_DateTime(FP_TimeBase):
         * @return If str is convertible to a DateTime, returns an FP_DateTime otherwise returns None
         """
         d = FP_DateTime(value)
-        if not d._getMatchData():
+        if not d._getMatchData(dateTimeRE):
             return None
         return d
 
@@ -292,7 +292,7 @@ class FP_Time(FP_TimeBase):
         * @return If str is convertible to a DateTime, returns an FP_Time otherwise returns None
         """
         d = FP_Time(value)
-        if not d._getMatchData():
+        if not d._getMatchData(timeRE):
             return None
         return d
 

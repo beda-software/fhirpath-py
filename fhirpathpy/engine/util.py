@@ -37,7 +37,7 @@ def arraify(x, instead_none=None):
         return x
     if is_some(x):
         return [x]
-    return [] if not instead_none else [instead_none]
+    return [] if instead_none is None else [instead_none]
 
 
 def flatten(x):

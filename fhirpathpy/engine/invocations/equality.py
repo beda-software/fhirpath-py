@@ -47,7 +47,8 @@ def equal(ctx, a, b):
 
 
 def unequal(ctx, a, b):
-    unequality_result = not equality(ctx, a, b)
+    equality_result = equality(ctx, a, b)
+    unequality_result = not equality_result if equality_result is not None else None
     return util.arraify(unequality_result)
 
 
@@ -57,7 +58,8 @@ def equival(ctx, a, b):
 
 
 def unequival(ctx, a, b):
-    unequivalence_result = not equivalence(ctx, a, b)
+    equivalence_result = equivalence(ctx, a, b)
+    unequivalence_result = not equivalence_result if equivalence_result is not None else None
     return util.arraify(unequivalence_result, instead_none=True)
 
 
