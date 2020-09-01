@@ -156,7 +156,7 @@ tests:
       - desc:  'DateTime literal compared with different DateTime'
         expression: '@2018 = @2017'
         result: [false]
-
+ 
       - desc: 'DateTime literal compared with different precision DateTime (1)'
         expression: '@2018 = @2018-02'
         result: []
@@ -185,7 +185,8 @@ tests:
         expression: '@2018-02-02T11 = @2018-02-02T11'
         result: [true]
 
-# TODO: Expression like @2018-02-02T11 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
+# TODO: Expression like @2018-02-02T11 doesn't proceed by FHIRPath RegEx. 
+# Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc:  'DateTime literal compared with different DateTime (hour)'
 #        expression: '@2018-02-02T11 = @2018-02-02T12'
 #        result: [false]
@@ -279,7 +280,8 @@ tests:
         expression: "@2018 = 'zzz'"
         result: [false]
 
-# TODO: Expression like @T10:04:23-04:00 doesn't proceed by FHIRPath RegEx. Need to rewrite the tests or delete tests with incorrect expressions
+# TODO: Expression like @T10:04:23-04:00 doesn't proceed by FHIRPath RegEx. 
+# Need to rewrite the tests or delete tests with incorrect expressions
 #      - desc: 'Time literal compared with same time in different timezone'
 #        expression: "@T10:04:23-04:00 = @T18:04:23+04:00"
 #        result: [true]

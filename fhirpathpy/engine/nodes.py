@@ -111,62 +111,61 @@ class FP_TimeBase(FP_Type):
         self.asStr = timeStr if isinstance(timeStr, str) else None
         self.timeMatchData = None
 
-    def getMatchStr(self):
-        if self.timeMatchData:
-            return self.timeMatchData.group(0)
-        return None
-
-    def getMatchGroups(self):
-        if self.timeMatchData:
-            return [group for group in self.timeMatchData.groups() if group]
-        return []
-
-    def getPrecision(self):
-        if self.timeMatchData:
-            result_prec = 0
-            matchGroups = self.getMatchGroups()
-            if type(self) == FP_DateTime:
-                matchGroupsIndices = FP_DateTime.matchGroupsIndices
-                for matchGroupsIndex in matchGroupsIndices:
-                    if len(matchGroups) >= matchGroupsIndex['index']:
-                        result_prec += 1
-                return result_prec
-            elif type(self) == FP_Time:
-                return FP_Time.maxPrecision
-            return result_prec
-        return 0
-
     def _getMatchData(self, regEx):
         if not self.timeMatchData:
             if self.asStr:
                 self.timeMatchData = re.match(regEx, self.asStr)
         return self.timeMatchData
 
-    def getDateTimeInt(self):
+    def getMatchStr(self):
+        if self.timeMatchData:
+            return self.timeMatchData.group(0)
+        return None
+
+    def _getDateTimeAsList(self):
+        dateTimeListResult = []
+        if self.timeMatchData:
+            timeMatchGroups = [group for group in self.timeMatchData.groups() if group]
+            matchGroupsIndices = self.matchGroupsIndices
+            for matchGroupsIndex in matchGroupsIndices:
+                if len(timeMatchGroups) >= matchGroupsIndex['index']:
+                    dateTimeListResult.append(timeMatchGroups[matchGroupsIndex['index']])
+        return dateTimeListResult
+
+    def _getPrecision(self):
+        if self.timeMatchData:
+            result_prec = 0
+            if type(self) == FP_DateTime:
+                return len(self._getDateTimeAsList())
+            if type(self) == FP_Time:
+                return FP_Time.maxPrecision
+            return result_prec
+        return 0
+
+    def _getDateTimeInt(self):
         """
         :return: If self.timeMatchData returns DateTime object converted to seconds int, else returns None
         """
         if self.timeMatchData:
             integer_result = 0
-            matchGroups = self.getMatchGroups()
+            dateTimeList = self._getDateTimeAsList()
+
             if type(self) == FP_DateTime:
-                currentPrecision = self.getPrecision()
+                currentPrecision = self._getPrecision()
                 if currentPrecision >= FP_DateTime.minPrecision:
                     dateTimeObject = self.getDateTimeObject()
                     integer_result = dateTimeObject.timestamp()
                 else:
-                    matchGroupsIndices = FP_DateTime.matchGroupsIndices
-                    for prec in range(FP_DateTime.minPrecision):
-                        if len(matchGroups) >= matchGroupsIndices[prec]['index']:
-                            integer_result += int(matchGroups[matchGroupsIndices[prec]['index']]) * \
-                                              self.datetime_multipliers[prec]['value']
-            elif type(self) == FP_Time:
+                    for prec in range(currentPrecision):
+                        integer_result += int(dateTimeList[prec]) * self.datetime_multipliers[prec]['value']
+                return integer_result
+
+            if type(self) == FP_Time:
                 timeObject = self.getTimeObject()
                 if timeObject:
-                    integer_result = datetime.timedelta(
+                    return datetime.timedelta(
                         hours=timeObject.hour, minutes=timeObject.minute, seconds=timeObject.second
                     ).total_seconds()
-            return integer_result
         return None
 
     def equals(self, otherDateTime):
@@ -190,42 +189,41 @@ class FP_TimeBase(FP_Type):
         if type(otherDateTime) != type(self) or (not self.timeMatchData or not otherDateTime.timeMatchData):
             return False
 
-        thisMatchGroups = self.getMatchGroups()
-        thisPrec = self.getPrecision()
-        otherMatchGroups = otherDateTime.getMatchGroups()
-        otherPrec = otherDateTime.getPrecision()
-        if thisPrec == otherPrec:
-            return self.getDateTimeInt() == otherDateTime.getDateTimeInt()
+        thisDateTimeList = self._getDateTimeAsList()
+        thisPrec = self._getPrecision()
+        otherDateTimeList = otherDateTime._getDateTimeAsList()
+        otherPrec = otherDateTime._getPrecision()
 
-        morePrecMatchGroups = thisMatchGroups if thisPrec >= otherPrec else otherMatchGroups
-        lessPrecMatchGroups = otherMatchGroups if thisPrec >= otherPrec else thisMatchGroups
-        matchGroupsIndices = otherDateTime.__class__.matchGroupsIndices
-        for matchGroupsIndex in matchGroupsIndices:
-            isMatchGroupsIndexInCurrentPrec = len(morePrecMatchGroups) >= matchGroupsIndex['index'] and len(lessPrecMatchGroups) >= matchGroupsIndex['index']
-            if isMatchGroupsIndexInCurrentPrec:
-                if morePrecMatchGroups[matchGroupsIndex['index']] != lessPrecMatchGroups[matchGroupsIndex['index']]:
-                    return False
+        if thisPrec == otherPrec:
+            return self._getDateTimeInt() == otherDateTime._getDateTimeInt()
+
+        morePrecDateTimeList = thisDateTimeList if thisPrec >= otherPrec else otherDateTimeList
+        lessPrecDateTimeList = otherDateTimeList if thisPrec >= otherPrec else thisDateTimeList
+
+        for lessPrecDateTimeElementIndex, lessPrecDateTimeElement in enumerate(lessPrecDateTimeList):
+            if lessPrecDateTimeElement != morePrecDateTimeList[lessPrecDateTimeElementIndex]:
+                return False
+
         return None
 
     def compare(self, otherDateTime):
         if type(otherDateTime) != type(self):
             raise TypeError
 
-        thisMatchGroups = self.getMatchGroups()
-        otherMatchGroups = otherDateTime.getMatchGroups()
-        thisPrec = self.getPrecision()
-        otherPrec = otherDateTime.getPrecision()
+        thisDateTimeList = self._getDateTimeAsList()
+        thisPrec = self._getPrecision()
+        otherDateTimeList = otherDateTime._getDateTimeAsList()
+        otherPrec = otherDateTime._getPrecision()
 
         if thisPrec != otherPrec:
-            matchGroupsIndices = otherDateTime.__class__.matchGroupsIndices
             for prec in range(thisPrec):
-                if len(otherMatchGroups) >= prec:
-                    if thisMatchGroups[matchGroupsIndices[prec]['index']] > otherMatchGroups[matchGroupsIndices[prec]['index']]:
+                if len(otherDateTimeList) >= prec:
+                    if thisDateTimeList[prec] > otherDateTimeList[prec]:
                         return 1
                 return -1
 
-        thisDateTimeInt = self.getDateTimeInt()
-        otherDateTimeInt = otherDateTime.getDateTimeInt()
+        thisDateTimeInt = self._getDateTimeInt()
+        otherDateTimeInt = otherDateTime._getDateTimeInt()
         if thisDateTimeInt < otherDateTimeInt:
             return -1
         elif thisDateTimeInt == otherDateTimeInt:
@@ -233,7 +231,7 @@ class FP_TimeBase(FP_Type):
         return 1
 
     @staticmethod
-    def check_string(value):
+    def checkDateTimeString(value):
         """
         Tests str to see if it is convertible to a DateTime or Time.
         * @return If str is convertible to a DateTime or Time, returns an FP_DateTime
@@ -274,7 +272,7 @@ class FP_DateTime(FP_TimeBase):
         return None
 
     @staticmethod
-    def check_string(value):
+    def checkDateTimeString(value):
         """
         Tests str to see if it is convertible to a DateTime.
         * @return If str is convertible to a DateTime, returns an FP_DateTime otherwise returns None
@@ -307,7 +305,7 @@ class FP_Time(FP_TimeBase):
         return None
 
     @staticmethod
-    def check_string(value):
+    def checkDateTimeString(value):
         """
         Tests str to see if it is convertible to a DateTime.
         * @return If str is convertible to a DateTime, returns an FP_Time otherwise returns None

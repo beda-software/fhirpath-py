@@ -35,9 +35,9 @@ def datetime_equality(ctx, x, y):
     datetime_x = x[0]
     datetime_y = y[0]
     if type(datetime_x) not in DATETIME_NODES_LIST:
-        datetime_x = nodes.FP_TimeBase.check_string(datetime_x)
+        datetime_x = nodes.FP_TimeBase.checkDateTimeString(datetime_x)
     if type(datetime_y) not in DATETIME_NODES_LIST:
-        datetime_y = nodes.FP_TimeBase.check_string(datetime_y)
+        datetime_y = nodes.FP_TimeBase.checkDateTimeString(datetime_y)
     return datetime_x.equals(datetime_y)
 
 
@@ -102,11 +102,11 @@ def typecheck(a, b):
 
         # TODO refactor
         if lClass == str and (rClass == nodes.FP_DateTime or rClass == nodes.FP_Time):
-            d = rClass.check_string(a)  # TODO
+            d = rClass.checkDateTimeString(a)  # TODO
             if d is not None:
                 rtn = [d, b]
         elif rClass == str and (lClass == nodes.FP_DateTime or lClass == nodes.FP_Time):
-            d = lClass.check_string(b)  # TODO
+            d = lClass.checkDateTimeString(b)  # TODO
             if d is not None:
                 rtn = [a, d]
 
