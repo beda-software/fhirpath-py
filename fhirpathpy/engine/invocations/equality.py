@@ -5,7 +5,7 @@ import fhirpathpy.engine.nodes as nodes
 """
 This file holds code to hande the FHIRPath Math functions.
 """
-DATETIME_NODES_LIST = [nodes.FP_DateTime, nodes.FP_Time]
+DATETIME_NODES_LIST = (nodes.FP_DateTime, nodes.FP_Time)
 
 
 def equality(ctx, x, y):
@@ -38,10 +38,6 @@ def datetime_equality(ctx, x, y):
         datetime_x = nodes.FP_DateTime(datetime_x) or nodes.FP_Time(datetime_x)
     if type(datetime_y) not in DATETIME_NODES_LIST:
         datetime_y = nodes.FP_DateTime(datetime_y) or nodes.FP_Time(datetime_y)
-    
-    print(datetime_x._getMatchAsList())
-    print(type(datetime_y))
-
     return datetime_x.equals(datetime_y)
 
 

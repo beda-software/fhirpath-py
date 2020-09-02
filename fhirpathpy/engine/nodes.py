@@ -142,17 +142,6 @@ class FP_TimeBase(FP_Type):
         if type(otherDateTime) != type(self):
             return False
 
-        # TODO: refactor rename
-
-        print("===!!!!!====")
-        print("===!!!!!====")
-        print(otherDateTime is None)
-        print(otherDateTime)
-        print(otherDateTime._getMatchAsList)
-        print(dir(otherDateTime))
-        print("=======")
-        print("===!!!!!====")
-
         thisDateTimeList = self._getMatchAsList()
         otherDateTimeList = otherDateTime._getMatchAsList()
 
@@ -199,20 +188,30 @@ class FP_Time(FP_TimeBase):
         {"key": "second", "index": 2}
     ]
 
+    def __new__(cls, dateStr):
+        if not isinstance(dateStr, str):
+            return None
+
+        if not re.match(timeRE, dateStr):
+            return None
+
+        return super(FP_Time, cls).__new__(cls)
+
     def __init__(self, timeStr):
         self.asStr = timeStr if isinstance(timeStr, str) else None
         self._timeMatchData = re.match(timeRE, self.asStr)
+        self._timeMatchStr = None
+        self._timeAsList = []
+        self._precision = 0
+        self._pyTimeObject = None
+        self._initialize()
 
-        if self._timeMatchData is None:
-            return None
-
-        self._timeAsList = self._extractAsMatchList(self._timeMatchData, self.matchGroupsIndices)
-        self._timeMatchStr = self._timeMatchData.group(0) if self._timeMatchData else None
-        self._precision = len(self._timeAsList)
+    def _initialize(self):
         if self._timeMatchData:
+            self._timeMatchStr = self._timeMatchData.group(0)
+            self._timeAsList = self._extractAsMatchList(self._timeMatchData, self.matchGroupsIndices)
+            self._precision = len(self._timeAsList)
             self._pyTimeObject = datetime.datetime.strptime(self.asStr, '%H:%M:%S').time()
-        else:
-            self._pyTimeObject = None
 
     def getTimeMatchStr(self):
         return self._timeMatchStr
@@ -245,21 +244,28 @@ class FP_DateTime(FP_TimeBase):
     ]
     minPrecision = 3
 
-    def __new__(self, dateStr):
+    def __new__(cls, dateStr):
         if not isinstance(dateStr, str):
             return None
 
-        if re.match(dateTimeRE, dateStr):
+        if not re.match(dateTimeRE, dateStr):
             return None
 
-        return super(FP_DateTime, self).__new__(self, dateStr)
+        return super(FP_DateTime, cls).__new__(cls)
 
     def __init__(self, dateStr):
         self.asStr = dateStr if isinstance(dateStr, str) else None
-        self._dateTimeMatchData = re.match(dateTimeRE, self.asStr)
-        self._dateTimeAsList = self._extractAsMatchList(self._dateTimeMatchData, self.matchGroupsIndices)
-        self._dateTimeMatchStr = self._dateTimeMatchData.group(0) if self._dateTimeMatchData else None
-        self._precision = len(self._dateTimeAsList)
+        self._dateTimeMatchData = re.match(dateTimeRE, self.asStr) if isinstance(self.asStr, str) else None
+        self._dateTimeMatchStr = None
+        self._dateTimeAsList = []
+        self._precision = 0
+        self._initialize()
+
+    def _initialize(self):
+        if self._dateTimeMatchData:
+            self._dateTimeMatchStr = self._dateTimeMatchData.group(0)
+            self._dateTimeAsList = self._extractAsMatchList(self._dateTimeMatchData, self.matchGroupsIndices)
+            self._precision = len(self._dateTimeAsList)
 
     def getDateTimeMatchStr(self):
         return self._dateTimeMatchStr
