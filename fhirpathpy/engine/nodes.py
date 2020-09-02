@@ -237,12 +237,13 @@ class FP_TimeBase(FP_Type):
         * @return If str is convertible to a DateTime or Time, returns an FP_DateTime
             or FP_Time otherwise returns None
         """
-        d = FP_DateTime(value)
-        if not d._getMatchData(dateTimeRE):
-            d = FP_Time(value)
-            if not d._getMatchData(timeRE):
+        dateTimeObject = FP_DateTime(value)
+        if not dateTimeObject._getMatchData(dateTimeRE):
+            timeObject = FP_Time(value)
+            if not timeObject._getMatchData(timeRE):
                 return None
-        return d
+            return timeObject
+        return dateTimeObject
 
 
 class FP_DateTime(FP_TimeBase):
@@ -277,10 +278,10 @@ class FP_DateTime(FP_TimeBase):
         Tests str to see if it is convertible to a DateTime.
         * @return If str is convertible to a DateTime, returns an FP_DateTime otherwise returns None
         """
-        d = FP_DateTime(value)
-        if not d._getMatchData(dateTimeRE):
+        dateTimeObject = FP_DateTime(value)
+        if not dateTimeObject._getMatchData(dateTimeRE):
             return None
-        return d
+        return dateTimeObject
 
 
 class FP_Time(FP_TimeBase):
@@ -310,10 +311,10 @@ class FP_Time(FP_TimeBase):
         Tests str to see if it is convertible to a DateTime.
         * @return If str is convertible to a DateTime, returns an FP_Time otherwise returns None
         """
-        d = FP_Time(value)
-        if not d._getMatchData(timeRE):
+        timeObject = FP_Time(value)
+        if not timeObject._getMatchData(timeRE):
             return None
-        return d
+        return timeObject
 
 
 class ResourceNode:
