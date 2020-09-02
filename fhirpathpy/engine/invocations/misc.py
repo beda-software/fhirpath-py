@@ -93,7 +93,7 @@ def to_date_time(ctx, coll):
     if ln == 1:
         value = util.get_data(coll[0])
 
-        dateTimeObject = nodes.FP_DateTime.checkDateTimeString(value)
+        dateTimeObject = nodes.FP_DateTime(value)
 
         if dateTimeObject:
             rtn[0] = dateTimeObject
@@ -110,7 +110,7 @@ def to_time(ctx, coll):
     if ln == 1:
         value = util.get_data(coll[0])
 
-        timeObject = nodes.FP_Time.checkDateTimeString(value)
+        timeObject = nodes.FP_Time(value)
 
         if timeObject:
             rtn[0] = timeObject

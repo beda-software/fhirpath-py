@@ -35,9 +35,13 @@ def datetime_equality(ctx, x, y):
     datetime_x = x[0]
     datetime_y = y[0]
     if type(datetime_x) not in DATETIME_NODES_LIST:
-        datetime_x = nodes.FP_TimeBase.checkDateTimeString(datetime_x)
+        datetime_x = nodes.FP_DateTime(datetime_x) or nodes.FP_Time(datetime_x)
     if type(datetime_y) not in DATETIME_NODES_LIST:
-        datetime_y = nodes.FP_TimeBase.checkDateTimeString(datetime_y)
+        datetime_y = nodes.FP_DateTime(datetime_y) or nodes.FP_Time(datetime_y)
+    
+    print(datetime_x._getMatchAsList())
+    print(type(datetime_y))
+
     return datetime_x.equals(datetime_y)
 
 
@@ -48,7 +52,7 @@ def equal(ctx, a, b):
 
 def unequal(ctx, a, b):
     equality_result = equality(ctx, a, b)
-    unequality_result = not equality_result if equality_result is not None else None
+    unequality_result = None if equality_result is None else not equality_result
     return util.arraify(unequality_result)
 
 
@@ -59,7 +63,7 @@ def equival(ctx, a, b):
 
 def unequival(ctx, a, b):
     equivalence_result = equivalence(ctx, a, b)
-    unequivalence_result = not equivalence_result if equivalence_result is not None else None
+    unequivalence_result = None if equivalence_result is None else not equivalence_result
     return util.arraify(unequivalence_result, instead_none=True)
 
 
@@ -102,11 +106,11 @@ def typecheck(a, b):
 
         # TODO refactor
         if lClass == str and (rClass == nodes.FP_DateTime or rClass == nodes.FP_Time):
-            d = rClass.checkDateTimeString(a)  # TODO
+            d = nodes.FP_DateTime(a) or nodes.FP_Time(a)
             if d is not None:
                 rtn = [d, b]
         elif rClass == str and (lClass == nodes.FP_DateTime or lClass == nodes.FP_Time):
-            d = lClass.checkDateTimeString(b)  # TODO
+            d = nodes.FP_DateTime(b) or nodes.FP_Time(b)
             if d is not None:
                 rtn = [a, d]
 
