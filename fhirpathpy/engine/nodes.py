@@ -204,9 +204,7 @@ class FP_Time(FP_TimeBase):
         self._timeAsList = []
         self._precision = 0
         self._pyTimeObject = None
-        self._initialize()
 
-    def _initialize(self):
         if self._timeMatchData:
             self._timeMatchStr = self._timeMatchData.group(0)
             self._timeAsList = self._extractAsMatchList(self._timeMatchData, self.matchGroupsIndices)
@@ -259,9 +257,7 @@ class FP_DateTime(FP_TimeBase):
         self._dateTimeMatchStr = None
         self._dateTimeAsList = []
         self._precision = 0
-        self._initialize()
 
-    def _initialize(self):
         if self._dateTimeMatchData:
             self._dateTimeMatchStr = self._dateTimeMatchData.group(0)
             self._dateTimeAsList = self._extractAsMatchList(self._dateTimeMatchData, self.matchGroupsIndices)
