@@ -5,11 +5,15 @@ import fhirpathpy.engine.nodes as nodes
 """
 This file holds code to hande the FHIRPath Math functions.
 """
+DATETIME_NODES_LIST = (nodes.FP_DateTime, nodes.FP_Time)
 
 
 def equality(ctx, x, y):
     if util.is_empty(x) or util.is_empty(y):
         return False
+
+    if type(x[0]) in DATETIME_NODES_LIST or type(y[0]) in DATETIME_NODES_LIST:
+        return datetime_equality(ctx, x, y)
 
     return x == y
 
@@ -21,23 +25,42 @@ def equivalence(ctx, x, y):
     if util.is_empty(x) or util.is_empty(y):
         return False
 
+    if type(x[0]) in DATETIME_NODES_LIST or type(y[0]) in DATETIME_NODES_LIST:
+        return datetime_equality(ctx, x, y)
+
     return x == y
 
 
+def datetime_equality(ctx, x, y):
+    datetime_x = x[0]
+    datetime_y = y[0]
+    if type(datetime_x) not in DATETIME_NODES_LIST:
+        datetime_x = nodes.FP_DateTime(datetime_x) or nodes.FP_Time(datetime_x)
+    if type(datetime_y) not in DATETIME_NODES_LIST:
+        datetime_y = nodes.FP_DateTime(datetime_y) or nodes.FP_Time(datetime_y)
+    return datetime_x.equals(datetime_y)
+
+
 def equal(ctx, a, b):
-    return [equality(ctx, a, b)]
+    equality_result = equality(ctx, a, b)
+    return util.arraify(equality_result)
 
 
 def unequal(ctx, a, b):
-    return [not equality(ctx, a, b)]
+    equality_result = equality(ctx, a, b)
+    unequality_result = None if equality_result is None else not equality_result
+    return util.arraify(unequality_result)
 
 
 def equival(ctx, a, b):
-    return [equivalence(ctx, a, b)]
+    equivalence_result = equivalence(ctx, a, b)
+    return util.arraify(equivalence_result, instead_none=False)
 
 
 def unequival(ctx, a, b):
-    return [not equivalence(ctx, a, b)]
+    equivalence_result = equivalence(ctx, a, b)
+    unequivalence_result = None if equivalence_result is None else not equivalence_result
+    return util.arraify(unequivalence_result, instead_none=True)
 
 
 def check_length(value):
@@ -55,7 +78,7 @@ def typecheck(a, b):
     inequality expression.  It is assumed that a check has already been made
     that there is at least one value in a and b.
 
-    Parameters: 
+    Parameters:
     a (list) - the left side of the inequality expression (which should be an array of one value)
     b (list) -  the right side of the inequality expression (which should be an array of one value)
 
@@ -79,11 +102,11 @@ def typecheck(a, b):
 
         # TODO refactor
         if lClass == str and (rClass == nodes.FP_DateTime or rClass == nodes.FP_Time):
-            d = rClass.check_string(a)  # TODO
+            d = nodes.FP_DateTime(a) or nodes.FP_Time(a)
             if d is not None:
                 rtn = [d, b]
         elif rClass == str and (lClass == nodes.FP_DateTime or lClass == nodes.FP_Time):
-            d = lClass.check_string(b)  # TODO
+            d = nodes.FP_DateTime(b) or nodes.FP_Time(b)
             if d is not None:
                 rtn = [a, d]
 
