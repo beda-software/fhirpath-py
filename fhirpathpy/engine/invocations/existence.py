@@ -55,23 +55,23 @@ def extract_boolean_value(data):
 
 
 def all_true_fn(ctx, items):
-    return [all(extract_boolean_value(item) for item in items)]
+    return [all((extract_boolean_value(item) for item in items))]
 
 
 def any_true_fn(ctx, items):
-    return [any(extract_boolean_value(item) for item in items)]
+    return [any((extract_boolean_value(item) for item in items))]
 
 
 def all_false_fn(ctx, items):
-    return [all(not extract_boolean_value(item) for item in items)]
+    return [all((not extract_boolean_value(item) for item in items))]
 
 
 def any_false_fn(ctx, items):
-    return [any(not extract_boolean_value(item) for item in items)]
+    return [any((not extract_boolean_value(item) for item in items))]
 
 
 def subset_of(ctx, coll1, coll2):
-    return all(item in coll2 for item in coll1)
+    return all((item in coll2 for item in coll1))
 
 
 def subset_of_fn(ctx, coll1, coll2):
@@ -83,9 +83,9 @@ def superset_of_fn(ctx, coll1, coll2):
 
 
 def distinct_fn(ctx, x):
-    if all([isinstance(v, nodes.ResourceNode) for v in x]):
+    if all((isinstance(v, nodes.ResourceNode) for v in x)):
 
-        data = [v.data for v in x]
+        data = (v.data for v in x)
 
         # naive and strong type implementation for unique values
         unique = []

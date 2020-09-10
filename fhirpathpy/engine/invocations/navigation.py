@@ -44,6 +44,7 @@ def children(ctx, coll):
     return reduce(create_reduce_children(ctx), coll, [])
 
 
+# TODO: is it needs to make it generator?
 def descendants(ctx, coll):
     res = []
     ch = children(ctx, coll)

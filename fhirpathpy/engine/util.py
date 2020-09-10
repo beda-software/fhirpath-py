@@ -1,3 +1,4 @@
+import itertools
 from functools import reduce
 from fhirpathpy.engine.nodes import ResourceNode
 
@@ -29,7 +30,7 @@ def is_nullable(x):
 
 
 def is_true(x):
-    return x == True or isinstance(x, list) and len(x) == 1 and x[0] == True
+    return x is True or isinstance(x, list) and len(x) == 1 and x[0] is True
 
 
 def arraify(x, instead_none=None):
@@ -50,3 +51,16 @@ def flatten(x):
         return acc
 
     return reduce(func, x, [])
+
+
+def peek_iterator(iterable):
+    """
+    :param iterable: iterable object
+    :return: If after call next of iterator raise StopIteration function returns none what means iterator is empty,
+    else function returns new iterator with first element back
+    """
+    try:
+        first = next(iterable)
+    except StopIteration:
+        return None
+    return itertools.chain([first], iterable)

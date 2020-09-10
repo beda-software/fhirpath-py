@@ -1,3 +1,4 @@
+import itertools
 import numbers
 import fhirpathpy.engine.util as util
 
@@ -21,14 +22,14 @@ def where_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
-    return util.flatten([x for x in data if check_macro_expr(expr, x)])
+    return util.flatten((x for x in data if check_macro_expr(expr, x)))
 
 
 def select_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
-    return util.flatten([expr(x) for x in data])
+    return util.flatten((expr(x) for x in data))
 
 
 def repeat_macro(ctx, data, expr):
@@ -38,13 +39,11 @@ def repeat_macro(ctx, data, expr):
     res = []
     items = data
 
-    next = None
-    lres = None
-
+    # TODO: is it needs to make it generator?
     while len(items) != 0:
-        next = items[0]
+        next_item = items[0]
         items = items[1:]
-        lres = expr(next)
+        lres = expr(next_item)
         if lres:
             res = res + lres
             items = items + lres
@@ -114,4 +113,4 @@ def check_fhir_type(ctx, x, tp):
 
 
 def of_type_fn(ctx, coll, tp):
-    return list(filter(lambda x: check_fhir_type(ctx, util.get_data(x), tp), coll))
+    return list(filter(lambda x: check_fhir_type(ctx, util.get_data(x), tp), iter(coll)))

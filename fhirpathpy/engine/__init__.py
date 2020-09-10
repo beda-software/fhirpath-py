@@ -21,7 +21,7 @@ def check_number_param(val):
 
 def check_boolean_param(val):
     data = util.get_data(val)
-    if data == True or data == False:
+    if isinstance(data, bool):
         return data
     raise Exception("Expected boolean, got: " + json.dumps(data))
 
