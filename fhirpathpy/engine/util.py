@@ -51,16 +51,3 @@ def flatten(x):
         return acc
 
     return reduce(func, x, [])
-
-
-def peek_iterator(iterable):
-    """
-    :param iterable: iterable object
-    :return: If after call next of iterator raise StopIteration function returns none what means iterator is empty,
-    else function returns new iterator with first element back
-    """
-    try:
-        first = next(iterable)
-    except StopIteration:
-        return None
-    return itertools.chain([first], iterable)
