@@ -69,3 +69,13 @@ def find_concept_test():
         "%Source.entry[0].resource.expansion.contains.where(code=%Coding.code)!~{}",
         env,
     ) == [False]
+
+
+def aidbox_polimorphici_test():
+    qr = {
+        "resourceType": "QuestionnaireResponse",
+        "item": {"linkId": "foo", "answer": {"value": {"Coding": {"code": 1}}}},
+    }
+    assert evaluate(qr, "QuestionnaireResponse.item.answer.value.Coding") == [
+        {"code": 1}
+    ]

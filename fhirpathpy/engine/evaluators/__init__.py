@@ -213,10 +213,13 @@ def member_invocation(ctx, parentData, node):
 
     if isinstance(parentData, list):
         if util.is_capitalized(key):
-            filtered = [x for x in parentData if x["resourceType"] == key]
-            mapped = [nodes.ResourceNode.create_node(x, key) for x in filtered]
+            try:
+                filtered = [x for x in parentData if x["resourceType"] == key]
+                mapped = [nodes.ResourceNode.create_node(x, key) for x in filtered]
 
-            return mapped
+                return mapped
+            except TypeError:
+                pass
 
         return list(reduce(create_reduce_member_invocation(model, key), parentData, []))
 
