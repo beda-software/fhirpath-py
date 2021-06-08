@@ -1,3 +1,5 @@
+import json
+from collections import OrderedDict
 from functools import reduce
 from fhirpathpy.engine.nodes import ResourceNode
 
@@ -50,3 +52,9 @@ def flatten(x):
         return acc
 
     return reduce(func, x, [])
+
+
+def uniq(arr):
+    # Strong type fast implementation for unique values that preserves ordering
+    ordered_dict = OrderedDict([json.dumps(x, sort_keys=True), x] for x in arr)
+    return list(ordered_dict.values())

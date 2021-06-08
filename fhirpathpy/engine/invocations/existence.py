@@ -1,4 +1,3 @@
-import json
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 import fhirpathpy.engine.invocations.filtering as filtering
@@ -84,27 +83,13 @@ def superset_of_fn(ctx, coll1, coll2):
 
 def distinct_fn(ctx, x):
     if all([isinstance(v, nodes.ResourceNode) for v in x]):
-
         data = [v.data for v in x]
 
-        # naive and strong type implementation for unique values
-        unique = []
-        for x in data:
-            step_next = False
-            for y in unique:
-                if type(x) == type(y) and x == y:
-                    step_next = True
-                    break
-
-            if step_next:
-                continue
-
-            unique.append(x)
+        unique = util.uniq(data)
 
         return [nodes.ResourceNode.create_node(item) for item in unique]
 
-    return list(set(x))
-
+    return util.uniq(x)
 
 def isdistinct_fn(ctx, x):
     return [len(x) == len(distinct_fn(ctx, x))]
