@@ -3,6 +3,7 @@ from fhirpathpy.parser import parse
 from fhirpathpy.engine import do_eval
 from fhirpathpy.engine.util import arraify, get_data
 from fhirpathpy.engine.nodes import FP_Type
+from functools import partial
 
 __title__ = "fhirpathpy"
 __version__ = "0.0.1a"
@@ -83,7 +84,4 @@ def compile(path, model=None):
     """
     node = parse(path)
 
-    def func(resource, context={}):
-        return apply_parsed_path(resource, node, context, model)
-
-    return func
+    return partial(apply_parsed_path, node=node, model=model)
