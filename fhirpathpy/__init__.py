@@ -82,6 +82,4 @@ def compile(path, model=None):
 
     For example, you could pass in the result of require("fhirpath/fhir-context/r4")
     """
-    node = parse(path)
-
-    return partial(apply_parsed_path, node=node, model=model)
+    return partial(apply_parsed_path, parsedPath=parse(path), model=model)
