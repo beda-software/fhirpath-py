@@ -1,4 +1,4 @@
-name: DRF Writable Nested
+name: fhirpath py
 
 on:
   - push
