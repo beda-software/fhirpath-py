@@ -1,7 +1,8 @@
 fhirpath.py
 ===========
 
-[![Build Status](https://travis-ci.org/beda-software/fhirpath-py.svg?branch=master)](https://travis-ci.org/beda-software/fhirpath-py)
+[![Build Status](https://github.com/beda-software/fhirpath-py/actions/workflows/build.yaml/badge.svg)](https://github.com/beda-software/fhirpath-py/actions)
+[![codecov](https://codecov.io/gh/beda-software/fhirpath-py/branch/master/graph/badge.svg)](https://codecov.io/gh/beda-software/fhirpath-py)
 [![Supported Python version](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/release/python-370/)
 
 [FHIRPath](https://www.hl7.org/fhir/fhirpath.html) implementation in Python
