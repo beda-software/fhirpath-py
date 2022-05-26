@@ -1,9 +1,8 @@
 from fhirpathpy.engine.invocations.constants import Constants
 from fhirpathpy.parser import parse
 from fhirpathpy.engine import do_eval
-from fhirpathpy.engine.util import arraify, get_data
+from fhirpathpy.engine.util import arraify, get_data, partial_with_args
 from fhirpathpy.engine.nodes import FP_Type
-from functools import partial
 
 __title__ = "fhirpathpy"
 __version__ = "0.0.1a"
@@ -82,4 +81,4 @@ def compile(path, model=None):
 
     For example, you could pass in the result of require("fhirpath/fhir-context/r4")
     """
-    return partial(apply_parsed_path, parsedPath=parse(path), model=model)
+    return partial_with_args(apply_parsed_path, parsedPath=parse(path), model=model)

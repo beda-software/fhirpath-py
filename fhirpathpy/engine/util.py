@@ -2,6 +2,23 @@ import json
 from collections import OrderedDict
 from functools import reduce
 from fhirpathpy.engine.nodes import ResourceNode
+import inspect
+
+
+class partial_with_args:
+    def __init__(self, func, **preset_args):
+        self.func = func
+        self.preset_args = preset_args
+
+    def __call__(self, *args, **kwargs):
+        new_args = dict(self.preset_args, **kwargs)
+        unset_params = [
+            param for param in inspect.signature(self.func).parameters
+            if param not in new_args
+        ]
+        for i, arg in enumerate(args):
+            new_args[unset_params[i]] = arg
+        return self.func(**new_args)
 
 
 def get_data(value):
