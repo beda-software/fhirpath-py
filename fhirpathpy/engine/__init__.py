@@ -52,6 +52,9 @@ def doInvoke(ctx, fn_name, data, raw_params):
 
     invocation = invocations[fn_name]
 
+    if "nullable_input" in invocation and util.is_nullable(data):
+        return []
+
     if not "arity" in invocation:
         if raw_params is None or util.is_empty(raw_params):
             res = invocation["fn"](ctx, util.arraify(data))
