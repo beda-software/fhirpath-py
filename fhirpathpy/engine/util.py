@@ -4,6 +4,16 @@ from functools import reduce
 from fhirpathpy.engine.nodes import ResourceNode
 
 
+class set_paths:
+    def __init__(self, func, parsedPath, model=None):
+        self.func = func
+        self.parsedPath = parsedPath
+        self.model = model
+
+    def __call__(self, resource, context={}):
+        return self.func(resource, self.parsedPath, context, self.model)
+
+
 def get_data(value):
     if isinstance(value, ResourceNode):
         return value.data

@@ -1,5 +1,5 @@
-from fhirpathpy import evaluate
-
+from fhirpathpy import evaluate, compile
+import pickle
 
 def find_concept_test():
     env = {}
@@ -79,3 +79,21 @@ def aidbox_polimorphici_test():
     assert evaluate(qr, "QuestionnaireResponse.item.answer.value.Coding") == [
         {"code": 1}
     ]
+
+
+def pickle_test():
+    resource = {
+        "resourceType": "DiagnosticReport",
+        "id": "abc",
+        "subject": {"reference": "Patient/cdf"},
+    }
+    path = compile(path="DiagnosticReport.subject.reference")
+
+    dumped = pickle.dumps(path)
+    reload = pickle.loads(dumped)
+
+    assert reload(resource) == ["Patient/cdf"]
+
+
+
+

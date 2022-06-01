@@ -1,7 +1,7 @@
 from fhirpathpy.engine.invocations.constants import Constants
 from fhirpathpy.parser import parse
 from fhirpathpy.engine import do_eval
-from fhirpathpy.engine.util import arraify, get_data
+from fhirpathpy.engine.util import arraify, get_data, set_paths
 from fhirpathpy.engine.nodes import FP_Type
 
 __title__ = "fhirpathpy"
@@ -81,9 +81,4 @@ def compile(path, model=None):
 
     For example, you could pass in the result of require("fhirpath/fhir-context/r4")
     """
-    node = parse(path)
-
-    def func(resource, context={}):
-        return apply_parsed_path(resource, node, context, model)
-
-    return func
+    return set_paths(apply_parsed_path, parsedPath=parse(path), model=model)
