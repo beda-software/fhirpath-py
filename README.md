@@ -12,7 +12,7 @@ Parser was generated with [antlr4](https://github.com/antlr/antlr4)
 
 # Getting started
 ## Install
-`pip install git+https://github.com/beda-software/fhirpath-py.git`
+`pip install fhirpathpy`
 
 ## Usage
 ```Python
