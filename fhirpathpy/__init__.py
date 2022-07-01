@@ -5,7 +5,7 @@ from fhirpathpy.engine.util import arraify, get_data, set_paths
 from fhirpathpy.engine.nodes import FP_Type
 
 __title__ = "fhirpathpy"
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 __author__ = "beda.software"
 __license__ = "MIT"
 __copyright__ = "Copyright 2022 beda.software"

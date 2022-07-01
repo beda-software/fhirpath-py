@@ -35,6 +35,7 @@ setup(
     url="https://github.com/beda-software/fhirpath-py",
     project_urls={
         "Source Code": "https://github.com/beda-software/fhirpath-py",
+        "Changelog": "https://github.com/beda-software/fhirpath-py/blob/master/CHANGELOG.md",
     },
     packages=["fhirpathpy"],
     include_package_data=True,
