@@ -33,7 +33,9 @@ setup(
     author_email="fhirpath@beda.software",
     license="MIT",
     url="https://github.com/beda-software/fhirpath-py"
-    project_urls={"Source Code": "https://github.com/beda-software/fhirpath-py",},
+    project_urls={
+        "Source Code": "https://github.com/beda-software/fhirpath-py",
+    },
     packages=["fhirpathpy"],
     include_package_data=True,
     zip_safe=False,
