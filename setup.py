@@ -32,7 +32,7 @@ setup(
     author="beda.software",
     author_email="fhirpath@beda.software",
     license="MIT",
-    url="https://github.com/beda-software/fhirpath-py"
+    url="https://github.com/beda-software/fhirpath-py",
     project_urls={
         "Source Code": "https://github.com/beda-software/fhirpath-py",
     },
