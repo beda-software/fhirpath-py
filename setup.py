@@ -17,6 +17,7 @@ def get_version(package):
 
 version = get_version("fhirpathpy")
 
+
 with open("README.md") as f:
     long_description = f.read()
 
@@ -25,10 +26,32 @@ setup(
     name="fhirpathpy",
     version=version,
     description="FHIRPath implementation in Python",
-    license="",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    keywords="fhirpath",
+    author="beda.software",
+    author_email="fhirpath@beda.software",
+    license="MIT",
+    url="https://github.com/beda-software/fhirpath-py"
     project_urls={"Source Code": "https://github.com/beda-software/fhirpath-py",},
     packages=["fhirpathpy"],
     include_package_data=True,
     zip_safe=False,
     install_requires=["antlr4-python3-runtime==4.8"],
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Web Environment",
+        "Intended Audience :: Developers",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3 :: Only",
+        "Topic :: Internet :: WWW/HTTP",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+    ],
 )
