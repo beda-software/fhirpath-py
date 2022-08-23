@@ -1,6 +1,7 @@
 import datetime
 import math
 import pytest
+from freezegun import freeze_time
 
 from fhirpathpy import evaluate
 from fhirpathpy.engine.invocations.constants import constants
@@ -192,16 +193,27 @@ def existence_functions_test(resource, path, expected):
         ({"a": False}, "a.toDecimal()", [0]),
         ({"a": False}, "a.toString()", ["False"]),
         ({"a": 101.99}, "a.toString()", ["101.99"]),
-        ({}, "now()", ["2020-08-20T17:52:15+03:00"]),
-        ({}, "today()", ["2020-08-20"]),
-        ({}, "timeOfDay()", ["17:52:15"]),
     ],
 )
 def misc_functions_test(resource, path, expected):
-    # Monkeypatching for Constants.nowDate
-    tz = datetime.timezone(datetime.timedelta(seconds=10800))
-    constants.nowDate = datetime.datetime(year=2020, month=8, day=20, hour=17, minute=52, second=15, tzinfo=tz)
     assert evaluate(resource, path) == expected
+
+def time_functions_test():
+    local_tz = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+
+    tz_offset = datetime.timedelta(hours=3)
+    with freeze_time(lambda: datetime.datetime(year=2020, month=8, day=20, hour=17, minute=52, second=15)):
+        assert datetime.datetime.fromisoformat(evaluate({}, 'now()')[0]).timestamp() == datetime.datetime.now().replace(tzinfo=local_tz).timestamp()
+        assert evaluate({}, 'today()') == ["2020-08-20"]
+        assert evaluate({}, 'timeOfDay()') == ["17:52:15"]
+
+def now_function_test():
+    with freeze_time(lambda: datetime.datetime(2020, 8, 20)) as frozen_datetime:
+        old_now_value = evaluate({}, 'now()')
+        frozen_datetime.tick(1.0)
+        new_now_value = evaluate({}, 'now()')
+    
+    assert old_now_value != new_now_value
 
 
 @pytest.mark.parametrize(

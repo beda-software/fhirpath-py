@@ -14,23 +14,23 @@ tests:
 # Returns a dateTime containing the current date and time, including timezone.
 
   - desc: '** TBD: now()'
-    expression: now()
-    result: ['2020-08-20T17:52:15+03:00']
+    expression: now().toString().substring(0,10) = today().toString()
+    result: [true]
 
   - desc: '5.8.3. today() : dateTime'
 # Returns a dateTime containing the current date.
 
   - desc: '** TBD: today()'
-    expression: today()
-    result: ['2020-08-20']
+    expression: now().toString().substring(11,8) = timeOfDay().toString()
+    result: [true]
 
 
   - desc: '5.8.4 timeOfDay() : dateTime'
 # Returns a dateTime containing the current time.
 
   - desc: '** TBD: timeOfDay()'
-    expression: timeOfDay()
-    result: ['17:52:15']
+    expression: timeOfDay().toString().length() = 8
+    result: [true]
 
 subject:
   coll:
