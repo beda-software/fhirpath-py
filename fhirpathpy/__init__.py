@@ -1,4 +1,4 @@
-from fhirpathpy.engine.invocations.constants import Constants
+from fhirpathpy.engine.invocations.constants import constants
 from fhirpathpy.parser import parse
 from fhirpathpy.engine import do_eval
 from fhirpathpy.engine.util import arraify, get_data, set_paths
@@ -15,7 +15,7 @@ VERSION = __version__
 
 
 def apply_parsed_path(resource, parsedPath, context={}, model=None):
-    Constants.reset()
+    constants.reset()
     dataRoot = arraify(resource)
 
     """

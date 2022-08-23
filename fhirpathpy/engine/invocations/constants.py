@@ -14,12 +14,11 @@ class Constants:
     timeOfDay = None
     localTimezoneOffset = None
 
-    @classmethod
-    def reset(cls):
-        cls.nowDate = datetime.datetime.now()
-        cls.today = None
-        cls.now = None
-        cls.timeOfDay = None
-        cls.localTimezoneOffset = None
+    def reset(self):
+        self.nowDate = datetime.datetime.now()
+        self.today = None
+        self.now = None
+        self.timeOfDay = None
+        self.localTimezoneOffset = None
 
 constants = Constants()
