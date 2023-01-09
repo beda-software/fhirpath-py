@@ -1,0 +1,13 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+[dev-packages]
+antlr4-python3-runtime = "==4.8"
+pytest = "==7.1.1"
+pytest-cov = "==3.0.0"
+freezegun = "==1.2.2"
+pyyaml = "==5.4"
