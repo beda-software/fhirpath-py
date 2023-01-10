@@ -19,7 +19,7 @@ skip = [".gitignore"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q --color=yes --cov=fhirpy --cov-report=xml"
+addopts = "-ra -q --color=yes --cov=fhirpathpy --cov-report=xml"
 testpaths = ["tests"]
 log_cli = true
 log_cli_level = "INFO"
