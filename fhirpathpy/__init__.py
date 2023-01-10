@@ -8,7 +8,7 @@ __title__ = "fhirpathpy"
 __version__ = "0.1.1"
 __author__ = "beda.software"
 __license__ = "MIT"
-__copyright__ = "Copyright 2022 beda.software"
+__copyright__ = "Copyright 2023 beda.software"
 
 # Version synonym
 VERSION = __version__
