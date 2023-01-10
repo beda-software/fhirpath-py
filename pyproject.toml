@@ -1,0 +1,64 @@
+[tool.black]
+line-length = 100
+target-version = ['py311']
+exclude = '''
+(
+  /(
+    | \.git
+    | \.pytest_cache
+    | pyproject.toml
+    | dist
+  )/
+)
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = [".gitignore"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --color=yes --cov=fhirpy --cov-report=xml"
+testpaths = ["tests"]
+log_cli = true
+log_cli_level = "INFO"
+python_functions = "*_test"
+
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "fhirpathpy"
+description = "FHIRPath implementation in Python"
+readme = "README.md"
+license = { file = "LICENSE.md" }
+keywords = ["fhir", "fhirpath"]
+dynamic = ["version"]
+authors = [{ name = "beda.software", email = "fhirpath@beda.software" }]
+dependencies = ["antlr4-python3-runtime==4.8"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+test = ["pytest==7.1.1", "freezegun==1.2.2", "pyyaml==5.4"]
+
+[project.urls]
+Homepage = "https://github.com/beda-software/fhirpath-py"
+Documentation = "https://github.com/beda-software/fhirpath-py#readme"
+Source = "https://github.com/beda-software/fhirpath-py.git"
+Changelog = "https://github.com/beda-software/fhirpath-py/blob/master/CHANGELOG.md"
