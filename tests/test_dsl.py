@@ -14,3 +14,13 @@ def dsl_test():
         )
         == "%Source.entry[0].resource.expansion.contains.where(code=%Coding.code) !~ {}"
     )
+
+    ### TODO
+    assert (
+        str(dsl.env.Location.where('817' in dsl.env.physicalType.coding.code).name)
+        == "Location.where(physicalType.coding.code contains '817').name"
+    )
+    """
+
+    (%QuestionnaireResponse.repeat(item).where(linkId='test-type').answer.children().Coding.code = 'trainingTest' or %QuestionnaireResponse.repeat(item).where(linkId='sample-set').answer.count() = 6).not()
+    """
