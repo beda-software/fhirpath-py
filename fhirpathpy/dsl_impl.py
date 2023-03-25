@@ -12,6 +12,8 @@ class DSL:
         elif self.path == "%":
             return DSL(f"{self.path}{attr}")
         elif self.path is not None:
+            if attr == "not_":
+                return DSL(f"{self.path}.not")
             return DSL(f"{self.path}.{attr}")
         else:
             return DSL(attr)
@@ -20,14 +22,31 @@ class DSL:
         return DSL(f"{self.path}[{attr}]")
 
     def __eq__(self, other):
-        return DSL(f"{self.path} ~ {format_value(other)}")
+        return DSL(f"{self.path} = {format_value(other)}")
 
     def __ne__(self, other):
-        return DSL(f"{self.path} !~ {format_value(other)}")
+        return DSL(f"{self.path} != {format_value(other)}")
 
-    def __call__(self, **kwargs):
-        args = build_args(kwargs)
-        return DSL(f"{self.path}({args})")
+    def __lshift__(self, item):
+        return DSL(f"{self.path} contains {format_value(item)}")
+
+    def __or__(self, item):
+        return DSL(f"({self.path} or {format_value(item)})")
+
+    def __not__(self):
+        return DSL(f"{self.path}.not()")
+
+    def __call__(self, *args, **kwargs):
+        if len(args) == 0 and len(kwargs) == 0:
+            return DSL(f"{self.path}()")
+        elif len(args) == 0 and len(kwargs) == 1:
+            arg = build_args(kwargs)
+            return DSL(f"{self.path}({arg})")
+        elif len(args) == 1 and len(kwargs) == 0:
+            arg = format_value(args[0])
+            return DSL(f"{self.path}({arg})")
+        else:
+            raise Exception(f"Wrong arguements args={args} kwargs={kwargs}")
 
     def __str__(self):
         return self.path
