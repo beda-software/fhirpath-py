@@ -115,3 +115,11 @@ def check_fhir_type(ctx, x, tp):
 
 def of_type_fn(ctx, coll, tp):
     return list(filter(lambda x: check_fhir_type(ctx, util.get_data(x), tp), coll))
+
+def extension(ctx,data,url):
+    res  = []
+    for d in data:
+        exts = [e for e in util.get_data(d)["extension"] if e["url"] == url]
+        if len(exts) > 0:
+            res.append(exts[0])
+    return res

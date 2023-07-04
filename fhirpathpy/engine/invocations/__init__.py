@@ -27,6 +27,7 @@ invocations = {
     "count": {"fn": existence.count_fn},
     "repeat": {"fn": filtering.repeat_macro, "arity": {1: ["Expr"]}},
     "where": {"fn": filtering.where_macro, "arity": {1: ["Expr"]}},
+    "extension": {"fn": filtering.extension, "arity": {1: ["String"]}},
     "select": {"fn": filtering.select_macro, "arity": {1: ["Expr"]}},
     "single": {"fn": filtering.single_fn},
     "first": {"fn": filtering.first_fn},
