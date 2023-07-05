@@ -218,7 +218,6 @@ def create_reduce_member_invocation(model, key):
 
 
 def member_invocation(ctx, parentData, node):
-    # print("CTX", [util.get_data(p) for p in parentData])
     key = engine.do_eval(ctx, parentData, node["children"][0])[0]
     model = ctx["model"]
 
