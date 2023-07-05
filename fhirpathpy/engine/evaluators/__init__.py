@@ -188,14 +188,15 @@ def create_reduce_member_invocation(model, key):
             # Use actualTypes to find the field's value
             for actualType in actualTypes:
                 field = key + actualType
-                if isinstance(res.data, (dict, list)) and field in res.data:
-                    toAdd = res.data[field]
+                if isinstance(res.data, (dict, list)):
+                    toAdd = res.data.get(field)
                     toAdd_ = res.data.get(f"_{field}")
-                    childPath = actualType
-                    break
+                    if toAdd is not None or toAdd_ is not None:
+                        childPath = actualType
+                        break
         else:
-            if isinstance(res.data, (dict, list)) and key in res.data:
-                toAdd = res.data[key]
+            if isinstance(res.data, (dict, list)):
+                toAdd = res.data.get(key)
                 toAdd_ = res.data.get(f"_{key}")
                 if key == 'extension':
                     childPath = 'Extension'
