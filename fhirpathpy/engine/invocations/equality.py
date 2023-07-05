@@ -35,9 +35,11 @@ def datetime_equality(ctx, x, y):
     datetime_x = x[0]
     datetime_y = y[0]
     if type(datetime_x) not in DATETIME_NODES_LIST:
-        datetime_x = nodes.FP_DateTime(datetime_x) or nodes.FP_Time(datetime_x)
+        v_x = util.get_data(datetime_x)
+        datetime_x = nodes.FP_DateTime(v_x) or nodes.FP_Time(v_x)
     if type(datetime_y) not in DATETIME_NODES_LIST:
-        datetime_y = nodes.FP_DateTime(datetime_y) or nodes.FP_Time(datetime_y)
+        v_y = util.get_data(datetime_y)
+        datetime_y = nodes.FP_DateTime(v_y) or nodes.FP_Time(v_y)
     return datetime_x.equals(datetime_y)
 
 
