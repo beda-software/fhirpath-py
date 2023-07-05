@@ -113,6 +113,6 @@ def to_time(ctx, coll):
         timeObject = nodes.FP_Time(value)
 
         if timeObject:
-            rtn[0] = timeObject
+            rtn.append(timeObject)
 
     return rtn
