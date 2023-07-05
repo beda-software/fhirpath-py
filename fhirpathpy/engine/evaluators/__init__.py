@@ -197,6 +197,8 @@ def create_reduce_member_invocation(model, key):
             if isinstance(res.data, (dict, list)) and key in res.data:
                 toAdd = res.data[key]
                 toAdd_ = res.data.get(f"_{key}")
+                if key == 'extension':
+                    childPath = 'Extension'
 
         if util.is_some(toAdd):
             if isinstance(toAdd, list):
