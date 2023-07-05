@@ -43,8 +43,8 @@ invocations = {
     "toInteger": {"fn": misc.to_integer},
     "toDecimal": {"fn": misc.to_decimal},
     "toString": {"fn": misc.to_string},
-    # toDateTime:   {fn: misc.toDateTime},
-    # toTime:       {fn: misc.toTime},
+    "toDateTime": {"fn": misc.to_date_time},
+    "toTime": {"fn": misc.to_time},
     "indexOf": {"fn": strings.index_of, "arity": {1: ["String"]}, "nullable_input": True},
     "substring": {
         "fn": strings.substring,

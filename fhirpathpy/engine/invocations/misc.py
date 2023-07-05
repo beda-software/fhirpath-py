@@ -96,7 +96,7 @@ def to_date_time(ctx, coll):
         dateTimeObject = nodes.FP_DateTime(value)
 
         if dateTimeObject:
-            rtn[0] = dateTimeObject
+            rtn.append(dateTimeObject)
 
     return rtn
 
