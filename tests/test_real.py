@@ -95,5 +95,37 @@ def pickle_test():
     assert reload(resource) == ["Patient/cdf"]
 
 
-
-
+def extension_test():
+    patient = {
+        "identifier": [
+            {
+                "period": {
+                    "start": "2020-01-01"
+                },
+                "system": "http://hl7.org/fhir/sid/us-mbi",
+                "type": {
+                    "coding": [
+                        {
+                            "code": "MC",
+                            "display": "Patient's Medicare number",
+                            "extension": [
+                                {
+                                    "url": "https://bluebutton.cms.gov/resources/codesystem/identifier-currency",
+                                    "valueCoding": {
+                                        "code": "current",
+                                        "display": "Current",
+                                        "system": "https://bluebutton.cms.gov/resources/codesystem/identifier-currency"
+                                    }
+                                }
+                            ],
+                            "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                        }
+                    ]
+                },
+                "value": "7SM0A00AA00"
+            }
+        ],
+        "resourceType": "Patient"
+    }
+    result = evaluate(patient, "Patient.identifier.where(type.coding.extension('https://bluebutton.cms.gov/resources/codesystem/identifier-currency').valueCoding.code = 'current').where(system = 'http://hl7.org/fhir/sid/us-mbi').value")
+    assert result == ["7SM0A00AA00"]

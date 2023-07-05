@@ -96,7 +96,7 @@ def to_date_time(ctx, coll):
         dateTimeObject = nodes.FP_DateTime(value)
 
         if dateTimeObject:
-            rtn[0] = dateTimeObject
+            rtn.append(dateTimeObject)
 
     return rtn
 
@@ -113,6 +113,6 @@ def to_time(ctx, coll):
         timeObject = nodes.FP_Time(value)
 
         if timeObject:
-            rtn[0] = timeObject
+            rtn.append(timeObject)
 
     return rtn
