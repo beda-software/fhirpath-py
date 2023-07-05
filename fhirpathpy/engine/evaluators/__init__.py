@@ -182,6 +182,7 @@ def create_reduce_member_invocation(model, key):
             actualTypes = model["choiceTypePaths"][childPath]
 
         toAdd = None
+        toAdd_ = None
 
         if isinstance(actualTypes, list):
             # Use actualTypes to find the field's value
@@ -189,11 +190,13 @@ def create_reduce_member_invocation(model, key):
                 field = key + actualType
                 if isinstance(res.data, (dict, list)) and field in res.data:
                     toAdd = res.data[field]
+                    toAdd_ = res.data.get(f"_{field}")
                     childPath = actualType
                     break
         else:
             if isinstance(res.data, (dict, list)) and key in res.data:
                 toAdd = res.data[key]
+                toAdd_ = res.data.get(f"_{key}")
 
         if util.is_some(toAdd):
             if isinstance(toAdd, list):
@@ -201,13 +204,19 @@ def create_reduce_member_invocation(model, key):
                 acc = acc + mapped
             else:
                 acc.append(nodes.ResourceNode.create_node(toAdd, childPath))
-            return acc
+        if util.is_some(toAdd_):
+            if isinstance(toAdd_, list):
+                mapped = [nodes.ResourceNode.create_node(x, childPath) for x in toAdd_]
+                acc = acc + mapped
+            else:
+                acc.append(nodes.ResourceNode.create_node(toAdd_, childPath))
         return acc
 
     return func
 
 
 def member_invocation(ctx, parentData, node):
+    # print("CTX", [util.get_data(p) for p in parentData])
     key = engine.do_eval(ctx, parentData, node["children"][0])[0]
     model = ctx["model"]
 
@@ -265,9 +274,7 @@ def polarity_expression(ctx, parentData, node):
     rtn = engine.do_eval(ctx, parentData, node["children"][0])
 
     if len(rtn) != 1:  # not yet in spec, but per Bryn Rhodes
-        raise Exception(
-            "Unary " + sign + " can only be applied to an individual number."
-        )
+        raise Exception("Unary " + sign + " can only be applied to an individual number.")
 
     if not util.is_number(rtn[0]):
         raise Exception("Unary " + sign + " can only be applied to a number.")
@@ -301,9 +308,7 @@ evaluators = {
     # expressions
     "PolarityExpression": polarity_expression,
     "IndexerExpression": indexer_expression,
-    "MembershipExpression": alias_op_expression(
-        {"contains": "containsOp", "in": "inOp"}
-    ),
+    "MembershipExpression": alias_op_expression({"contains": "containsOp", "in": "inOp"}),
     "TermExpression": term_expression,
     "UnionExpression": union_expression,
     "InvocationExpression": invocation_expression,
