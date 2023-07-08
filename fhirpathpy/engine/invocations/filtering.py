@@ -42,11 +42,15 @@ def repeat_macro(ctx, data, expr):
     next = None
     lres = None
 
+    uniq = set()
+
     while len(items) != 0:
         next = items[0]
         items = items[1:]
-        lres = expr(next)
-        if lres:
+        lres = [l for l in expr(next) if l not in uniq]
+        if len(lres) > 0:
+            for l in lres:
+                uniq.add(l)
             res = res + lres
             items = items + lres
 
