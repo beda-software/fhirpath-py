@@ -1,0 +1,269 @@
+tests:
+  - desc: '6.6 Math'
+  - desc: '6.6.1 multiplication'
+  - desc: '** Can multiply two numbers'
+    expression: n1 * n2
+    result: [10]
+  - desc: '** Can multiply two number literals'
+    expression: 2 * 4
+    result: [8]
+  - desc: '** Error multiplying string (1)'
+    expression: s5 * n2
+    error: true
+  - desc: '** Error multiplying string (2)'
+    expression: n2 * s5
+    error: true
+  - desc: '** Error multiplying string (3)'
+    expression: s5 * s5
+    error: true
+  - desc: '** Error multiplying multi-valued collection (1)'
+    expression: n1 * a3
+    error: true
+  - desc: '** Error multiplying multi-valued collection (2)'
+    expression: a3 * n1
+    error: true
+  - desc: '** Empty result multiplying empty collection (1)'
+    expression: n1 * n4
+    result: []
+  - desc: '** Empty result multiplying empty collection (2)'
+    expression: n4 * n1
+    result: []
+
+
+  - desc: '6.6.2 division'
+  - desc: '** Can divide two numbers'
+    expression: n2/n1
+    result: [2.5]
+  - desc: '** Can divide two number literals'
+    expression: 5/2
+    result: [2.5]
+
+
+  - desc: '6.6.3 addition'
+  - desc: '** Can add two numbers'
+    expression: n1 + n2
+    result: [7]
+  - desc: '** Can add two number literals'
+    expression: 2+3
+    result: [5]
+  - desc: '** Error adding array of numbers'
+    expression: n1 + a3
+    error: true
+  - desc: '** Error adding missing numbers'
+    expression: n1 + n4
+    disable: true
+    error: true
+  - desc: '** Error adding non-matching types'
+    expression: n1 + s5
+    error: true
+  - desc: '** Error adding non-matching types (2)'
+    expression: s5 + n1
+    error: true
+  - desc: '** Empty result if one or both operands is empty (1)'
+    disable: true
+    expression: n1 + n4
+    result: []
+  - desc: '** Empty result if one or both operands is empty (1b)'
+    expression: s5 + n4
+    result: []
+  - desc: '** Empty result if one or both operands is empty (2)'
+    expression: n4 + n1
+    result: []
+  - desc: '** Empty result if one or both operands is empty (3)'
+    expression: n4 + n4
+    result: []
+
+  - desc: '6.6.4 substraction'
+  - desc: '** Can subtract two numbers'
+    expression: n1 - n2
+    result: [-3]
+  - desc: '** Can subtract two number literals'
+    expression:  5-3
+    result: [2]
+
+
+  - desc: '6.6.5 div'
+  - desc: '** Can div two numbers'
+    expression: n2 div n1
+    result: [2]
+  - desc: '** Error truncated divide array of numbers'
+    expression: MathTestData.n1 div MathTestData.a3
+    error: true
+  - desc: '** Error truncated divide missing numbers'
+    disable: true
+    expression: MathTestData.n1 div MathTestData.n4
+    error: true
+  - desc: '** Error truncated divide non-number'
+    expression: MathTestData.n1 div MathTestData.s5
+    error: true
+
+  - desc: '6.6.6 mod'
+  - desc: '** Can mod two numbers'
+    expression: n2 mod n1
+    result: [1]
+  - desc: '** Error reminder of truncated division array of numbers'
+    expression: MathTestData.n1 mod MathTestData.a3
+    error: true
+  - desc: '** Error reminder of truncated division missing numbers'
+    disable: true
+    expression: MathTestData.n1 mod MathTestData.n4
+    error: true
+  - desc: '** Error reminder of truncated division non-number'
+    expression: MathTestData.n1 mod MathTestData.s5
+    error: true
+
+  - desc: '6.6.7 string concatenation'
+  - desc: '** Can concatenate two strings'
+    expression: s5 & s6
+    result: ["onetwo"]
+  - desc: '** Can concatenate two strings with +'
+    expression: s5 + s6
+    result: ["onetwo"]
+  - desc: '** Empty collection in concatenation is empty string (1)'
+    expression: n4 & s5
+    result: ["one"]
+  - desc: '** Empty collection in concatenation is empty string (2)'
+    expression: s5 & n4
+    result: ["one"]
+  - desc: '** Empty collection in concatenation is empty string (3)'
+    expression: n4 & n4
+    result: [""]
+  - 'group:  6.7 Date/Time Arithmetic':
+    - expression: "@2018 + 1 'a' = @2019"
+      error: true
+    - expression: "@2018 + 1 year"
+      result: ['2019']
+    - expression: "@2016 + 364 days"
+      result: ['2016']
+    - expression: "@2016 - 364 days"
+      result: ['2016']
+    - expression: "@2016 + 365 days"
+      result: ['2017']
+    - expression: "@2016 - 365 days"
+      result: ['2015']
+    - expression: "@2016 + 11 months"
+      result: ['2016']
+    - expression: "@2016 + 12 months"
+      result: ['2017']
+    - expression: "@2018 + 2 years"
+      result: ['2020']
+    - expression: "@2018-02 + 1 'mo'"
+      error: true
+    - expression: "@2018-02 + 1 month"
+      result: ['2018-03']
+    - expression: "@2018-02 + 2 months"
+      result: ['2018-04']
+    - expression: "@2016-01 + 29 days"
+      result: ['2016-01']
+    - expression: "@2016-01 + 29 'd'"
+      result: ['2016-01']
+    - expression: "@2016-01 + 30 days"
+      result: ['2016-02']
+    - expression: "@2016-01 + 30 'd'"
+      result: ['2016-02']
+    - expression: "@2016-01 + 1 hour"
+      result: ['2016-01']
+    - expression: "@2018-01-03 + 2 years"
+      result: ['2020-01-03']
+    - expression: "@2018-02-18T12:23:45-05:00 + 2 years"
+      result: ['2020-02-18T14:23:45-03:00']
+    - expression: "@2016-02-29 + 1 month"
+      result: ['2016-03-29']
+    - expression: "@2016-02-29 + 1 year"
+      result: ['2017-02-28']
+    - expression: "@2016-01-31 + 1 month"
+      result: ['2016-02-29']
+    - expression: "@2016-01-31 + 1 month + 1 day"
+      result: ['2016-03-01']
+    - expression: "@2016-02-28 + 1 week"
+      result: ['2016-03-06']
+    - expression: "@2016-02-28 + 1 'wk'"
+      result: ['2016-03-06']
+    - expression: "@2016-02-28 + 1 day"
+      result: ['2016-02-29']
+    - expression: "@2016-02-28 + 2 days"
+      result: ['2016-03-01']
+    - expression: "@2016-02-28 - 2 days"
+      result: ['2016-02-26']
+    - expression: "@2016-01-01 + 1 month"
+      result: ['2016-02-01']
+    - expression: "@2016-01-01 + 24 hours"
+      result: ['2016-01-02']
+    - expression: "@2016-01-01 + 47 hours"
+      result: ['2016-01-02']
+    - expression: "@2018-02-18T12 + 59 minutes = @2018-02-18T12"
+      result: [true]
+    - expression: "@2018-02-18T12 + 60 minutes = @2018-02-18T13"
+      result: [true]
+    - expression: "@2018-02-18T12:00 + 59 seconds = @2018-02-18T12:00"
+      result: [true]
+    - expression: "@2018-02-18T12:00 + 60 seconds = @2018-02-18T12:01"
+      result: [true]
+    - expression: "@T09:45:23 + 2 years"
+      error: true
+    - expression: "@T09:45Z + 120 seconds = @T04:47-05:00"
+      result: [true]
+    - expression: "@T09:45Z + 59 seconds = @T09:45Z"
+      result: [true]
+    - expression: "@T09:45:23Z + 2 minutes = @T04:47:23.000-05:00"
+      result: [true]
+    - expression: "@T23:59:23Z + 2 minutes = @T00:01:23Z"
+      result: [true]
+    - expression: "@T23:59:23-05:00 + 2 minutes = @T00:01:23-05:00"
+      result: [true]
+    - expression: "@T23:59:23-05:00 + 2 days"
+      error: true
+    - expression: "@T23:59:23-05:00 + 5 milliseconds = @T23:59:23.005-05:00"
+      result: [true]
+    - expression: "@T23:59:23-05:00 + 1.5 seconds = @T23:59:24.500-05:00"
+      result: [true]
+    - expression: "@T23:59:23-05:00 + 1.5 's' = @T23:59:24.500-05:00"
+      result: [true]
+    - expression: "@T23:59:23-05:00 - 1.5 's' = @T23:59:21.500-05:00"
+      result: [true]
+    - expression: "@T23:59:23-05:00 + 1000 milliseconds = @T23:59:24-05:00"
+      result: [true]
+    - expression: "@T23:59:23.005-05:00 + 995 milliseconds = @T23:59:24-05:00"
+      result: [true]
+    - expression: "@T23:59:23.005-05:00 + 1990 milliseconds = @T23:59:24.995-05:00"
+      result: [true]
+# From the FHIRPath specification: "For precisions above seconds, the decimal
+# portion of the time-valued quantity is ignored, since date/time arithmetic
+# above seconds is performed with calendar duration semantics."
+    - expression: "@2016-02-29 + 1.5 year"
+      result: ['2017-02-28']
+    - expression: "@2016-02-28 + 1.5 weeks"
+      result: ['2016-03-06']
+    - expression: "@2016-02-28 - 1.5 weeks"
+      result: ['2016-02-21']
+    - expression: "@2016-02-28 + 1.5 'wk'"
+      result: ['2016-03-06']
+    - expression: "@2016-02-28 + 1.5 day"
+      result: ['2016-02-29']
+    - expression: "@T23:59:23-05:00 + 1.5 hours = @T00:59:23-05:00"
+      result: [true]
+    - expression: "Patient.birthDate - 1 day = @1974-12-24"
+      model: r4
+      inputfile: patient-example.json
+      result:
+        - true
+    - expression: "Patient.birthDate + 1 day = @1974-12-26"
+      model: r4
+      inputfile: patient-example.json
+      result:
+        - true
+    - desc: '** Do not convert a resource node value to Date without model'
+      expression: "Patient.birthDate + 1 day = @1974-12-26"
+      inputfile: patient-example.json
+      error: true
+
+subject:
+  resourceType: MathTestData
+  n1: 2
+  n2: 5
+  a3:
+    - 1
+    - 2
+  n4: []
+  s5: "one"
+  s6: "two"

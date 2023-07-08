@@ -1,0 +1,3571 @@
+tests:
+  - 'group: Miscellaneous accessor tests':
+      - desc: '** Extract birthDate'
+        inputfile: patient-example.json
+        expression: birthDate
+        result:
+          - '1974-12-25'
+      - desc: '** patient has a birthDate'
+        inputfile: patient-example.json
+        expression: birthDate
+        result:
+          - true
+        disable: true
+      - desc: '** patient telecom types'
+        inputfile: patient-example.json
+        expression: telecom.use
+        result:
+          - home
+          - work
+          - mobile
+          - old
+  - 'group: Tests ported from the Java Unit Tests':
+      - desc: '** testSimple'
+        inputfile: patient-example.json
+        expression: name.given
+        result:
+          - Peter
+          - James
+          - Jim
+          - Peter
+          - James
+      - desc: '** testSimpleNone'
+        inputfile: patient-example.json
+        expression: name.suffix
+        result: []
+      - desc: '** testEscapedIdentifier'
+        inputfile: patient-example.json
+        expression: name.`given`
+        result:
+          - Peter
+          - James
+          - Jim
+          - Peter
+          - James
+      - desc: '** testSimpleBackTick1'
+        inputfile: patient-example.json
+        expression: '`Patient`.name.`given`'
+        result:
+          - Peter
+          - James
+          - Jim
+          - Peter
+          - James
+      - desc: '** testSimpleFail'
+        inputfile: patient-example.json
+        expression: name.given1
+        error: true
+        disable: true
+      - desc: '** testSimpleWithContext'
+        inputfile: patient-example.json
+        expression: Patient.name.given
+        result:
+          - Peter
+          - James
+          - Jim
+          - Peter
+          - James
+      - desc: '** testSimpleWithWrongContext'
+        inputfile: patient-example.json
+        expression: Encounter.name.given
+        error: true
+        disable: true
+  - 'group: testObservations':
+      - desc: '** testPolymorphismA'
+        inputfile: observation-example.json
+        expression: Observation.value.unit
+        result:
+          - lbs
+        model: r4
+      - desc: '** testPolymorphismB'
+        inputfile: observation-example.json
+        expression: Observation.valueQuantity.unit
+        error: true
+        disable: true
+      - desc: '** testPolymorphismIsA'
+        inputfile: observation-example.json
+        expression: Observation.value.is(Quantity)
+        result:
+          - true
+        model: r4
+      - desc: '** testPolymorphismIsA'
+        inputfile: observation-example.json
+        expression: Observation.value is Quantity
+        result:
+          - true
+        model: r4
+      - desc: '** testPolymorphismIsB'
+        inputfile: observation-example.json
+        expression: Observation.value.is(Period).not()
+        result:
+          - true
+        model: r4
+      - desc: '** testPolymorphismAsA'
+        inputfile: observation-example.json
+        expression: Observation.value.as(Quantity).unit
+        result:
+          - lbs
+        model: r4
+      - desc: '** testPolymorphismAsAFunction'
+        inputfile: observation-example.json
+        expression: (Observation.value as Quantity).unit
+        result:
+          - lbs
+        model: r4
+      - desc: '** testPolymorphismAsB'
+        inputfile: observation-example.json
+        expression: (Observation.value as Period).unit
+        error: true
+        disable: true
+      - desc: '** testPolymorphismAsBFunction'
+        inputfile: observation-example.json
+        expression: Observation.value.as(Period).start
+        result: []
+  - 'group: testDollar':
+      - desc: '** testDollarThis1'
+        inputfile: patient-example.json
+        expression: Patient.name.given.where(substring($this.length()-3) = 'out')
+        result: []
+      - desc: '** testDollarThis2'
+        inputfile: patient-example.json
+        expression: Patient.name.given.where(substring($this.length()-3) = 'ter')
+        result:
+          - Peter
+          - Peter
+      - desc: '** testDollarOrderAllowed'
+        inputfile: patient-example.json
+        expression: Patient.name.skip(1).given
+        result:
+          - Jim
+          - Peter
+          - James
+      - desc: '** testDollarOrderAllowedA'
+        inputfile: patient-example.json
+        expression: Patient.name.skip(3).given
+        result: []
+      - desc: '** testDollarOrderNotAllowed'
+        inputfile: patient-example.json
+        expression: Patient.children().skip(1)
+        error: true
+        disable: true
+  - 'group: testLiterals':
+      - desc: '** testLiteralTrue'
+        inputfile: patient-example.json
+        expression: Patient.name.exists() = true
+        result:
+          - true
+      - desc: '** testLiteralFalse'
+        inputfile: patient-example.json
+        expression: Patient.name.empty() = false
+        result:
+          - true
+      - desc: '** testLiteralString'
+        inputfile: patient-example.json
+        expression: Patient.name.given.first() = 'Peter'
+        result:
+          - true
+      - desc: '** testLiteralInteger1'
+        inputfile: patient-example.json
+        expression: 1.convertsToInteger()
+        result:
+          - true
+      - desc: '** testLiteralInteger0'
+        inputfile: patient-example.json
+        expression: 0.convertsToInteger()
+        result:
+          - true
+      - desc: '** testLiteralIntegerNegative1'
+        inputfile: patient-example.json
+        expression: (-1).convertsToInteger()
+        result:
+          - true
+      - desc: '** testLiteralIntegerNegative1Invalid'
+        inputfile: patient-example.json
+        expression: '-1.convertsToInteger()'
+        error: true
+      - desc: '** testLiteralIntegerMax'
+        inputfile: patient-example.json
+        expression: 2147483647.convertsToInteger()
+        result:
+          - true
+      - desc: '** testLiteralString'
+        inputfile: patient-example.json
+        expression: '''test''.convertsToString()'
+        result:
+          - true
+      - desc: '** testLiteralStringEscapes'
+        inputfile: patient-example.json
+        expression: '''\\\/\f\r\n\t\"\`\''\u002a''.convertsToString()'
+        result:
+          - true
+      - desc: '** testLiteralBooleanTrue'
+        inputfile: patient-example.json
+        expression: true.convertsToBoolean()
+        result:
+          - true
+      - desc: '** testLiteralBooleanFalse'
+        inputfile: patient-example.json
+        expression: false.convertsToBoolean()
+        result:
+          - true
+      - desc: '** testLiteralDecimal10'
+        inputfile: patient-example.json
+        expression: 1.0.convertsToDecimal()
+        result:
+          - true
+      - desc: '** testLiteralDecimal01'
+        inputfile: patient-example.json
+        expression: 0.1.convertsToDecimal()
+        result:
+          - true
+      - desc: '** testLiteralDecimal00'
+        inputfile: patient-example.json
+        expression: 0.0.convertsToDecimal()
+        result:
+          - true
+      - desc: '** testLiteralDecimalNegative01'
+        inputfile: patient-example.json
+        expression: (-0.1).convertsToDecimal()
+        result:
+          - true
+      - desc: '** testLiteralDecimalNegative01Invalid'
+        inputfile: patient-example.json
+        expression: '-0.1.convertsToDecimal()'
+        error: true
+      - desc: '** testLiteralDecimalMax'
+        inputfile: patient-example.json
+        expression: 1234567890987654321.0.convertsToDecimal()
+        result:
+          - true
+      - desc: '** testLiteralDecimalStep'
+        inputfile: patient-example.json
+        expression: 0.00000001.convertsToDecimal()
+        result:
+          - true
+      - desc: '** testLiteralDateYear'
+        inputfile: patient-example.json
+        expression: '@2015.is(Date)'
+        result:
+          - true
+        disable: true
+      - desc: '** testLiteralDateMonth'
+        inputfile: patient-example.json
+        expression: '@2015-02.is(Date)'
+        result:
+          - true
+        disable: true
+      - desc: '** testLiteralDateDay'
+        inputfile: patient-example.json
+        expression: '@2015-02-04.is(Date)'
+        result:
+          - true
+        disable: true
+      - desc: '** testLiteralDateTimeYear'
+        inputfile: patient-example.json
+        expression: '@2015T.is(DateTime)'
+        result:
+          - true
+        disable: true
+      - desc: '** testLiteralDateTimeMonth'
+        inputfile: patient-example.json
+        expression: '@2015-02T.is(DateTime)'
+        result:
+          - true
+        disable: true
+      - desc: '** testLiteralDateTimeDay'
+        inputfile: patient-example.json
+        expression: '@2015-02-04T.is(DateTime)'
+        result:
+          - true
+        disable: true
+      - desc: '** testLiteralDateTimeHour'
+        inputfile: patient-example.json
+        expression: '@2015-02-04T14.is(DateTime)'
+        result:
+          - true
+      - desc: '** testLiteralDateTimeMinute'
+        inputfile: patient-example.json
+        expression: '@2015-02-04T14:34.is(DateTime)'
+        result:
+          - true
+      - desc: '** testLiteralDateTimeSecond'
+        inputfile: patient-example.json
+        expression: '@2015-02-04T14:34:28.is(DateTime)'
+        result:
+          - true
+      - desc: '** testLiteralDateTimeMillisecond'
+        inputfile: patient-example.json
+        expression: '@2015-02-04T14:34:28.123.is(DateTime)'
+        result:
+          - true
+      - desc: '** testLiteralDateTimeUTC'
+        inputfile: patient-example.json
+        expression: '@2015-02-04T14:34:28Z.is(DateTime)'
+        result:
+          - true
+      - desc: '** testLiteralDateTimeTimezoneOffset'
+        inputfile: patient-example.json
+        expression: '@2015-02-04T14:34:28+10:00.is(DateTime)'
+        result:
+          - true
+      - desc: '** testLiteralTimeHour'
+        inputfile: patient-example.json
+        expression: '@T14.is(Time)'
+        result:
+          - true
+      - desc: '** testLiteralTimeMinute'
+        inputfile: patient-example.json
+        expression: '@T14:34.is(Time)'
+        result:
+          - true
+      - desc: '** testLiteralTimeSecond'
+        inputfile: patient-example.json
+        expression: '@T14:34:28.is(Time)'
+        result:
+          - true
+      - desc: '** testLiteralTimeMillisecond'
+        inputfile: patient-example.json
+        expression: '@T14:34:28.123.is(Time)'
+        result:
+          - true
+      - desc: '** testLiteralTimeUTC'
+        inputfile: patient-example.json
+        expression: '@T14:34:28Z.is(Time)'
+        error: true
+        disable: true
+      - desc: '** testLiteralTimeTimezoneOffset'
+        inputfile: patient-example.json
+        expression: '@T14:34:28+10:00.is(Time)'
+        error: true
+        disable: true
+      - desc: '** testLiteralQuantityDecimal'
+        inputfile: patient-example.json
+        expression: 10.1 'mg'.convertsToQuantity()
+        result:
+          - true
+      - desc: '** testLiteralQuantityInteger'
+        inputfile: patient-example.json
+        expression: 10 'mg'.convertsToQuantity()
+        result:
+          - true
+      - desc: '** testLiteralQuantityDay'
+        inputfile: patient-example.json
+        expression: 4 days.convertsToQuantity()
+        result:
+          - true
+      - desc: '** testLiteralIntegerNotEqual'
+        inputfile: patient-example.json
+        expression: '-3 != 3'
+        result:
+          - true
+      - desc: '** testLiteralIntegerEqual'
+        inputfile: patient-example.json
+        expression: Patient.name.given.count() = 5
+        result:
+          - true
+      - desc: '** testPolarityPrecedence'
+        inputfile: patient-example.json
+        expression: '-Patient.name.given.count() = -5'
+        result:
+          - true
+      - desc: '** testLiteralIntegerGreaterThan'
+        inputfile: patient-example.json
+        expression: Patient.name.given.count() > -3
+        result:
+          - true
+      - desc: '** testLiteralIntegerCountNotEqual'
+        inputfile: patient-example.json
+        expression: Patient.name.given.count() != 0
+        result:
+          - true
+      - desc: '** testLiteralIntegerLessThanTrue'
+        inputfile: patient-example.json
+        expression: 1 < 2
+        result:
+          - true
+      - desc: '** testLiteralIntegerLessThanFalse'
+        inputfile: patient-example.json
+        expression: 1 < -2
+        result:
+          - false
+      - desc: '** testLiteralIntegerLessThanPolarityTrue'
+        inputfile: patient-example.json
+        expression: +1 < +2
+        result:
+          - true
+      - desc: '** testLiteralIntegerLessThanPolarityFalse'
+        inputfile: patient-example.json
+        expression: '-1 < 2'
+        result:
+          - true
+      - desc: '** testLiteralDecimalGreaterThanNonZeroTrue'
+        inputfile: observation-example.json
+        expression: Observation.value.value > 180.0
+        result:
+          - true
+        model: r4
+      - desc: '** testLiteralDecimalGreaterThanZeroTrue'
+        inputfile: observation-example.json
+        expression: Observation.value.value > 0.0
+        result:
+          - true
+        model: r4
+      - desc: '** testLiteralDecimalGreaterThanIntegerTrue'
+        inputfile: observation-example.json
+        expression: Observation.value.value > 0
+        result:
+          - true
+        model: r4
+      - desc: '** testLiteralDecimalLessThanInteger'
+        inputfile: observation-example.json
+        expression: Observation.value.value < 190
+        result:
+          - true
+        model: r4
+      - desc: '** testLiteralDecimalLessThanInvalid'
+        inputfile: observation-example.json
+        expression: Observation.value.value < 'test'
+        error: true
+        disable: true
+      - desc: '** testDateEqual'
+        inputfile: patient-example.json
+        expression: Patient.birthDate = @1974-12-25
+        result:
+          - true
+        model: r4
+      - desc: '** testDateNotEqual'
+        inputfile: patient-example.json
+        expression: 'Patient.birthDate != @1974-12-25T12:34:00'
+        result: []
+        model: r4
+      - desc: '** testDateNotEqualTimezoneOffsetBefore'
+        inputfile: patient-example.json
+        expression: 'Patient.birthDate != @1974-12-25T12:34:00-10:00'
+        result:
+          - true
+      - desc: '** testDateNotEqualTimezoneOffsetAfter'
+        inputfile: patient-example.json
+        expression: 'Patient.birthDate != @1974-12-25T12:34:00+10:00'
+        result:
+          - true
+      - desc: '** testDateNotEqualUTC'
+        inputfile: patient-example.json
+        expression: 'Patient.birthDate != @1974-12-25T12:34:00Z'
+        result:
+          - true
+      - desc: '** testDateNotEqualTimeSecond'
+        inputfile: patient-example.json
+        expression: 'Patient.birthDate != @T12:14:15'
+        result:
+          - true
+      - desc: '** testDateNotEqualTimeMinute'
+        inputfile: patient-example.json
+        expression: 'Patient.birthDate != @T12:14'
+        result:
+          - true
+      - desc: '** testDateNotEqualToday'
+        inputfile: patient-example.json
+        expression: Patient.birthDate < today()
+        result:
+          - true
+        model: r4
+      - desc: '** testDateTimeGreaterThanDate'
+        inputfile: patient-example.json
+        expression: now() > Patient.birthDate
+        result:
+          - true
+        model: r4
+      - desc: '** testLiteralDateTimeTZGreater'
+        inputfile: patient-example.json
+        expression: '@2017-11-05T01:30:00.0-04:00 > @2017-11-05T01:15:00.0-05:00'
+        result:
+          - false
+      - desc: '** testLiteralDateTimeTZLess'
+        inputfile: patient-example.json
+        expression: '@2017-11-05T01:30:00.0-04:00 < @2017-11-05T01:15:00.0-05:00'
+        result:
+          - true
+      - desc: '** testLiteralDateTimeTZEqualFalse'
+        inputfile: patient-example.json
+        expression: '@2017-11-05T01:30:00.0-04:00 = @2017-11-05T01:15:00.0-05:00'
+        result:
+          - false
+      - desc: '** testLiteralDateTimeTZEqualTrue'
+        inputfile: patient-example.json
+        expression: '@2017-11-05T01:30:00.0-04:00 = @2017-11-05T00:30:00.0-05:00'
+        result:
+          - true
+      - desc: '** testLiteralUnicode'
+        inputfile: patient-example.json
+        expression: Patient.name.given.first() = 'P\u0065ter'
+        result:
+          - true
+      - desc: '** testCollectionNotEmpty'
+        inputfile: patient-example.json
+        expression: Patient.name.given.empty().not()
+        result:
+          - true
+      - desc: '** testCollectionNotEqualEmpty'
+        inputfile: patient-example.json
+        expression: 'Patient.name.given != {}'
+        result: []
+      - desc: '** testExpressions'
+        inputfile: patient-example.json
+        expression: Patient.name.select(given | family).distinct()
+        result:
+          - Peter
+          - James
+          - Chalmers
+          - Jim
+          - Windsor
+      - desc: '** testExpressionsEqual'
+        inputfile: patient-example.json
+        expression: Patient.name.given.count() = 1 + 4
+        result:
+          - true
+      - desc: '** testNotEmpty'
+        inputfile: patient-example.json
+        expression: Patient.name.empty().not()
+        result:
+          - true
+      - desc: '** testEmpty'
+        inputfile: patient-example.json
+        expression: Patient.link.empty()
+        result:
+          - true
+      - desc: '** testLiteralNotTrue'
+        inputfile: patient-example.json
+        expression: true.not() = false
+        result:
+          - true
+      - desc: '** testLiteralNotFalse'
+        inputfile: patient-example.json
+        expression: false.not() = true
+        result:
+          - true
+      - desc: '** testIntegerBooleanNotTrue'
+        inputfile: patient-example.json
+        expression: (0).not() = true
+        result:
+          - true
+        disable: true
+      - desc: '** testIntegerBooleanNotFalse'
+        inputfile: patient-example.json
+        expression: (1).not() = false
+        result:
+          - true
+      - desc: '** testNotInvalid'
+        inputfile: patient-example.json
+        expression: (1|2).not() = false
+        error: true
+  - 'group: testTypes':
+      - desc: '** testStringYearConvertsToDate'
+        inputfile: patient-example.json
+        expression: '''2015''.convertsToDate()'
+        result:
+          - true
+      - desc: '** testStringMonthConvertsToDate'
+        inputfile: patient-example.json
+        expression: '''2015-02''.convertsToDate()'
+        result:
+          - true
+      - desc: '** testStringDayConvertsToDate'
+        inputfile: patient-example.json
+        expression: '''2015-02-04''.convertsToDate()'
+        result:
+          - true
+      - desc: '** testStringYearConvertsToDateTime'
+        inputfile: patient-example.json
+        expression: '''2015''.convertsToDateTime()'
+        result:
+          - true
+      - desc: '** testStringMonthConvertsToDateTime'
+        inputfile: patient-example.json
+        expression: '''2015-02''.convertsToDateTime()'
+        result:
+          - true
+      - desc: '** testStringDayConvertsToDateTime'
+        inputfile: patient-example.json
+        expression: '''2015-02-04''.convertsToDateTime()'
+        result:
+          - true
+      - desc: '** testStringHourConvertsToDateTime'
+        inputfile: patient-example.json
+        expression: '''2015-02-04T14''.convertsToDateTime()'
+        result:
+          - true
+      - desc: '** testStringMinuteConvertsToDateTime'
+        inputfile: patient-example.json
+        expression: '''2015-02-04T14:34''.convertsToDateTime()'
+        result:
+          - true
+      - desc: '** testStringSecondConvertsToDateTime'
+        inputfile: patient-example.json
+        expression: '''2015-02-04T14:34:28''.convertsToDateTime()'
+        result:
+          - true
+      - desc: '** testStringMillisecondConvertsToDateTime'
+        inputfile: patient-example.json
+        expression: '''2015-02-04T14:34:28.123''.convertsToDateTime()'
+        result:
+          - true
+      - desc: '** testStringUTCConvertsToDateTime'
+        inputfile: patient-example.json
+        expression: '''2015-02-04T14:34:28Z''.convertsToDateTime()'
+        result:
+          - true
+      - desc: '** testStringTZConvertsToDateTime'
+        inputfile: patient-example.json
+        expression: '''2015-02-04T14:34:28+10:00''.convertsToDateTime()'
+        result:
+          - true
+      - desc: '** testStringHourConvertsToTime'
+        inputfile: patient-example.json
+        expression: '''14''.convertsToTime()'
+        result:
+          - true
+      - desc: '** testStringMinuteConvertsToTime'
+        inputfile: patient-example.json
+        expression: '''14:34''.convertsToTime()'
+        result:
+          - true
+      - desc: '** testStringSecondConvertsToTime'
+        inputfile: patient-example.json
+        expression: '''14:34:28''.convertsToTime()'
+        result:
+          - true
+      - desc: '** testStringMillisecondConvertsToTime'
+        inputfile: patient-example.json
+        expression: '''14:34:28.123''.convertsToTime()'
+        result:
+          - true
+      - desc: '** testIntegerLiteralConvertsToInteger'
+        inputfile: patient-example.json
+        expression: 1.convertsToInteger()
+        result:
+          - true
+      - desc: '** testIntegerLiteralIsInteger'
+        inputfile: patient-example.json
+        expression: 1.is(Integer)
+        result:
+          - true
+      - desc: '** testIntegerLiteralIsSystemInteger'
+        inputfile: patient-example.json
+        expression: 1.is(System.Integer)
+        result:
+          - true
+      - desc: '** testStringLiteralConvertsToInteger'
+        inputfile: patient-example.json
+        expression: '''1''.convertsToInteger()'
+        result:
+          - true
+      - desc: '** testStringLiteralConvertsToIntegerFalse'
+        inputfile: patient-example.json
+        expression: '''a''.convertsToInteger().not()'
+        result:
+          - true
+      - desc: '** testStringDecimalConvertsToIntegerFalse'
+        inputfile: patient-example.json
+        expression: '''1.0''.convertsToInteger().not()'
+        result:
+          - true
+      - desc: '** testStringLiteralIsNotInteger'
+        inputfile: patient-example.json
+        expression: '''1''.is(Integer).not()'
+        result:
+          - true
+      - desc: '** testBooleanLiteralConvertsToInteger'
+        inputfile: patient-example.json
+        expression: true.convertsToInteger()
+        result:
+          - true
+      - desc: '** testBooleanLiteralIsNotInteger'
+        inputfile: patient-example.json
+        expression: true.is(Integer).not()
+        result:
+          - true
+      - desc: '** testDateIsNotInteger'
+        inputfile: patient-example.json
+        expression: '@2013-04-05.is(Integer).not()'
+        result:
+          - true
+      - desc: '** testIntegerLiteralToInteger'
+        inputfile: patient-example.json
+        expression: 1.toInteger() = 1
+        result:
+          - true
+      - desc: '** testStringIntegerLiteralToInteger'
+        inputfile: patient-example.json
+        expression: '''1''.toInteger() = 1'
+        result:
+          - true
+      - desc: '** testDecimalLiteralToInteger'
+        inputfile: patient-example.json
+        expression: '''1.1''.toInteger() = {}'
+        result: []
+      - desc: '** testDecimalLiteralToIntegerIsEmpty'
+        inputfile: patient-example.json
+        expression: '''1.1''.toInteger().empty()'
+        result:
+          - true
+      - desc: '** testBooleanLiteralToInteger'
+        inputfile: patient-example.json
+        expression: true.toInteger() = 1
+        result:
+          - true
+      - desc: '** testIntegerLiteralConvertsToDecimal'
+        inputfile: patient-example.json
+        expression: 1.convertsToDecimal()
+        result:
+          - true
+      - desc: '** testIntegerLiteralIsNotDecimal'
+        inputfile: patient-example.json
+        expression: 1.is(Decimal).not()
+        result:
+          - true
+      - desc: '** testDecimalLiteralConvertsToDecimal'
+        inputfile: patient-example.json
+        expression: 1.0.convertsToDecimal()
+        result:
+          - true
+      - desc: '** testDecimalLiteralIsDecimal'
+        inputfile: patient-example.json
+        expression: 1.0.is(Decimal)
+        result:
+          - true
+        disable: true
+      - desc: '** testStringIntegerLiteralConvertsToDecimal'
+        inputfile: patient-example.json
+        expression: '''1''.convertsToDecimal()'
+        result:
+          - true
+      - desc: '** testStringIntegerLiteralIsNotDecimal'
+        inputfile: patient-example.json
+        expression: '''1''.is(Decimal).not()'
+        result:
+          - true
+      - desc: '** testStringLiteralConvertsToDecimalFalse'
+        inputfile: patient-example.json
+        expression: '''1.a''.convertsToDecimal().not()'
+        result:
+          - true
+      - desc: '** testStringDecimalLiteralConvertsToDecimal'
+        inputfile: patient-example.json
+        expression: '''1.0''.convertsToDecimal()'
+        result:
+          - true
+      - desc: '** testStringDecimalLiteralIsNotDecimal'
+        inputfile: patient-example.json
+        expression: '''1.0''.is(Decimal).not()'
+        result:
+          - true
+      - desc: '** testBooleanLiteralConvertsToDecimal'
+        inputfile: patient-example.json
+        expression: true.convertsToDecimal()
+        result:
+          - true
+      - desc: '** testBooleanLiteralIsNotDecimal'
+        inputfile: patient-example.json
+        expression: true.is(Decimal).not()
+        result:
+          - true
+      - desc: '** testIntegerLiteralToDecimal'
+        inputfile: patient-example.json
+        expression: 1.toDecimal() = 1.0
+        result:
+          - true
+      - desc: '** testIntegerLiteralToDeciamlEquivalent'
+        inputfile: patient-example.json
+        expression: 1.toDecimal() ~ 1.0
+        result:
+          - true
+      - desc: '** testDecimalLiteralToDecimal'
+        inputfile: patient-example.json
+        expression: 1.0.toDecimal() = 1.0
+        result:
+          - true
+      - desc: '** testDecimalLiteralToDecimalEqual'
+        inputfile: patient-example.json
+        expression: '''1.1''.toDecimal() = 1.1'
+        result:
+          - true
+      - desc: '** testBooleanLiteralToDecimal'
+        inputfile: patient-example.json
+        expression: true.toDecimal() = 1
+        result:
+          - true
+      - desc: '** testIntegerLiteralConvertsToQuantity'
+        inputfile: patient-example.json
+        expression: 1.convertsToQuantity()
+        result:
+          - true
+      - desc: '** testIntegerLiteralIsNotQuantity'
+        inputfile: patient-example.json
+        expression: 1.is(Quantity).not()
+        result:
+          - true
+      - desc: '** testDecimalLiteralConvertsToQuantity'
+        inputfile: patient-example.json
+        expression: 1.0.convertsToQuantity()
+        result:
+          - true
+      - desc: '** testDecimalLiteralIsNotQuantity'
+        inputfile: patient-example.json
+        expression: 1.0.is(System.Quantity).not()
+        result:
+          - true
+      - desc: '** testStringIntegerLiteralConvertsToQuantity'
+        inputfile: patient-example.json
+        expression: '''1''.convertsToQuantity()'
+        result:
+          - true
+      - desc: '** testStringIntegerLiteralIsNotQuantity'
+        inputfile: patient-example.json
+        expression: '''1''.is(System.Quantity).not()'
+        result:
+          - true
+      - desc: '** testStringQuantityLiteralConvertsToQuantity'
+        inputfile: patient-example.json
+        expression: '''1 day''.convertsToQuantity()'
+        result:
+          - true
+      - desc: '** testStringQuantityWeekConvertsToQuantity'
+        inputfile: patient-example.json
+        expression: '''1 \''wk\''''.convertsToQuantity()'
+        result:
+          - true
+      - desc: '** testStringQuantityWeekConvertsToQuantityFalse'
+        inputfile: patient-example.json
+        expression: '''1 wk''.convertsToQuantity().not()'
+        result:
+          - true
+      - desc: '** testStringDecimalLiteralConvertsToQuantityFalse'
+        inputfile: patient-example.json
+        expression: '''1.a''.convertsToQuantity().not()'
+        result:
+          - true
+      - desc: '** testStringDecimalLiteralConvertsToQuantity'
+        inputfile: patient-example.json
+        expression: '''1.0''.convertsToQuantity()'
+        result:
+          - true
+      - desc: '** testStringDecimalLiteralIsNotSystemQuantity'
+        inputfile: patient-example.json
+        expression: '''1.0''.is(System.Quantity).not()'
+        result:
+          - true
+      - desc: '** testBooleanLiteralConvertsToQuantity'
+        inputfile: patient-example.json
+        expression: true.convertsToQuantity()
+        result:
+          - true
+      - desc: '** testBooleanLiteralIsNotSystemQuantity'
+        inputfile: patient-example.json
+        expression: true.is(System.Quantity).not()
+        result:
+          - true
+      - desc: '** testIntegerLiteralToQuantity'
+        inputfile: patient-example.json
+        expression: 1.toQuantity() = 1 '1'
+        result:
+          - true
+      - desc: '** testDecimalLiteralToQuantity'
+        inputfile: patient-example.json
+        expression: 1.0.toQuantity() = 1.0 '1'
+        result:
+          - true
+      - desc: '** testStringIntegerLiteralToQuantity'
+        inputfile: patient-example.json
+        expression: '''1''.toQuantity()'
+        result:
+          - 1 '1'
+      - desc: '** testStringQuantityLiteralToQuantity'
+        inputfile: patient-example.json
+        expression: '''1 day''.toQuantity() = 1 day'
+        result:
+          - true
+      - desc: '** testStringQuantityDayLiteralToQuantity'
+        inputfile: patient-example.json
+        expression: '''1 day''.toQuantity() = 1 ''{day}'''
+        result:
+          - true
+        disable: true
+      - desc: '** testStringQuantityWeekLiteralToQuantity'
+        inputfile: patient-example.json
+        expression: '''1 \''wk\''''.toQuantity() = 1 ''wk'''
+        result:
+          - true
+      - desc: '** testStringDecimalLiteralToQuantity'
+        inputfile: patient-example.json
+        expression: '''1.0''.toQuantity() ~ 1 ''1'''
+        result:
+          - true
+      - desc: '** testIntegerLiteralConvertsToBoolean'
+        inputfile: patient-example.json
+        expression: 1.convertsToBoolean()
+        result:
+          - true
+      - desc: '** testIntegerLiteralConvertsToBooleanFalse'
+        inputfile: patient-example.json
+        expression: 2.convertsToBoolean()
+        result:
+          - false
+      - desc: '** testNegativeIntegerLiteralConvertsToBooleanFalse'
+        inputfile: patient-example.json
+        expression: (-1).convertsToBoolean()
+        result:
+          - false
+      - desc: '** testIntegerLiteralFalseConvertsToBoolean'
+        inputfile: patient-example.json
+        expression: 0.convertsToBoolean()
+        result:
+          - true
+      - desc: '** testDecimalLiteralConvertsToBoolean'
+        inputfile: patient-example.json
+        expression: 1.0.convertsToBoolean()
+        result:
+          - true
+      - desc: '** testStringTrueLiteralConvertsToBoolean'
+        inputfile: patient-example.json
+        expression: '''true''.convertsToBoolean()'
+        result:
+          - true
+      - desc: '** testStringFalseLiteralConvertsToBoolean'
+        inputfile: patient-example.json
+        expression: '''false''.convertsToBoolean()'
+        result:
+          - true
+      - desc: '** testStringFalseLiteralAlsoConvertsToBoolean'
+        inputfile: patient-example.json
+        expression: '''False''.convertsToBoolean()'
+        result:
+          - true
+      - desc: '** testTrueLiteralConvertsToBoolean'
+        inputfile: patient-example.json
+        expression: true.convertsToBoolean()
+        result:
+          - true
+      - desc: '** testFalseLiteralConvertsToBoolean'
+        inputfile: patient-example.json
+        expression: false.convertsToBoolean()
+        result:
+          - true
+      - desc: '** testIntegerLiteralToBoolean'
+        inputfile: patient-example.json
+        expression: 1.toBoolean()
+        result:
+          - true
+      - desc: '** testIntegerLiteralToBooleanEmpty'
+        inputfile: patient-example.json
+        expression: 2.toBoolean()
+        result: []
+      - desc: '** testIntegerLiteralToBooleanFalse'
+        inputfile: patient-example.json
+        expression: 0.toBoolean()
+        result:
+          - false
+      - desc: '** testStringTrueToBoolean'
+        inputfile: patient-example.json
+        expression: '''true''.toBoolean()'
+        result:
+          - true
+      - desc: '** testStringFalseToBoolean'
+        inputfile: patient-example.json
+        expression: '''false''.toBoolean()'
+        result:
+          - false
+      - desc: '** testIntegerLiteralConvertsToString'
+        inputfile: patient-example.json
+        expression: 1.convertsToString()
+        result:
+          - true
+      - desc: '** testIntegerLiteralIsNotString'
+        inputfile: patient-example.json
+        expression: 1.is(String).not()
+        result:
+          - true
+      - desc: '** testNegativeIntegerLiteralConvertsToString'
+        inputfile: patient-example.json
+        expression: (-1).convertsToString()
+        result:
+          - true
+      - desc: '** testDecimalLiteralConvertsToString'
+        inputfile: patient-example.json
+        expression: 1.0.convertsToString()
+        result:
+          - true
+      - desc: '** testStringLiteralConvertsToString'
+        inputfile: patient-example.json
+        expression: '''true''.convertsToString()'
+        result:
+          - true
+      - desc: '** testBooleanLiteralConvertsToString'
+        inputfile: patient-example.json
+        expression: true.convertsToString()
+        result:
+          - true
+      - desc: '** testQuantityLiteralConvertsToString'
+        inputfile: patient-example.json
+        expression: 1 'wk'.convertsToString()
+        result:
+          - true
+      - desc: '** testIntegerLiteralToString'
+        inputfile: patient-example.json
+        expression: 1.toString()
+        result:
+          - '1'
+      - desc: '** testNegativeIntegerLiteralToString'
+        inputfile: patient-example.json
+        expression: (-1).toString()
+        result:
+          - '-1'
+      - desc: '** testDecimalLiteralToString'
+        inputfile: patient-example.json
+        expression: 1.0.toString()
+        result:
+          - '1.0'
+        disable: true
+      - desc: '** testStringLiteralToString'
+        inputfile: patient-example.json
+        expression: '''true''.toString()'
+        result:
+          - 'true'
+      - desc: '** testBooleanLiteralToString'
+        inputfile: patient-example.json
+        expression: true.toString()
+        result:
+          - 'true'
+      - desc: '** testQuantityLiteralWkToString'
+        inputfile: patient-example.json
+        expression: 1 'wk'.toString()
+        result:
+          - 1 'wk'
+      - desc: '** testQuantityLiteralWeekToString'
+        inputfile: patient-example.json
+        expression: 1 week.toString()
+        result:
+          - '1 ''{week}'''
+        disable: true
+  - 'group: testAll':
+      - desc: '** testAllTrue1'
+        inputfile: patient-example.json
+        expression: Patient.name.select(given.exists()).allTrue()
+        result:
+          - true
+      - desc: '** testAllTrue2'
+        inputfile: patient-example.json
+        expression: Patient.name.select(period.exists()).allTrue()
+        result:
+          - false
+      - desc: '** testAllTrue3'
+        inputfile: patient-example.json
+        expression: Patient.name.all(given.exists())
+        result:
+          - true
+      - desc: '** testAllTrue4'
+        inputfile: patient-example.json
+        expression: Patient.name.all(period.exists())
+        result:
+          - false
+  - 'group: testSubSetOf':
+      - desc: '** testSubSetOf1'
+        inputfile: patient-example.json
+        expression: Patient.name.first().subsetOf($this.name)
+        result:
+          - true
+      - desc: '** testSubSetOf2'
+        inputfile: patient-example.json
+        expression: Patient.name.subsetOf($this.name.first()).not()
+        result:
+          - true
+  - 'group: testSuperSetOf':
+      - desc: '** testSuperSetOf1'
+        inputfile: patient-example.json
+        expression: Patient.name.first().supersetOf($this.name).not()
+        result:
+          - true
+      - desc: '** testSuperSetOf2'
+        inputfile: patient-example.json
+        expression: Patient.name.supersetOf($this.name.first())
+        result:
+          - true
+  - 'group: testQuantity':
+      - desc: '** testQuantity1'
+        inputfile: patient-example.json
+        expression: 4.0000 'g' = 4000.0 'mg'
+        result:
+          - true
+      - desc: '** testQuantity2'
+        inputfile: patient-example.json
+        expression: 4 'g' ~ 4000 'mg'
+        result:
+          - true
+      - desc: '** testQuantity3'
+        inputfile: patient-example.json
+        expression: 4 'g' != 4040 'mg'
+        result:
+          - true
+      - desc: '** testQuantity4'
+        inputfile: patient-example.json
+        expression: 4 'g' ~ 4040 'mg'
+        result:
+          - true
+      - desc: '** testQuantity5'
+        inputfile: patient-example.json
+        expression: 7 days = 1 week
+        result:
+          - true
+      - desc: '** testQuantity6'
+        inputfile: patient-example.json
+        expression: 7 days = 1 'wk'
+        result:
+          - true
+      - desc: '** testQuantity7'
+        inputfile: patient-example.json
+        expression: 6 days < 1 week
+        result:
+          - true
+        disable: true
+      - desc: '** testQuantity8'
+        inputfile: patient-example.json
+        expression: 8 days > 1 week
+        result:
+          - true
+        disable: true
+      - desc: '** testQuantity9'
+        inputfile: patient-example.json
+        expression: 2.0 'cm' * 2.0 'm' = 0.040 'm2'
+        result:
+          - true
+        disable: true
+      - desc: '** testQuantity10'
+        inputfile: patient-example.json
+        expression: 4.0 'g' / 2.0 'm' = 2 'g/m'
+        result:
+          - true
+        disable: true
+      - desc: '** testQuantity11'
+        inputfile: patient-example.json
+        expression: 1.0 'm' / 1.0 'm' = 1 '1'
+        result:
+          - true
+        disable: true
+  - 'group: testCollectionBoolean':
+      - desc: '** testCollectionBoolean1'
+        inputfile: patient-example.json
+        expression: 'iif(1 | 2 | 3, true, false)'
+        error: true
+        disable: true
+      - desc: '** testCollectionBoolean2'
+        inputfile: patient-example.json
+        expression: 'iif({}, true, false)'
+        result:
+          - false
+      - desc: '** testCollectionBoolean3'
+        inputfile: patient-example.json
+        expression: 'iif(true, true, false)'
+        result:
+          - true
+      - desc: '** testCollectionBoolean4'
+        inputfile: patient-example.json
+        expression: 'iif({} | true, true, false)'
+        result:
+          - true
+      - desc: '** testCollectionBoolean5'
+        inputfile: patient-example.json
+        expression: 'iif(true, true, 1/0)'
+        result:
+          - true
+      - desc: '** testCollectionBoolean6'
+        inputfile: patient-example.json
+        expression: 'iif(false, 1/0, true)'
+        result:
+          - true
+  - 'group: testDistinct':
+      - desc: '** testDistinct1'
+        inputfile: patient-example.json
+        expression: (1 | 2 | 3).isDistinct()
+        result:
+          - true
+      - desc: '** testDistinct2'
+        inputfile: questionnaire-example.json
+        expression: Questionnaire.descendants().linkId.isDistinct()
+        result:
+          - true
+      - desc: '** testDistinct3'
+        inputfile: questionnaire-example.json
+        expression: >-
+          Questionnaire.descendants().linkId.select(substring(0,1)).isDistinct().not()
+        result:
+          - true
+      - desc: '** testDistinct4'
+        inputfile: patient-example.json
+        expression: (1 | 2 | 3).distinct()
+        result:
+          - 1
+          - 2
+          - 3
+      - desc: '** testDistinct5'
+        inputfile: questionnaire-example.json
+        expression: Questionnaire.descendants().linkId.distinct().count()
+        result:
+          - 10
+      - desc: '** testDistinct6'
+        inputfile: questionnaire-example.json
+        expression: >-
+          Questionnaire.descendants().linkId.select(substring(0,1)).distinct().count()
+        result:
+          - 2
+  - 'group: testCount':
+      - desc: '** testCount1'
+        inputfile: patient-example.json
+        expression: Patient.name.count()
+        result:
+          - 3
+      - desc: '** testCount2'
+        inputfile: patient-example.json
+        expression: Patient.name.count() = 3
+        result:
+          - true
+      - desc: '** testCount3'
+        inputfile: patient-example.json
+        expression: Patient.name.first().count()
+        result:
+          - 1
+      - desc: '** testCount4'
+        inputfile: patient-example.json
+        expression: Patient.name.first().count() = 1
+        result:
+          - true
+  - 'group: testWhere':
+      - desc: '** testWhere1'
+        inputfile: patient-example.json
+        expression: Patient.name.count() = 3
+        result:
+          - true
+      - desc: '** testWhere2'
+        inputfile: patient-example.json
+        expression: Patient.name.where(given = 'Jim').count() = 1
+        result:
+          - true
+      - desc: '** testWhere3'
+        inputfile: patient-example.json
+        expression: Patient.name.where(given = 'X').count() = 0
+        result:
+          - true
+      - desc: '** testWhere4'
+        inputfile: patient-example.json
+        expression: Patient.name.where($this.given = 'Jim').count() = 1
+        result:
+          - true
+  - 'group: testSelect':
+      - desc: '** testSelect1'
+        inputfile: patient-example.json
+        expression: Patient.name.select(given).count() = 5
+        result:
+          - true
+      - desc: '** testSelect2'
+        inputfile: patient-example.json
+        expression: 'Patient.name.select(given | family).count() = 7 '
+        result:
+          - true
+  - 'group: testRepeat':
+      - desc: '** testRepeat1'
+        inputfile: valueset-example-expansion.json
+        expression: ValueSet.expansion.repeat(contains).count() = 10
+        result:
+          - true
+      - desc: '** testRepeat2'
+        inputfile: questionnaire-example.json
+        expression: Questionnaire.repeat(item).code.count() = 11
+        result:
+          - true
+      - desc: '** testRepeat3'
+        inputfile: questionnaire-example.json
+        expression: Questionnaire.descendants().code.count() = 23
+        result:
+          - true
+      - desc: '** testRepeat4'
+        inputfile: questionnaire-example.json
+        expression: Questionnaire.children().code.count() = 2
+        result:
+          - true
+  - 'group: testAggregate':
+      - desc: '** testAggregate1'
+        inputfile: patient-example.json
+        expression: '(1|2|3|4|5|6|7|8|9).aggregate($this+$total, 0) = 45'
+        result:
+          - true
+      - desc: '** testAggregate2'
+        inputfile: patient-example.json
+        expression: '(1|2|3|4|5|6|7|8|9).aggregate($this+$total, 2) = 47'
+        result:
+          - true
+      - desc: '** testAggregate3'
+        inputfile: patient-example.json
+        expression: >-
+          (1|2|3|4|5|6|7|8|9).aggregate(iif($total.empty(), $this, iif($this <
+          $total, $this, $total))) = 1
+        result:
+          - true
+      - desc: '** testAggregate4'
+        inputfile: patient-example.json
+        expression: >-
+          (1|2|3|4|5|6|7|8|9).aggregate(iif($total.empty(), $this, iif($this >
+          $total, $this, $total))) = 9
+        result:
+          - true
+  - 'group: testIndexer':
+      - desc: '** testIndexer1'
+        inputfile: patient-example.json
+        expression: 'Patient.name[0].given = ''Peter'' | ''James'''
+        result:
+          - true
+      - desc: '** testIndexer2'
+        inputfile: patient-example.json
+        expression: 'Patient.name[1].given = ''Jim'''
+        result:
+          - true
+  - 'group: testSingle':
+      - desc: '** testSingle1'
+        inputfile: patient-example.json
+        expression: Patient.name.first().single().exists()
+        result:
+          - true
+      - desc: '** testSingle2'
+        inputfile: patient-example.json
+        expression: Patient.name.single().exists()
+        error: true
+        disable: true
+  - 'group: testFirstLast':
+      - desc: '** testFirstLast1'
+        inputfile: patient-example.json
+        expression: Patient.name.first().given = 'Peter' | 'James'
+        result:
+          - true
+      - desc: '** testFirstLast2'
+        inputfile: patient-example.json
+        expression: Patient.name.last().given = 'Peter' | 'James'
+        result:
+          - true
+  - 'group: testTail':
+      - desc: '** testTail1'
+        inputfile: patient-example.json
+        expression: (0 | 1 | 2).tail() = 1 | 2
+        result:
+          - true
+      - desc: '** testTail2'
+        inputfile: patient-example.json
+        expression: Patient.name.tail().given = 'Jim' | 'Peter' | 'James'
+        result:
+          - true
+  - 'group: testSkip':
+      - desc: '** testSkip1'
+        inputfile: patient-example.json
+        expression: (0 | 1 | 2).skip(1) = 1 | 2
+        result:
+          - true
+      - desc: '** testSkip2'
+        inputfile: patient-example.json
+        expression: (0 | 1 | 2).skip(2) = 2
+        result:
+          - true
+      - desc: '** testSkip3'
+        inputfile: patient-example.json
+        expression: Patient.name.skip(1).given.trace('test') = 'Jim' | 'Peter' | 'James'
+        result:
+          - true
+      - desc: '** testSkip4'
+        inputfile: patient-example.json
+        expression: Patient.name.skip(3).given.exists() = false
+        result:
+          - true
+  - 'group: testTake':
+      - desc: '** testTake1'
+        inputfile: patient-example.json
+        expression: (0 | 1 | 2).take(1) = 0
+        result:
+          - true
+      - desc: '** testTake2'
+        inputfile: patient-example.json
+        expression: (0 | 1 | 2).take(2) = 0 | 1
+        result:
+          - true
+      - desc: '** testTake3'
+        inputfile: patient-example.json
+        expression: Patient.name.take(1).given = 'Peter' | 'James'
+        result:
+          - true
+      - desc: '** testTake4'
+        inputfile: patient-example.json
+        expression: Patient.name.take(2).given = 'Peter' | 'James' | 'Jim'
+        result:
+          - true
+      - desc: '** testTake5'
+        inputfile: patient-example.json
+        expression: Patient.name.take(3).given.count() = 5
+        result:
+          - true
+      - desc: '** testTake6'
+        inputfile: patient-example.json
+        expression: Patient.name.take(4).given.count() = 5
+        result:
+          - true
+      - desc: '** testTake7'
+        inputfile: patient-example.json
+        expression: Patient.name.take(0).given.exists() = false
+        result:
+          - true
+  - 'group: testIif':
+      - desc: '** testIif1'
+        inputfile: patient-example.json
+        expression: 'iif(Patient.name.exists(), ''named'', ''unnamed'') = ''named'''
+        result:
+          - true
+      - desc: '** testIif2'
+        inputfile: patient-example.json
+        expression: 'iif(Patient.name.empty(), ''unnamed'', ''named'') = ''named'''
+        result:
+          - true
+      - desc: '** testIif3'
+        inputfile: patient-example.json
+        expression: 'iif(true, true, (1 | 2).toString())'
+        result:
+          - true
+      - desc: '** testIif4'
+        inputfile: patient-example.json
+        expression: 'iif(false, (1 | 2).toString(), true)'
+        result:
+          - true
+  - 'group: testToInteger':
+      - desc: '** testToInteger1'
+        inputfile: patient-example.json
+        expression: '''1''.toInteger() = 1'
+        result:
+          - true
+      - desc: '** testToInteger2'
+        inputfile: patient-example.json
+        expression: '''-1''.toInteger() = -1'
+        result:
+          - true
+      - desc: '** testToInteger3'
+        inputfile: patient-example.json
+        expression: '''0''.toInteger() = 0'
+        result:
+          - true
+      - desc: '** testToInteger4'
+        inputfile: patient-example.json
+        expression: '''0.0''.toInteger().empty()'
+        result:
+          - true
+      - desc: '** testToInteger5'
+        inputfile: patient-example.json
+        expression: '''st''.toInteger().empty()'
+        result:
+          - true
+  - 'group: testToDecimal':
+      - desc: '** testToDecimal1'
+        inputfile: patient-example.json
+        expression: '''1''.toDecimal() = 1'
+        result:
+          - true
+      - desc: '** testToDecimal2'
+        inputfile: patient-example.json
+        expression: '''-1''.toInteger() = -1'
+        result:
+          - true
+      - desc: '** testToDecimal3'
+        inputfile: patient-example.json
+        expression: '''0''.toDecimal() = 0'
+        result:
+          - true
+      - desc: '** testToDecimal4'
+        inputfile: patient-example.json
+        expression: '''0.0''.toDecimal() = 0.0'
+        result:
+          - true
+      - desc: '** testToDecimal5'
+        inputfile: patient-example.json
+        expression: '''st''.toDecimal().empty()'
+        result:
+          - true
+  - 'group: testToString':
+      - desc: '** testToString1'
+        inputfile: patient-example.json
+        expression: 1.toString() = '1'
+        result:
+          - true
+      - desc: '** testToString2'
+        inputfile: patient-example.json
+        expression: '''-1''.toInteger() = -1'
+        result:
+          - true
+      - desc: '** testToString3'
+        inputfile: patient-example.json
+        expression: 0.toString() = '0'
+        result:
+          - true
+      - desc: '** testToString4'
+        inputfile: patient-example.json
+        expression: 0.0.toString() = '0.0'
+        result:
+          - true
+        disable: true
+      - desc: '** testToString5'
+        inputfile: patient-example.json
+        expression: '@2014-12-14.toString() = ''2014-12-14'''
+        result:
+          - true
+  - 'group: testCase':
+      - desc: '** testCase1'
+        inputfile: patient-example.json
+        expression: '''t''.upper() = ''T'''
+        result:
+          - true
+      - desc: '** testCase2'
+        inputfile: patient-example.json
+        expression: '''t''.lower() = ''t'''
+        result:
+          - true
+      - desc: '** testCase3'
+        inputfile: patient-example.json
+        expression: '''T''.upper() = ''T'''
+        result:
+          - true
+      - desc: '** testCase4'
+        inputfile: patient-example.json
+        expression: '''T''.lower() = ''t'''
+        result:
+          - true
+  - 'group: testToChars':
+      - desc: '** testToChars1'
+        inputfile: patient-example.json
+        expression: '''t2''.toChars() = ''t'' | ''2'''
+        result:
+          - true
+  - 'group: testSubstring':
+      - desc: '** testSubstring1'
+        inputfile: patient-example.json
+        expression: '''12345''.substring(2) = ''345'''
+        result:
+          - true
+      - desc: '** testSubstring2'
+        inputfile: patient-example.json
+        expression: '''12345''.substring(2,1) = ''3'''
+        result:
+          - true
+      - desc: '** testSubstring3'
+        inputfile: patient-example.json
+        expression: '''12345''.substring(2,5) = ''345'''
+        result:
+          - true
+      - desc: '** testSubstring4'
+        inputfile: patient-example.json
+        expression: '''12345''.substring(25).empty()'
+        result:
+          - true
+      - desc: '** testSubstring5'
+        inputfile: patient-example.json
+        expression: '''12345''.substring(-1).empty()'
+        result:
+          - true
+  - 'group: testStartsWith':
+      - desc: '** testStartsWith1'
+        inputfile: patient-example.json
+        expression: '''12345''.startsWith(''2'') = false'
+        result:
+          - true
+      - desc: '** testStartsWith2'
+        inputfile: patient-example.json
+        expression: '''12345''.startsWith(''1'') = true'
+        result:
+          - true
+      - desc: '** testStartsWith3'
+        inputfile: patient-example.json
+        expression: '''12345''.startsWith(''12'') = true'
+        result:
+          - true
+      - desc: '** testStartsWith4'
+        inputfile: patient-example.json
+        expression: '''12345''.startsWith(''13'') = false'
+        result:
+          - true
+      - desc: '** testStartsWith5'
+        inputfile: patient-example.json
+        expression: '''12345''.startsWith(''12345'') = true'
+        result:
+          - true
+      - desc: '** testStartsWith6'
+        inputfile: patient-example.json
+        expression: '''12345''.startsWith(''123456'') = false'
+        result:
+          - true
+      - desc: '** testStartsWith7'
+        inputfile: patient-example.json
+        expression: '''12345''.startsWith('''') = true'
+        result:
+          - true
+  - 'group: testEndsWith':
+      - desc: '** testEndsWith1'
+        inputfile: patient-example.json
+        expression: '''12345''.endsWith(''2'') = false'
+        result:
+          - true
+      - desc: '** testEndsWith2'
+        inputfile: patient-example.json
+        expression: '''12345''.endsWith(''5'') = true'
+        result:
+          - true
+      - desc: '** testEndsWith3'
+        inputfile: patient-example.json
+        expression: '''12345''.endsWith(''45'') = true'
+        result:
+          - true
+      - desc: '** testEndsWith4'
+        inputfile: patient-example.json
+        expression: '''12345''.endsWith(''35'') = false'
+        result:
+          - true
+      - desc: '** testEndsWith5'
+        inputfile: patient-example.json
+        expression: '''12345''.endsWith(''12345'') = true'
+        result:
+          - true
+      - desc: '** testEndsWith6'
+        inputfile: patient-example.json
+        expression: '''12345''.endsWith(''012345'') = false'
+        result:
+          - true
+      - desc: '** testEndsWith7'
+        inputfile: patient-example.json
+        expression: '''12345''.endsWith('''') = true'
+        result:
+          - true
+  - 'group: testContainsString':
+      - desc: '** testContainsString1'
+        inputfile: patient-example.json
+        expression: '''12345''.contains(''6'') = false'
+        result:
+          - true
+      - desc: '** testContainsString2'
+        inputfile: patient-example.json
+        expression: '''12345''.contains(''5'') = true'
+        result:
+          - true
+      - desc: '** testContainsString3'
+        inputfile: patient-example.json
+        expression: '''12345''.contains(''45'') = true'
+        result:
+          - true
+      - desc: '** testContainsString4'
+        inputfile: patient-example.json
+        expression: '''12345''.contains(''35'') = false'
+        result:
+          - true
+      - desc: '** testContainsString5'
+        inputfile: patient-example.json
+        expression: '''12345''.contains(''12345'') = true'
+        result:
+          - true
+      - desc: '** testContainsString6'
+        inputfile: patient-example.json
+        expression: '''12345''.contains(''012345'') = false'
+        result:
+          - true
+      - desc: '** testContainsString7'
+        inputfile: patient-example.json
+        expression: '''12345''.contains('''') = true'
+        result:
+          - true
+  - 'group: testLength':
+      - desc: '** testLength1'
+        inputfile: patient-example.json
+        expression: '''123456''.length() = 6'
+        result:
+          - true
+      - desc: '** testLength2'
+        inputfile: patient-example.json
+        expression: '''12345''.length() = 5'
+        result:
+          - true
+      - desc: '** testLength3'
+        inputfile: patient-example.json
+        expression: '''123''.length() = 3'
+        result:
+          - true
+      - desc: '** testLength4'
+        inputfile: patient-example.json
+        expression: '''1''.length() = 1'
+        result:
+          - true
+      - desc: '** testLength5'
+        inputfile: patient-example.json
+        expression: '''''.length() = 0'
+        result:
+          - true
+  - 'group: testTrace':
+      - desc: '** testTrace1'
+        inputfile: patient-example.json
+        expression: name.given.trace('test').count() = 5
+        result:
+          - true
+      - desc: '** testTrace2'
+        inputfile: patient-example.json
+        expression: 'name.trace(''test'', given).count() = 3'
+        result:
+          - true
+  - 'group: testToday':
+      - desc: '** testToday1'
+        inputfile: patient-example.json
+        expression: Patient.birthDate < today()
+        result:
+          - true
+        model: r4
+      - desc: '** testToday2'
+        inputfile: patient-example.json
+        expression: today().toString().length() = 10
+        result:
+          - true
+  - 'group: testNow':
+      - desc: '** testNow1'
+        inputfile: patient-example.json
+        expression: Patient.birthDate < now()
+        result:
+          - true
+        model: r4
+      - desc: '** testNow2'
+        inputfile: patient-example.json
+        expression: now().toString().length() > 10
+        result:
+          - true
+  - 'group: testEquality':
+      - desc: '** testEquality1'
+        inputfile: patient-example.json
+        expression: 1 = 1
+        result:
+          - true
+      - desc: '** testEquality2'
+        inputfile: patient-example.json
+        expression: '{} = {}'
+        result: []
+      - desc: '** testEquality3'
+        inputfile: patient-example.json
+        expression: 'true = {}'
+        result: []
+      - desc: '** testEquality4'
+        inputfile: patient-example.json
+        expression: (1) = (1)
+        result:
+          - true
+      - desc: '** testEquality5'
+        inputfile: patient-example.json
+        expression: (1 | 2) = (1 | 2)
+        result:
+          - true
+      - desc: '** testEquality6'
+        inputfile: patient-example.json
+        expression: (1 | 2 | 3) = (1 | 2 | 3)
+        result:
+          - true
+      - desc: '** testEquality7'
+        inputfile: patient-example.json
+        expression: '(1 | 1) = (1 | 2 | {})'
+        result: []
+        disable: true
+      - desc: '** testEquality8'
+        inputfile: patient-example.json
+        expression: 1 = 2
+        result:
+          - false
+      - desc: '** testEquality9'
+        inputfile: patient-example.json
+        expression: '''a'' = ''a'''
+        result:
+          - true
+      - desc: '** testEquality10'
+        inputfile: patient-example.json
+        expression: '''a'' = ''A'''
+        result:
+          - false
+      - desc: '** testEquality11'
+        inputfile: patient-example.json
+        expression: '''a'' = ''b'''
+        result:
+          - false
+      - desc: '** testEquality12'
+        inputfile: patient-example.json
+        expression: 1.1 = 1.1
+        result:
+          - true
+      - desc: '** testEquality13'
+        inputfile: patient-example.json
+        expression: 1.1 = 1.2
+        result:
+          - false
+      - desc: '** testEquality14'
+        inputfile: patient-example.json
+        expression: 1.10 = 1.1
+        result:
+          - true
+      - desc: '** testEquality15'
+        inputfile: patient-example.json
+        expression: 0 = 0
+        result:
+          - true
+      - desc: '** testEquality16'
+        inputfile: patient-example.json
+        expression: 0.0 = 0
+        result:
+          - true
+      - desc: '** testEquality17'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 = @2012-04-15'
+        result:
+          - true
+      - desc: '** testEquality18'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 = @2012-04-16'
+        result:
+          - false
+      - desc: '** testEquality19'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 = @2012-04-15T10:00:00'
+        result: []
+      - desc: '** testEquality20'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:00:00 = @2012-04-15T10:00:00'
+        result:
+          - false
+      - desc: '** testEquality21'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:30:31 = @2012-04-15T15:30:31.0'
+        result:
+          - true
+      - desc: '** testEquality22'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:30:31 = @2012-04-15T15:30:31.1'
+        result:
+          - false
+      - desc: '** testEquality23'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:00:00Z = @2012-04-15T10:00:00'
+        result: []
+        disable: true
+      - desc: '** testEquality24'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:00:00+02:00 = @2012-04-15T16:00:00+03:00'
+        result:
+          - true
+      - desc: '** testEquality25'
+        inputfile: patient-example.json
+        expression: name = name
+        result:
+          - true
+      - desc: '** testEquality26'
+        inputfile: patient-example.json
+        expression: name.take(2) = name.take(2).first() | name.take(2).last()
+        result:
+          - true
+      - desc: '** testEquality27'
+        inputfile: patient-example.json
+        expression: name.take(2) = name.take(2).last() | name.take(2).first()
+        result:
+          - false
+      - desc: '** testEquality28'
+        inputfile: observation-example.json
+        expression: 'Observation.value = 185 ''[lb_av]'''
+        result:
+          - true
+        model: r4
+  - 'group: testNEquality':
+      - desc: '** testNEquality1'
+        inputfile: patient-example.json
+        expression: 1 != 1
+        result:
+          - false
+      - desc: '** testNEquality2'
+        inputfile: patient-example.json
+        expression: '{} != {}'
+        result: []
+      - desc: '** testNEquality3'
+        inputfile: patient-example.json
+        expression: 1 != 2
+        result:
+          - true
+      - desc: '** testNEquality4'
+        inputfile: patient-example.json
+        expression: '''a'' != ''a'''
+        result:
+          - false
+      - desc: '** testNEquality5'
+        inputfile: patient-example.json
+        expression: '''a'' != ''b'''
+        result:
+          - true
+      - desc: '** testNEquality6'
+        inputfile: patient-example.json
+        expression: 1.1 != 1.1
+        result:
+          - false
+      - desc: '** testNEquality7'
+        inputfile: patient-example.json
+        expression: 1.1 != 1.2
+        result:
+          - true
+      - desc: '** testNEquality8'
+        inputfile: patient-example.json
+        expression: 1.10 != 1.1
+        result:
+          - false
+      - desc: '** testNEquality9'
+        inputfile: patient-example.json
+        expression: 0 != 0
+        result:
+          - false
+      - desc: '** testNEquality10'
+        inputfile: patient-example.json
+        expression: 0.0 != 0
+        result:
+          - false
+      - desc: '** testNEquality11'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 != @2012-04-15'
+        result:
+          - false
+      - desc: '** testNEquality12'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 != @2012-04-16'
+        result:
+          - true
+      - desc: '** testNEquality13'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 != @2012-04-15T10:00:00'
+        result: []
+      - desc: '** testNEquality14'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:00:00 != @2012-04-15T10:00:00'
+        result:
+          - true
+      - desc: '** testNEquality15'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:30:31 != @2012-04-15T15:30:31.0'
+        result:
+          - false
+      - desc: '** testNEquality16'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:30:31 != @2012-04-15T15:30:31.1'
+        result:
+          - true
+      - desc: '** testNEquality17'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:00:00Z != @2012-04-15T10:00:00'
+        result: []
+        disable: true
+      - desc: '** testNEquality18'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:00:00+02:00 != @2012-04-15T16:00:00+03:00'
+        result:
+          - false
+      - desc: '** testNEquality19'
+        inputfile: patient-example.json
+        expression: name != name
+        result:
+          - false
+      - desc: '** testNEquality20'
+        inputfile: patient-example.json
+        expression: name.take(2) != name.take(2).first() | name.take(2).last()
+        result:
+          - false
+      - desc: '** testNEquality21'
+        inputfile: patient-example.json
+        expression: name.take(2) != name.take(2).last() | name.take(2).first()
+        result:
+          - true
+      - desc: '** testNEquality22'
+        inputfile: patient-example.json
+        expression: 1.2 / 1.8 != 0.6666667
+        result:
+          - true
+      - desc: '** testNEquality23'
+        inputfile: patient-example.json
+        expression: 1.2 / 1.8 != 0.67
+        result:
+          - true
+      - desc: '** testNEquality24'
+        inputfile: observation-example.json
+        expression: Observation.value != 185 'kg'
+        result:
+          - true
+        model: r4
+  - 'group: testEquivalent':
+      - desc: '** testEquivalent1'
+        inputfile: patient-example.json
+        expression: 1 ~ 1
+        result:
+          - true
+      - desc: '** testEquivalent2'
+        inputfile: patient-example.json
+        expression: '{} ~ {}'
+        result:
+          - true
+      - desc: '** testEquivalent3'
+        inputfile: patient-example.json
+        expression: '1 ~ {}'
+        result:
+          - false
+        disable: true
+      - desc: '** testEquivalent4'
+        inputfile: patient-example.json
+        expression: 1 ~ 2
+        result:
+          - false
+      - desc: '** testEquivalent5'
+        inputfile: patient-example.json
+        expression: '''a'' ~ ''a'''
+        result:
+          - true
+      - desc: '** testEquivalent6'
+        inputfile: patient-example.json
+        expression: '''a'' ~ ''A'''
+        result:
+          - true
+      - desc: '** testEquivalent7'
+        inputfile: patient-example.json
+        expression: '''a'' ~ ''b'''
+        result:
+          - false
+      - desc: '** testEquivalent8'
+        inputfile: patient-example.json
+        expression: 1.1 ~ 1.1
+        result:
+          - true
+      - desc: '** testEquivalent9'
+        inputfile: patient-example.json
+        expression: 1.1 ~ 1.2
+        result:
+          - false
+      - desc: '** testEquivalent10'
+        inputfile: patient-example.json
+        expression: 1.10 ~ 1.1
+        result:
+          - true
+      - desc: '** testEquivalent11'
+        inputfile: patient-example.json
+        expression: 1.2 / 1.8 ~ 0.67
+        result:
+          - true
+      - desc: '** testEquivalent12'
+        inputfile: patient-example.json
+        expression: 0 ~ 0
+        result:
+          - true
+      - desc: '** testEquivalent13'
+        inputfile: patient-example.json
+        expression: 0.0 ~ 0
+        result:
+          - true
+      - desc: '** testEquivalent14'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 ~ @2012-04-15'
+        result:
+          - true
+      - desc: '** testEquivalent15'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 ~ @2012-04-16'
+        result:
+          - false
+      - desc: '** testEquivalent16'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 ~ @2012-04-15T10:00:00'
+        result:
+          - false
+      - desc: '** testEquivalent17'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:30:31 ~ @2012-04-15T15:30:31.0'
+        result:
+          - true
+      - desc: '** testEquivalent18'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:30:31 ~ @2012-04-15T15:30:31.1'
+        result:
+          - false
+      - desc: '** testEquivalent19'
+        inputfile: patient-example.json
+        expression: name ~ name
+        result:
+          - true
+      - desc: '** testEquivalent20'
+        inputfile: patient-example.json
+        expression: >-
+          name.take(2).given ~ name.take(2).first().given |
+          name.take(2).last().given
+        result:
+          - true
+      - desc: '** testEquivalent21'
+        inputfile: patient-example.json
+        expression: >-
+          name.take(2).given ~ name.take(2).last().given |
+          name.take(2).first().given
+        result:
+          - true
+        disable: true
+      - desc: '** testEquivalent22'
+        inputfile: observation-example.json
+        expression: 'Observation.value ~ 185 ''[lb_av]'''
+        result:
+          - true
+        model: r4
+  - 'group: testNotEquivalent':
+      - desc: '** testNotEquivalent1'
+        inputfile: patient-example.json
+        expression: 1 !~ 1
+        result:
+          - false
+      - desc: '** testNotEquivalent2'
+        inputfile: patient-example.json
+        expression: '{} !~ {}'
+        result:
+          - false
+      - desc: '** testNotEquivalent3'
+        inputfile: patient-example.json
+        expression: '{} !~ 1'
+        result:
+          - true
+        disable: true
+      - desc: '** testNotEquivalent4'
+        inputfile: patient-example.json
+        expression: 1 !~ 2
+        result:
+          - true
+      - desc: '** testNotEquivalent5'
+        inputfile: patient-example.json
+        expression: '''a'' !~ ''a'''
+        result:
+          - false
+      - desc: '** testNotEquivalent6'
+        inputfile: patient-example.json
+        expression: '''a'' !~ ''A'''
+        result:
+          - false
+      - desc: '** testNotEquivalent7'
+        inputfile: patient-example.json
+        expression: '''a'' !~ ''b'''
+        result:
+          - true
+      - desc: '** testNotEquivalent8'
+        inputfile: patient-example.json
+        expression: 1.1 !~ 1.1
+        result:
+          - false
+      - desc: '** testNotEquivalent9'
+        inputfile: patient-example.json
+        expression: 1.1 !~ 1.2
+        result:
+          - true
+      - desc: '** testNotEquivalent10'
+        inputfile: patient-example.json
+        expression: 1.10 !~ 1.1
+        result:
+          - false
+      - desc: '** testNotEquivalent11'
+        inputfile: patient-example.json
+        expression: 0 !~ 0
+        result:
+          - false
+      - desc: '** testNotEquivalent12'
+        inputfile: patient-example.json
+        expression: 0.0 !~ 0
+        result:
+          - false
+      - desc: '** testNotEquivalent13'
+        inputfile: patient-example.json
+        expression: 1.2 / 1.8 !~ 0.6
+        result:
+          - true
+      - desc: '** testNotEquivalent14'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 !~ @2012-04-15'
+        result:
+          - false
+      - desc: '** testNotEquivalent15'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 !~ @2012-04-16'
+        result:
+          - true
+      - desc: '** testNotEquivalent16'
+        inputfile: patient-example.json
+        expression: '@2012-04-15 !~ @2012-04-15T10:00:00'
+        result:
+          - true
+      - desc: '** testNotEquivalent17'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:30:31 !~ @2012-04-15T15:30:31.0'
+        result:
+          - false
+      - desc: '** testNotEquivalent18'
+        inputfile: patient-example.json
+        expression: '@2012-04-15T15:30:31 !~ @2012-04-15T15:30:31.1'
+        result:
+          - true
+      - desc: '** testNotEquivalent19'
+        inputfile: patient-example.json
+        expression: name !~ name
+        result:
+          - true
+        disable: true
+      - desc: '** testNotEquivalent20'
+        inputfile: patient-example.json
+        expression: >-
+          name.take(2).given !~ name.take(2).first().given |
+          name.take(2).last().given
+        result:
+          - false
+      - desc: '** testNotEquivalent21'
+        inputfile: patient-example.json
+        expression: >-
+          name.take(2).given !~ name.take(2).last().given |
+          name.take(2).first().given
+        result:
+          - false
+        disable: true
+      - desc: '** testNotEquivalent22'
+        inputfile: observation-example.json
+        expression: Observation.value !~ 185 'kg'
+        result:
+          - true
+        model: r4
+  - 'group: testLessThan':
+      - desc: '** testLessThan1'
+        inputfile: patient-example.json
+        expression: 1 < 2
+        result:
+          - true
+      - desc: '** testLessThan2'
+        inputfile: patient-example.json
+        expression: 1.0 < 1.2
+        result:
+          - true
+      - desc: '** testLessThan3'
+        inputfile: patient-example.json
+        expression: '''a'' < ''b'''
+        result:
+          - true
+      - desc: '** testLessThan4'
+        inputfile: patient-example.json
+        expression: '''A'' < ''a'''
+        result:
+          - true
+      - desc: '** testLessThan5'
+        inputfile: patient-example.json
+        expression: '@2014-12-12 < @2014-12-13'
+        result:
+          - true
+      - desc: '** testLessThan6'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:00 < @2014-12-13T12:00:01'
+        result:
+          - true
+      - desc: '** testLessThan7'
+        inputfile: patient-example.json
+        expression: '@T12:00:00 < @T14:00:00'
+        result:
+          - true
+      - desc: '** testLessThan8'
+        inputfile: patient-example.json
+        expression: 1 < 1
+        result:
+          - false
+      - desc: '** testLessThan9'
+        inputfile: patient-example.json
+        expression: 1.0 < 1.0
+        result:
+          - false
+      - desc: '** testLessThan10'
+        inputfile: patient-example.json
+        expression: '''a'' < ''a'''
+        result:
+          - false
+      - desc: '** testLessThan11'
+        inputfile: patient-example.json
+        expression: '''A'' < ''A'''
+        result:
+          - false
+      - desc: '** testLessThan12'
+        inputfile: patient-example.json
+        expression: '@2014-12-12 < @2014-12-12'
+        result:
+          - false
+      - desc: '** testLessThan13'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:00 < @2014-12-13T12:00:00'
+        result:
+          - false
+      - desc: '** testLessThan14'
+        inputfile: patient-example.json
+        expression: '@T12:00:00 < @T12:00:00'
+        result:
+          - false
+      - desc: '** testLessThan15'
+        inputfile: patient-example.json
+        expression: 2 < 1
+        result:
+          - false
+      - desc: '** testLessThan16'
+        inputfile: patient-example.json
+        expression: 1.1 < 1.0
+        result:
+          - false
+      - desc: '** testLessThan17'
+        inputfile: patient-example.json
+        expression: '''b'' < ''a'''
+        result:
+          - false
+      - desc: '** testLessThan18'
+        inputfile: patient-example.json
+        expression: '''B'' < ''A'''
+        result:
+          - false
+      - desc: '** testLessThan19'
+        inputfile: patient-example.json
+        expression: '@2014-12-13 < @2014-12-12'
+        result:
+          - false
+      - desc: '** testLessThan20'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:01 < @2014-12-13T12:00:00'
+        result:
+          - false
+      - desc: '** testLessThan21'
+        inputfile: patient-example.json
+        expression: '@T12:00:01 < @T12:00:00'
+        result:
+          - false
+      - desc: '** testLessThan22'
+        inputfile: observation-example.json
+        expression: 'Observation.value < 200 ''[lb_av]'''
+        result:
+          - true
+        disable: true
+      - desc: '** testLessThan23'
+        inputfile: patient-example.json
+        expression: '@2018-03 < @2018-03-01'
+        result: []
+      - desc: '** testLessThan24'
+        inputfile: patient-example.json
+        expression: '@2018-03-01T10 < @2018-03-01T10:30'
+        result: []
+      - desc: '** testLessThan25'
+        inputfile: patient-example.json
+        expression: '@T10 < @T10:30'
+        result: []
+      - desc: '** testLessThan26'
+        inputfile: patient-example.json
+        expression: '@2018-03-01T10:30:00 < @2018-03-01T10:30:00.0'
+        result:
+          - false
+      - desc: '** testLessThan27'
+        inputfile: patient-example.json
+        expression: '@T10:30:00 < @T10:30:00.0'
+        result:
+          - false
+  - 'group: testLessOrEqual':
+      - desc: '** testLessOrEqual1'
+        inputfile: patient-example.json
+        expression: 1 <= 2
+        result:
+          - true
+      - desc: '** testLessOrEqual2'
+        inputfile: patient-example.json
+        expression: 1.0 <= 1.2
+        result:
+          - true
+      - desc: '** testLessOrEqual3'
+        inputfile: patient-example.json
+        expression: '''a'' <= ''b'''
+        result:
+          - true
+      - desc: '** testLessOrEqual4'
+        inputfile: patient-example.json
+        expression: '''A'' <= ''a'''
+        result:
+          - true
+      - desc: '** testLessOrEqual5'
+        inputfile: patient-example.json
+        expression: '@2014-12-12 <= @2014-12-13'
+        result:
+          - true
+      - desc: '** testLessOrEqual6'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:00 <= @2014-12-13T12:00:01'
+        result:
+          - true
+      - desc: '** testLessOrEqual7'
+        inputfile: patient-example.json
+        expression: '@T12:00:00 <= @T14:00:00'
+        result:
+          - true
+      - desc: '** testLessOrEqual8'
+        inputfile: patient-example.json
+        expression: 1 <= 1
+        result:
+          - true
+      - desc: '** testLessOrEqual9'
+        inputfile: patient-example.json
+        expression: 1.0 <= 1.0
+        result:
+          - true
+      - desc: '** testLessOrEqual10'
+        inputfile: patient-example.json
+        expression: '''a'' <= ''a'''
+        result:
+          - true
+      - desc: '** testLessOrEqual11'
+        inputfile: patient-example.json
+        expression: '''A'' <= ''A'''
+        result:
+          - true
+      - desc: '** testLessOrEqual12'
+        inputfile: patient-example.json
+        expression: '@2014-12-12 <= @2014-12-12'
+        result:
+          - true
+      - desc: '** testLessOrEqual13'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:00 <= @2014-12-13T12:00:00'
+        result:
+          - true
+      - desc: '** testLessOrEqual14'
+        inputfile: patient-example.json
+        expression: '@T12:00:00 <= @T12:00:00'
+        result:
+          - true
+      - desc: '** testLessOrEqual15'
+        inputfile: patient-example.json
+        expression: 2 <= 1
+        result:
+          - false
+      - desc: '** testLessOrEqual16'
+        inputfile: patient-example.json
+        expression: 1.1 <= 1.0
+        result:
+          - false
+      - desc: '** testLessOrEqual17'
+        inputfile: patient-example.json
+        expression: '''b'' <= ''a'''
+        result:
+          - false
+      - desc: '** testLessOrEqual18'
+        inputfile: patient-example.json
+        expression: '''B'' <= ''A'''
+        result:
+          - false
+      - desc: '** testLessOrEqual19'
+        inputfile: patient-example.json
+        expression: '@2014-12-13 <= @2014-12-12'
+        result:
+          - false
+      - desc: '** testLessOrEqual20'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:01 <= @2014-12-13T12:00:00'
+        result:
+          - false
+      - desc: '** testLessOrEqual21'
+        inputfile: patient-example.json
+        expression: '@T12:00:01 <= @T12:00:00'
+        result:
+          - false
+      - desc: '** testLessOrEqual22'
+        inputfile: observation-example.json
+        expression: 'Observation.value <= 200 ''[lb_av]'''
+        result:
+          - true
+        disable: true
+      - desc: '** testLessOrEqual23'
+        inputfile: patient-example.json
+        expression: '@2018-03 <= @2018-03-01'
+        result: []
+      - desc: '** testLessOrEqual24'
+        inputfile: patient-example.json
+        expression: '@2018-03-01T10 <= @2018-03-01T10:30'
+        result: []
+      - desc: '** testLessOrEqual25'
+        inputfile: patient-example.json
+        expression: '@T10 <= @T10:30'
+        result: []
+      - desc: '** testLessOrEqual26'
+        inputfile: patient-example.json
+        expression: '@2018-03-01T10:30:00  <= @2018-03-01T10:30:00.0'
+        result:
+          - true
+      - desc: '** testLessOrEqual27'
+        inputfile: patient-example.json
+        expression: '@T10:30:00 <= @T10:30:00.0'
+        result:
+          - true
+  - 'group: testGreatorOrEqual':
+      - desc: '** testGreatorOrEqual1'
+        inputfile: patient-example.json
+        expression: 1 >= 2
+        result:
+          - false
+      - desc: '** testGreatorOrEqual2'
+        inputfile: patient-example.json
+        expression: 1.0 >= 1.2
+        result:
+          - false
+      - desc: '** testGreatorOrEqual3'
+        inputfile: patient-example.json
+        expression: '''a'' >= ''b'''
+        result:
+          - false
+      - desc: '** testGreatorOrEqual4'
+        inputfile: patient-example.json
+        expression: '''A'' >= ''a'''
+        result:
+          - false
+      - desc: '** testGreatorOrEqual5'
+        inputfile: patient-example.json
+        expression: '@2014-12-12 >= @2014-12-13'
+        result:
+          - false
+      - desc: '** testGreatorOrEqual6'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:00 >= @2014-12-13T12:00:01'
+        result:
+          - false
+      - desc: '** testGreatorOrEqual7'
+        inputfile: patient-example.json
+        expression: '@T12:00:00 >= @T14:00:00'
+        result:
+          - false
+      - desc: '** testGreatorOrEqual8'
+        inputfile: patient-example.json
+        expression: 1 >= 1
+        result:
+          - true
+      - desc: '** testGreatorOrEqual9'
+        inputfile: patient-example.json
+        expression: 1.0 >= 1.0
+        result:
+          - true
+      - desc: '** testGreatorOrEqual10'
+        inputfile: patient-example.json
+        expression: '''a'' >= ''a'''
+        result:
+          - true
+      - desc: '** testGreatorOrEqual11'
+        inputfile: patient-example.json
+        expression: '''A'' >= ''A'''
+        result:
+          - true
+      - desc: '** testGreatorOrEqual12'
+        inputfile: patient-example.json
+        expression: '@2014-12-12 >= @2014-12-12'
+        result:
+          - true
+      - desc: '** testGreatorOrEqual13'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:00 >= @2014-12-13T12:00:00'
+        result:
+          - true
+      - desc: '** testGreatorOrEqual14'
+        inputfile: patient-example.json
+        expression: '@T12:00:00 >= @T12:00:00'
+        result:
+          - true
+      - desc: '** testGreatorOrEqual15'
+        inputfile: patient-example.json
+        expression: 2 >= 1
+        result:
+          - true
+      - desc: '** testGreatorOrEqual16'
+        inputfile: patient-example.json
+        expression: 1.1 >= 1.0
+        result:
+          - true
+      - desc: '** testGreatorOrEqual17'
+        inputfile: patient-example.json
+        expression: '''b'' >= ''a'''
+        result:
+          - true
+      - desc: '** testGreatorOrEqual18'
+        inputfile: patient-example.json
+        expression: '''B'' >= ''A'''
+        result:
+          - true
+      - desc: '** testGreatorOrEqual19'
+        inputfile: patient-example.json
+        expression: '@2014-12-13 >= @2014-12-12'
+        result:
+          - true
+      - desc: '** testGreatorOrEqual20'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:01 >= @2014-12-13T12:00:00'
+        result:
+          - true
+      - desc: '** testGreatorOrEqual21'
+        inputfile: patient-example.json
+        expression: '@T12:00:01 >= @T12:00:00'
+        result:
+          - true
+      - desc: '** testGreatorOrEqual22'
+        inputfile: observation-example.json
+        expression: 'Observation.value >= 100 ''[lb_av]'''
+        result:
+          - true
+        disable: true
+      - desc: '** testGreatorOrEqual23'
+        inputfile: patient-example.json
+        expression: '@2018-03 >= @2018-03-01'
+        result: []
+      - desc: '** testGreatorOrEqual24'
+        inputfile: patient-example.json
+        expression: '@2018-03-01T10 >= @2018-03-01T10:30'
+        result: []
+      - desc: '** testGreatorOrEqual25'
+        inputfile: patient-example.json
+        expression: '@T10 >= @T10:30'
+        result: []
+      - desc: '** testGreatorOrEqual26'
+        inputfile: patient-example.json
+        expression: '@2018-03-01T10:30:00 >= @2018-03-01T10:30:00.0'
+        result:
+          - true
+      - desc: '** testGreatorOrEqual27'
+        inputfile: patient-example.json
+        expression: '@T10:30:00 >= @T10:30:00.0'
+        result:
+          - true
+  - 'group: testGreaterThan':
+      - desc: '** testGreaterThan1'
+        inputfile: patient-example.json
+        expression: 1 > 2
+        result:
+          - false
+      - desc: '** testGreaterThan2'
+        inputfile: patient-example.json
+        expression: 1.0 > 1.2
+        result:
+          - false
+      - desc: '** testGreaterThan3'
+        inputfile: patient-example.json
+        expression: '''a'' > ''b'''
+        result:
+          - false
+      - desc: '** testGreaterThan4'
+        inputfile: patient-example.json
+        expression: '''A'' > ''a'''
+        result:
+          - false
+      - desc: '** testGreaterThan5'
+        inputfile: patient-example.json
+        expression: '@2014-12-12 > @2014-12-13'
+        result:
+          - false
+      - desc: '** testGreaterThan6'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:00 > @2014-12-13T12:00:01'
+        result:
+          - false
+      - desc: '** testGreaterThan7'
+        inputfile: patient-example.json
+        expression: '@T12:00:00 > @T14:00:00'
+        result:
+          - false
+      - desc: '** testGreaterThan8'
+        inputfile: patient-example.json
+        expression: 1 > 1
+        result:
+          - false
+      - desc: '** testGreaterThan9'
+        inputfile: patient-example.json
+        expression: 1.0 > 1.0
+        result:
+          - false
+      - desc: '** testGreaterThan10'
+        inputfile: patient-example.json
+        expression: '''a'' > ''a'''
+        result:
+          - false
+      - desc: '** testGreaterThan11'
+        inputfile: patient-example.json
+        expression: '''A'' > ''A'''
+        result:
+          - false
+      - desc: '** testGreaterThan12'
+        inputfile: patient-example.json
+        expression: '@2014-12-12 > @2014-12-12'
+        result:
+          - false
+      - desc: '** testGreaterThan13'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:00 > @2014-12-13T12:00:00'
+        result:
+          - false
+      - desc: '** testGreaterThan14'
+        inputfile: patient-example.json
+        expression: '@T12:00:00 > @T12:00:00'
+        result:
+          - false
+      - desc: '** testGreaterThan15'
+        inputfile: patient-example.json
+        expression: 2 > 1
+        result:
+          - true
+      - desc: '** testGreaterThan16'
+        inputfile: patient-example.json
+        expression: 1.1 > 1.0
+        result:
+          - true
+      - desc: '** testGreaterThan17'
+        inputfile: patient-example.json
+        expression: '''b'' > ''a'''
+        result:
+          - true
+      - desc: '** testGreaterThan18'
+        inputfile: patient-example.json
+        expression: '''B'' > ''A'''
+        result:
+          - true
+      - desc: '** testGreaterThan19'
+        inputfile: patient-example.json
+        expression: '@2014-12-13 > @2014-12-12'
+        result:
+          - true
+      - desc: '** testGreaterThan20'
+        inputfile: patient-example.json
+        expression: '@2014-12-13T12:00:01 > @2014-12-13T12:00:00'
+        result:
+          - true
+      - desc: '** testGreaterThan21'
+        inputfile: patient-example.json
+        expression: '@T12:00:01 > @T12:00:00'
+        result:
+          - true
+      - desc: '** testGreaterThan22'
+        inputfile: observation-example.json
+        expression: 'Observation.value > 100 ''[lb_av]'''
+        result:
+          - true
+        disable: true
+      - desc: '** testGreaterThan23'
+        inputfile: patient-example.json
+        expression: '@2018-03 > @2018-03-01'
+        result: []
+      - desc: '** testGreaterThan24'
+        inputfile: patient-example.json
+        expression: '@2018-03-01T10 > @2018-03-01T10:30'
+        result: []
+      - desc: '** testGreaterThan25'
+        inputfile: patient-example.json
+        expression: '@T10 > @T10:30'
+        result: []
+      - desc: '** testGreaterThan26'
+        inputfile: patient-example.json
+        expression: '@2018-03-01T10:30:00 > @2018-03-01T10:30:00.0'
+        result:
+          - false
+      - desc: '** testGreaterThan27'
+        inputfile: patient-example.json
+        expression: '@T10:30:00 > @T10:30:00.0'
+        result:
+          - false
+  - 'group: testUnion':
+      - desc: '** testUnion1'
+        inputfile: patient-example.json
+        expression: (1 | 2 | 3).count() = 3
+        result:
+          - true
+      - desc: '** testUnion2'
+        inputfile: patient-example.json
+        expression: (1 | 2 | 2).count() = 2
+        result:
+          - true
+      - desc: '** testUnion3'
+        inputfile: patient-example.json
+        expression: (1|1).count() = 1
+        result:
+          - true
+      - desc: '** testUnion4'
+        inputfile: patient-example.json
+        expression: 1.union(2).union(3).count() = 3
+        result:
+          - true
+      - desc: '** testUnion5'
+        inputfile: patient-example.json
+        expression: 1.union(2.union(3)).count() = 3
+        result:
+          - true
+      - desc: '** testUnion6'
+        inputfile: patient-example.json
+        expression: (1 | 2).combine(2).count() = 3
+        result:
+          - true
+      - desc: '** testUnion7'
+        inputfile: patient-example.json
+        expression: 1.combine(1).count() = 2
+        result:
+          - true
+      - desc: '** testUnion8'
+        inputfile: patient-example.json
+        expression: 1.combine(1).union(2).count() = 2
+        result:
+          - true
+  - 'group: testIntersect':
+      - desc: '** testIntersect1'
+        inputfile: patient-example.json
+        expression: (1 | 2 | 3).intersect(2 | 4) = 2
+        result:
+          - true
+      - desc: '** testIntersect2'
+        inputfile: patient-example.json
+        expression: (1 | 2).intersect(4).empty()
+        result:
+          - true
+      - desc: '** testIntersect3'
+        inputfile: patient-example.json
+        expression: '(1 | 2).intersect({}).empty()'
+        result:
+          - true
+      - desc: '** testIntersect4'
+        inputfile: patient-example.json
+        expression: 1.combine(1).intersect(1).count() = 1
+        result:
+          - true
+  - 'group: testExclude':
+      - desc: '** testExclude1'
+        inputfile: patient-example.json
+        expression: (1 | 2 | 3).exclude(2 | 4) = 1 | 3
+        result:
+          - true
+      - desc: '** testExclude2'
+        inputfile: patient-example.json
+        expression: (1 | 2).exclude(4) = 1 | 2
+        result:
+          - true
+      - desc: '** testExclude3'
+        inputfile: patient-example.json
+        expression: '(1 | 2).exclude({}) = 1 | 2'
+        result:
+          - true
+      - desc: '** testExclude4'
+        inputfile: patient-example.json
+        expression: 1.combine(1).exclude(2).count() = 2
+        result:
+          - true
+    disable: true
+  - 'group: testIn':
+      - desc: '** testIn1'
+        inputfile: patient-example.json
+        expression: 1 in (1 | 2 | 3)
+        result:
+          - true
+      - desc: '** testIn2'
+        inputfile: patient-example.json
+        expression: 1 in (2 | 3)
+        result:
+          - false
+      - desc: '** testIn3'
+        inputfile: patient-example.json
+        expression: '''a'' in (''a'' | ''c'' | ''d'')'
+        result:
+          - true
+      - desc: '** testIn4'
+        inputfile: patient-example.json
+        expression: '''b'' in (''a'' | ''c'' | ''d'')'
+        result:
+          - false
+  - 'group: testContainsCollection':
+      - desc: '** testContainsCollection1'
+        inputfile: patient-example.json
+        expression: (1 | 2 | 3) contains 1
+        result:
+          - true
+      - desc: '** testContainsCollection2'
+        inputfile: patient-example.json
+        expression: '(2 | 3) contains 1 '
+        result:
+          - false
+      - desc: '** testContainsCollection3'
+        inputfile: patient-example.json
+        expression: ('a' | 'c' | 'd') contains 'a'
+        result:
+          - true
+      - desc: '** testContainsCollection4'
+        inputfile: patient-example.json
+        expression: ('a' | 'c' | 'd') contains 'b'
+        result:
+          - false
+  - 'group: testBooleanLogicAnd':
+      - desc: '** testBooleanLogicAnd1'
+        inputfile: patient-example.json
+        expression: (true and true) = true
+        result:
+          - true
+      - desc: '** testBooleanLogicAnd2'
+        inputfile: patient-example.json
+        expression: (true and false) = false
+        result:
+          - true
+      - desc: '** testBooleanLogicAnd3'
+        inputfile: patient-example.json
+        expression: '(true and {}).empty()'
+        result:
+          - true
+      - desc: '** testBooleanLogicAnd4'
+        inputfile: patient-example.json
+        expression: (false and true) = false
+        result:
+          - true
+      - desc: '** testBooleanLogicAnd5'
+        inputfile: patient-example.json
+        expression: (false and false) = false
+        result:
+          - true
+      - desc: '** testBooleanLogicAnd6'
+        inputfile: patient-example.json
+        expression: '(false and {}) = false'
+        result:
+          - true
+      - desc: '** testBooleanLogicAnd7'
+        inputfile: patient-example.json
+        expression: '({} and true).empty()'
+        result:
+          - true
+      - desc: '** testBooleanLogicAnd8'
+        inputfile: patient-example.json
+        expression: '({} and false) = false'
+        result:
+          - true
+      - desc: '** testBooleanLogicAnd9'
+        inputfile: patient-example.json
+        expression: '({} and {}).empty()'
+        result:
+          - true
+  - 'group: testBooleanLogicOr':
+      - desc: '** testBooleanLogicOr1'
+        inputfile: patient-example.json
+        expression: (true or true) = true
+        result:
+          - true
+      - desc: '** testBooleanLogicOr2'
+        inputfile: patient-example.json
+        expression: (true or false) = true
+        result:
+          - true
+      - desc: '** testBooleanLogicOr3'
+        inputfile: patient-example.json
+        expression: '(true or {}) = true'
+        result:
+          - true
+      - desc: '** testBooleanLogicOr4'
+        inputfile: patient-example.json
+        expression: (false or true) = true
+        result:
+          - true
+      - desc: '** testBooleanLogicOr5'
+        inputfile: patient-example.json
+        expression: (false or false) = false
+        result:
+          - true
+      - desc: '** testBooleanLogicOr6'
+        inputfile: patient-example.json
+        expression: '(false or {}).empty()'
+        result:
+          - true
+      - desc: '** testBooleanLogicOr7'
+        inputfile: patient-example.json
+        expression: '({} or true) = true'
+        result:
+          - true
+      - desc: '** testBooleanLogicOr8'
+        inputfile: patient-example.json
+        expression: '({} or false).empty()'
+        result:
+          - true
+      - desc: '** testBooleanLogicOr9'
+        inputfile: patient-example.json
+        expression: '({} or {}).empty()'
+        result:
+          - true
+  - 'group: testBooleanLogicXOr':
+      - desc: '** testBooleanLogicXOr1'
+        inputfile: patient-example.json
+        expression: (true xor true) = false
+        result:
+          - true
+      - desc: '** testBooleanLogicXOr2'
+        inputfile: patient-example.json
+        expression: (true xor false) = true
+        result:
+          - true
+      - desc: '** testBooleanLogicXOr3'
+        inputfile: patient-example.json
+        expression: '(true xor {}).empty()'
+        result:
+          - true
+      - desc: '** testBooleanLogicXOr4'
+        inputfile: patient-example.json
+        expression: (false xor true) = true
+        result:
+          - true
+      - desc: '** testBooleanLogicXOr5'
+        inputfile: patient-example.json
+        expression: (false xor false) = false
+        result:
+          - true
+      - desc: '** testBooleanLogicXOr6'
+        inputfile: patient-example.json
+        expression: '(false xor {}).empty()'
+        result:
+          - true
+      - desc: '** testBooleanLogicXOr7'
+        inputfile: patient-example.json
+        expression: '({} xor true).empty()'
+        result:
+          - true
+      - desc: '** testBooleanLogicXOr8'
+        inputfile: patient-example.json
+        expression: '({} xor false).empty()'
+        result:
+          - true
+      - desc: '** testBooleanLogicXOr9'
+        inputfile: patient-example.json
+        expression: '({} xor {}).empty()'
+        result:
+          - true
+  - 'group: testBooleanImplies':
+      - desc: '** testBooleanImplies1'
+        inputfile: patient-example.json
+        expression: (true implies true) = true
+        result:
+          - true
+      - desc: '** testBooleanImplies2'
+        inputfile: patient-example.json
+        expression: (true implies false) = false
+        result:
+          - true
+      - desc: '** testBooleanImplies3'
+        inputfile: patient-example.json
+        expression: '(true implies {}).empty()'
+        result:
+          - true
+      - desc: '** testBooleanImplies4'
+        inputfile: patient-example.json
+        expression: (false implies true) = true
+        result:
+          - true
+      - desc: '** testBooleanImplies5'
+        inputfile: patient-example.json
+        expression: (false implies false) = true
+        result:
+          - true
+      - desc: '** testBooleanImplies6'
+        inputfile: patient-example.json
+        expression: '(false implies {}) = true'
+        result:
+          - true
+      - desc: '** testBooleanImplies7'
+        inputfile: patient-example.json
+        expression: '({} implies true) = true'
+        result:
+          - true
+      - desc: '** testBooleanImplies8'
+        inputfile: patient-example.json
+        expression: '({} implies false).empty()'
+        result:
+          - true
+      - desc: '** testBooleanImplies9'
+        inputfile: patient-example.json
+        expression: '({} implies {}).empty()'
+        result:
+          - true
+  - 'group: testPlus':
+      - desc: '** testPlus1'
+        inputfile: patient-example.json
+        expression: 1 + 1 = 2
+        result:
+          - true
+      - desc: '** testPlus2'
+        inputfile: patient-example.json
+        expression: 1 + 0 = 1
+        result:
+          - true
+      - desc: '** testPlus3'
+        inputfile: patient-example.json
+        expression: 1.2 + 1.8 = 3.0
+        result:
+          - true
+      - desc: '** testPlus4'
+        inputfile: patient-example.json
+        expression: '''a''+''b'' = ''ab'''
+        result:
+          - true
+  - 'group: testConcatenate':
+      - desc: '** testConcatenate1'
+        inputfile: patient-example.json
+        expression: '''a'' & ''b'' = ''ab'''
+        result:
+          - true
+      - desc: '** testConcatenate2'
+        inputfile: patient-example.json
+        expression: '''1'' & {} = ''1'''
+        result:
+          - true
+      - desc: '** testConcatenate3'
+        inputfile: patient-example.json
+        expression: '{} & ''b'' = ''b'''
+        result:
+          - true
+      - desc: '** testConcatenate4'
+        inputfile: patient-example.json
+        expression: '(1 | 2 | 3) & ''b'' = ''1,2,3b'''
+        error: true
+  - 'group: testMinus':
+      - desc: '** testMinus1'
+        inputfile: patient-example.json
+        expression: 1 - 1 = 0
+        result:
+          - true
+      - desc: '** testMinus2'
+        inputfile: patient-example.json
+        expression: 1 - 0 = 1
+        result:
+          - true
+      - desc: '** testMinus3'
+        inputfile: patient-example.json
+        expression: 1.8 - 1.2 = 0.6
+        result:
+          - true
+      - desc: '** testMinus4'
+        inputfile: patient-example.json
+        expression: '''a''-''b'' = ''ab'''
+        error: true
+  - 'group: testMultiply':
+      - desc: '** testMultiply1'
+        inputfile: patient-example.json
+        expression: 1.2 * 1.8 = 2.16
+        result:
+          - true
+      - desc: '** testMultiply2'
+        inputfile: patient-example.json
+        expression: 1 * 1 = 1
+        result:
+          - true
+      - desc: '** testMultiply3'
+        inputfile: patient-example.json
+        expression: 1 * 0 = 0
+        result:
+          - true
+  - 'group: testDivide':
+      - desc: '** testDivide1'
+        inputfile: patient-example.json
+        expression: 1 / 1 = 1
+        result:
+          - true
+      - desc: '** testDivide2'
+        inputfile: patient-example.json
+        expression: 4 / 2 = 2
+        result:
+          - true
+      - desc: '** testDivide3'
+        inputfile: patient-example.json
+        expression: 4.0 / 2.0 = 2.0
+        result:
+          - true
+      - desc: '** testDivide4'
+        inputfile: patient-example.json
+        expression: 1 / 2 = 0.5
+        result:
+          - true
+      - desc: '** testDivide5'
+        inputfile: patient-example.json
+        expression: 1.2 / 1.8 = 0.66666667
+        result:
+          - true
+      - desc: '** testDivide6'
+        inputfile: patient-example.json
+        expression: 1 / 0
+        result: []
+  - 'group: testDiv':
+      - desc: '** testDiv1'
+        inputfile: patient-example.json
+        expression: 1 div 1 = 1
+        result:
+          - true
+      - desc: '** testDiv2'
+        inputfile: patient-example.json
+        expression: 4 div 2 = 2
+        result:
+          - true
+      - desc: '** testDiv3'
+        inputfile: patient-example.json
+        expression: 5 div 2 = 2
+        result:
+          - true
+      - desc: '** testDiv4'
+        inputfile: patient-example.json
+        expression: 2.2 div 1.8 = 1
+        result:
+          - true
+      - desc: '** testDiv5'
+        inputfile: patient-example.json
+        expression: 5 div 0
+        result: []
+  - 'group: testMod':
+      - desc: '** testMod1'
+        inputfile: patient-example.json
+        expression: 1 mod 1 = 0
+        result:
+          - true
+      - desc: '** testMod2'
+        inputfile: patient-example.json
+        expression: 4 mod 2 = 0
+        result:
+          - true
+      - desc: '** testMod3'
+        inputfile: patient-example.json
+        expression: 5 mod 2 = 1
+        result:
+          - true
+      - desc: '** testMod4'
+        inputfile: patient-example.json
+        expression: 2.2 mod 1.8 = 0.4
+        result:
+          - true
+      - desc: '** testMod5'
+        inputfile: patient-example.json
+        expression: 5 mod 0
+        result: []
+  - 'group: testRound':
+      - desc: '** testRound1'
+        inputfile: patient-example.json
+        expression: 1.round() = 1
+        result:
+          - true
+      - desc: '** testRound2'
+        inputfile: patient-example.json
+        expression: 3.14159.round(3) = 2
+        result:
+          - true
+    disable: true
+  - 'group: testSqrt':
+      - desc: '** testSqrt1'
+        inputfile: patient-example.json
+        expression: 81.sqrt() = 9.0
+        result:
+          - true
+      - desc: '** testSqrt2'
+        inputfile: patient-example.json
+        expression: (-1).sqrt()
+        result: []
+  - 'group: testAbs':
+      - desc: '** testAbs1'
+        inputfile: patient-example.json
+        expression: (-5).abs() = 5
+        result:
+          - true
+      - desc: '** testAbs2'
+        inputfile: patient-example.json
+        expression: (-5.5).abs() = 5.5
+        result:
+          - true
+      - desc: '** testAbs3'
+        inputfile: patient-example.json
+        expression: (-5.5 'mg').abs() = 5.5 'mg'
+        result:
+          - true
+        disable: true
+  - 'group: testCeiling':
+      - desc: '** testCeiling1'
+        inputfile: patient-example.json
+        expression: 1.ceiling() = 1
+        result:
+          - true
+      - desc: '** testCeiling2'
+        inputfile: patient-example.json
+        expression: (-1.1).ceiling() = -1
+        result:
+          - true
+      - desc: '** testCeiling3'
+        inputfile: patient-example.json
+        expression: 1.1.ceiling() = 2
+        result:
+          - true
+  - 'group: testExp':
+      - desc: '** testExp1'
+        inputfile: patient-example.json
+        expression: 0.exp() = 1
+        result:
+          - true
+      - desc: '** testExp2'
+        inputfile: patient-example.json
+        expression: (-0.0).exp() = 1
+        result:
+          - true
+  - 'group: testFloor':
+      - desc: '** testFloor1'
+        inputfile: patient-example.json
+        expression: 1.floor() = 1
+        result:
+          - true
+      - desc: '** testFloor2'
+        inputfile: patient-example.json
+        expression: 2.1.floor() = 2
+        result:
+          - true
+      - desc: '** testFloor3'
+        inputfile: patient-example.json
+        expression: (-2.1).floor() = -3
+        result:
+          - true
+  - 'group: testLn':
+      - desc: '** testLn1'
+        inputfile: patient-example.json
+        expression: 1.ln() = 0.0
+        result:
+          - true
+      - desc: '** testLn2'
+        inputfile: patient-example.json
+        expression: 1.0.ln() = 0.0
+        result:
+          - true
+  - 'group: testLog':
+      - desc: '** testLog1'
+        inputfile: patient-example.json
+        expression: 16.log(2) = 4.0
+        result:
+          - true
+      - desc: '** testLog2'
+        inputfile: patient-example.json
+        expression: 100.0.log(10.0) = 2.0
+        result:
+          - true
+  - 'group: testPower':
+      - desc: '** testPower1'
+        inputfile: patient-example.json
+        expression: 2.power(3) = 8
+        result:
+          - true
+      - desc: '** testPower2'
+        inputfile: patient-example.json
+        expression: 2.5.power(2) = 6.25
+        result:
+          - true
+      - desc: '** testPower3'
+        inputfile: patient-example.json
+        expression: (-1).power(0.5)
+        result: []
+  - 'group: testTruncate':
+      - desc: '** testTruncate1'
+        inputfile: patient-example.json
+        expression: 101.truncate() = 101
+        result:
+          - true
+      - desc: '** testTruncate2'
+        inputfile: patient-example.json
+        expression: 1.00000001.truncate() = 1
+        result:
+          - true
+      - desc: '** testTruncate3'
+        inputfile: patient-example.json
+        expression: (-1.56).truncate() = -1
+        result:
+          - true
+  - 'group: testPrecedence':
+      - desc: '** test unary precedence'
+        inputfile: patient-example.json
+        expression: '-1.convertsToInteger()'
+        error: true
+      - desc: '** testPrecedence2'
+        inputfile: patient-example.json
+        expression: 1+2*3+4 = 11
+        result:
+          - true
+      - desc: '** testPrecedence3'
+        inputfile: patient-example.json
+        expression: 1 > 2 is Boolean
+        result:
+          - true
+      - desc: '** testPrecedence4'
+        inputfile: patient-example.json
+        expression: 1 | 1 is Integer
+        result:
+          - true
+  - 'group: testVariables':
+      - desc: '** testVariables1'
+        inputfile: patient-example.json
+        expression: '%sct = ''http://snomed.info/sct'''
+        result:
+          - true
+        disable: true
+      - desc: '** testVariables2'
+        inputfile: patient-example.json
+        expression: '%loinc = ''http://loinc.org'''
+        result:
+          - true
+        disable: true
+      - desc: '** testVariables3'
+        inputfile: patient-example.json
+        expression: '%ucum = ''http://unitsofmeasure.org'''
+        result:
+          - true
+      - desc: '** testVariables4'
+        inputfile: patient-example.json
+        expression: >-
+          %`vs-administrative-gender` =
+          'http://hl7.org/fhir/ValueSet/administrative-gender'
+        result:
+          - true
+        disable: true
+  - 'group: testExtension':
+      - desc: '** testExtension1'
+        inputfile: patient-example.json
+        expression: >-
+          Patient.birthDate.extension('http://hl7.org/fhir/StructureDefinition/patient-birthTime').exists()
+        result:
+          - true
+      - desc: '** testExtension2'
+        inputfile: patient-example.json
+        expression: Patient.birthDate.extension(%`ext-patient-birthTime`).exists()
+        result:
+          - true
+        disable: true
+      - desc: '** testExtension3'
+        inputfile: patient-example.json
+        expression: >-
+          Patient.birthDate.extension('http://hl7.org/fhir/StructureDefinition/patient-birthTime1').empty()
+        result:
+          - true
+  - 'group: testType':
+      - desc: '** testType1'
+        inputfile: patient-example.json
+        expression: 1.type().namespace = 'System'
+        result:
+          - true
+      - desc: '** testType2'
+        inputfile: patient-example.json
+        expression: 1.type().name = 'Integer'
+        result:
+          - true
+      - desc: '** testType3'
+        inputfile: patient-example.json
+        expression: true.type().namespace = 'System'
+        result:
+          - true
+      - desc: '** testType4'
+        inputfile: patient-example.json
+        expression: true.type().name = 'Boolean'
+        result:
+          - true
+      - desc: '** testType5'
+        inputfile: patient-example.json
+        expression: true.is(Boolean)
+        result:
+          - true
+      - desc: '** testType6'
+        inputfile: patient-example.json
+        expression: true.is(System.Boolean)
+        result:
+          - true
+      - desc: '** testType7'
+        inputfile: patient-example.json
+        expression: true is Boolean
+        result:
+          - true
+      - desc: '** testType8'
+        inputfile: patient-example.json
+        expression: true is System.Boolean
+        result:
+          - true
+      - desc: '** testType9'
+        inputfile: patient-example.json
+        expression: Patient.active.type().namespace = 'FHIR'
+        result:
+          - true
+      - desc: '** testType10'
+        inputfile: patient-example.json
+        expression: Patient.active.type().name = 'boolean'
+        result:
+          - true
+      - desc: '** testType11'
+        inputfile: patient-example.json
+        expression: Patient.active.is(boolean)
+        result:
+          - true
+      - desc: '** testType12'
+        inputfile: patient-example.json
+        expression: Patient.active.is(Boolean).not()
+        result:
+          - true
+      - desc: '** testType13'
+        inputfile: patient-example.json
+        expression: Patient.active.is(FHIR.boolean)
+        result:
+          - true
+      - desc: '** testType14'
+        inputfile: patient-example.json
+        expression: Patient.active.is(System.Boolean).not()
+        result:
+          - true
+      - desc: '** testType15'
+        inputfile: patient-example.json
+        expression: Patient.type().namespace = 'FHIR'
+        result:
+          - true
+      - desc: '** testType16'
+        inputfile: patient-example.json
+        expression: Patient.type().name = 'Patient'
+        result:
+          - true
+      - desc: '** testType17'
+        inputfile: patient-example.json
+        expression: Patient.is(Patient)
+        result:
+          - true
+      - desc: '** testType18'
+        inputfile: patient-example.json
+        expression: Patient.is(FHIR.Patient)
+        result:
+          - true
+      - desc: '** testType19'
+        inputfile: patient-example.json
+        expression: Patient.is(FHIR.`Patient`)
+        result:
+          - true
+      - desc: '** testType20'
+        inputfile: patient-example.json
+        expression: Patient.ofType(Patient).type().name
+        result:
+          - Patient
+      - desc: '** testType21'
+        inputfile: patient-example.json
+        expression: Patient.ofType(FHIR.Patient).type().name
+        result:
+          - Patient
+      - desc: '** testType22'
+        inputfile: patient-example.json
+        expression: Patient.is(System.Patient).not()
+        result:
+          - true
+      - desc: '** testType23'
+        inputfile: patient-example.json
+        expression: Patient.ofType(FHIR.`Patient`).type().name
+        result:
+          - Patient
+  - 'group: testConformsTo':
+      - desc: '** testConformsTo'
+        inputfile: patient-example.json
+        expression: 'conformsTo(''http://hl7.org/fhir/StructureDefinition/Patient'')'
+        result:
+          - true
+      - desc: '** testConformsTo'
+        inputfile: patient-example.json
+        expression: 'conformsTo(''http://hl7.org/fhir/StructureDefinition/Person'')'
+        result:
+          - false
+      - desc: '** testConformsTo'
+        inputfile: patient-example.json
+        expression: 'conformsTo(''http://trash'')'
+        error: true
+    disable: true
