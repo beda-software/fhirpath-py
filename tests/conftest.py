@@ -90,6 +90,15 @@ class YamlItem(pytest.Item):
             with pytest.raises(Exception):
                 evaluate(resource, expression, variables, model)
         else:
-            assert (
-                evaluate(resource, expression, variables, model) == self.test["result"]
-            )
+            result = evaluate(resource, expression, variables, model)
+            compare(result, self.test["result"])
+
+
+def compare(l1, l2):
+    # TODO REFACTOR
+    if l1 == l2:
+        assert True
+    elif len(l1) == len(l2) == 1:
+        e1 = l1[0]
+        e2 = evaluate({}, l2[0])[0]
+        assert e1 == e2

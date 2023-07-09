@@ -86,13 +86,22 @@ class FP_Quantity(FP_Type):
     }
 
     def __init__(self, value, unit):
-        super.__init__(value, unit)
-        self.asStr = value + " " + unit
+        super().__init__()
+        self.asStr = f"{value} {unit}"
         self.value = value
         self.unit = unit
 
-    def toString(self):
+    def __str__(self):
         return self.asStr
+
+    def __repr__(self):
+        return f"{type(self)}<{self.asStr}>"
+
+    def __eq__(self, other):
+        if isinstance(other, FP_Quantity):
+            return self.value == other.value and self.unit == other.unit
+        else:
+            return super().__eq__(other)
 
 
 class FP_TimeBase(FP_Type):
