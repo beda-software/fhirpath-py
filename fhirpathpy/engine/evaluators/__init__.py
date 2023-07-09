@@ -62,9 +62,7 @@ def alias_op_expression(mapFn):
         op = node["terminalNodeText"][0]
 
         if not op in mapFn:
-            raise Exception(
-                "Do not know how to alias " + op + " by " + json.dumps(mapFn)
-            )
+            raise Exception("Do not know how to alias " + op + " by " + json.dumps(mapFn))
 
         alias = mapFn[op]
         return engine.infix_invoke(ctx, alias, parentData, node["children"])
@@ -112,9 +110,11 @@ def external_constant_term(ctx, parent_data, node):
 
     return value
 
+
 def match(m):
     code = m.group(1)
     return chr(int(code[1:], 16))
+
 
 def string_literal(ctx, parentData, node):
     # Remove the beginning and ending quotes.
@@ -128,7 +128,7 @@ def string_literal(ctx, parentData, node):
     rtn = rtn.replace("\\t", "\t")
     rtn = rtn.replace("\\f", "\f")
     rtn = rtn.replace("\\\\", "\\")
-    rtn = re.sub(r"\\(u\d{4})",match, rtn)
+    rtn = re.sub(r"\\(u\d{4})", match, rtn)
 
     return [rtn]
 
@@ -137,9 +137,9 @@ def quantity_literal(ctx, parentData, node):
     valueNode = node["children"][0]
     value = float(valueNode["terminalNodeText"][0])
     unitNode = valueNode["children"][0]
-    unit = unitNode['terminalNodeText'][0]
+    unit = unitNode["terminalNodeText"][0]
     # Sometimes the unit is in a child node of the child
-    if unit is not None and 'children' in unitNode and len(unitNode["children"]) > 0:
+    if unit is not None and "children" in unitNode and len(unitNode["children"]) > 0:
         unit = unitNode["children"][0]["terminalNodeText"][0]
 
     return [nodes.FP_Quantity(value, unit)]
@@ -196,8 +196,8 @@ def create_reduce_member_invocation(model, key):
             if isinstance(res.data, (dict, list)):
                 toAdd = res.data.get(key)
                 toAdd_ = res.data.get(f"_{key}")
-                if key == 'extension':
-                    childPath = 'Extension'
+                if key == "extension":
+                    childPath = "Extension"
 
         if util.is_some(toAdd):
             if isinstance(toAdd, list):

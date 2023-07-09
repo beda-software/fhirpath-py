@@ -2,13 +2,15 @@ import os
 import json
 
 import pathlib
+
 current_dir = pathlib.Path(__file__).parent.resolve()
 
 resources = {}
 
 
 def save_to_resources(re, filepath):
-        resources[resource_filename] = json.loads(paths_file.read())
+    resources[resource_filename] = json.loads(paths_file.read())
+
 
 files = [f for f in os.listdir(current_dir)]
 for f in files:

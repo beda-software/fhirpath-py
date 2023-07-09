@@ -129,10 +129,7 @@ def make_param(ctx, parentData, node_type, param):
 
     if len(res) > 1:
         raise Exception(
-            "Unexpected collection"
-            + json.dumps(res)
-            + "; expected singleton of type "
-            + node_type
+            "Unexpected collection" + json.dumps(res) + "; expected singleton of type " + node_type
         )
 
     if len(res) == 0:

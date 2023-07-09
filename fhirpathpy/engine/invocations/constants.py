@@ -21,4 +21,5 @@ class Constants:
         self.timeOfDay = None
         self.localTimezoneOffset = None
 
+
 constants = Constants()

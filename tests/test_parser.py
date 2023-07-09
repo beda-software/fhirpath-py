@@ -42,7 +42,13 @@ def parse_non_valid_test():
 
 
 @pytest.mark.parametrize(
-    "expression", ["%v+2", "a.b+2", "Observation.value", "Patient.name.given",]
+    "expression",
+    [
+        "%v+2",
+        "a.b+2",
+        "Observation.value",
+        "Patient.name.given",
+    ],
 )
 def output_correct_ast_test(expression):
     assert are_ast_equal(parse(expression), load_ast_fixture(expression))

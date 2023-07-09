@@ -91,5 +91,6 @@ def distinct_fn(ctx, x):
 
     return util.uniq(x)
 
+
 def isdistinct_fn(ctx, x):
     return [len(x) == len(distinct_fn(ctx, x))]
