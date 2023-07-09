@@ -47,11 +47,17 @@ class YamlFile(pytest.File):
                 for expression in test["expression"]:
                     test["expression"] = expression
                     yield YamlItem.from_parent(
-                        self, name=name, test=test, resource=subject,
+                        self,
+                        name=name,
+                        test=test,
+                        resource=subject,
                     )
             else:
                 yield YamlItem.from_parent(
-                    self, name=name, test=test, resource=subject,
+                    self,
+                    name=name,
+                    test=test,
+                    resource=subject,
                 )
 
 
@@ -63,7 +69,6 @@ class YamlItem(pytest.Item):
         self.resource = resource
 
     def runtest(self):
-
         expression = self.test["expression"]
         resource = self.resource
 

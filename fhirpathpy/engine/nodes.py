@@ -3,9 +3,9 @@ import json
 import re
 import time
 
-dateFormat = '([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])'
-timeRE = '([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\.[0-9]+)?'
-dateTimeRE = '%s(T%s(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?' % (dateFormat, timeRE)
+dateFormat = "([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])"
+timeRE = "([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\.[0-9]+)?"
+dateTimeRE = "%s(T%s(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?" % (dateFormat, timeRE)
 
 
 class FP_Type:
@@ -103,7 +103,7 @@ class FP_TimeBase(FP_Type):
         {"key": "hour", "value": (60 * 60)},
         {"key": "minute", "value": 60},
         {"key": "second", "value": 1},
-        {"key": "tz", "value": (60 * 60)}
+        {"key": "tz", "value": (60 * 60)},
     ]
 
     def _extractAsMatchList(self, matchDate, matchGroupsIndices):
@@ -111,8 +111,8 @@ class FP_TimeBase(FP_Type):
         if matchDate and matchGroupsIndices:
             timeMatchGroups = [group for group in matchDate.groups() if group]
             for matchGroupsIndex in matchGroupsIndices:
-                if len(timeMatchGroups) >= matchGroupsIndex['index']:
-                    dateTimeListResult.append(timeMatchGroups[matchGroupsIndex['index']])
+                if len(timeMatchGroups) >= matchGroupsIndex["index"]:
+                    dateTimeListResult.append(timeMatchGroups[matchGroupsIndex["index"]])
         return dateTimeListResult
 
     def _getMatchAsList(self):
@@ -148,10 +148,16 @@ class FP_TimeBase(FP_Type):
         if self._precision == otherDateTime._precision:
             return self._getDateTimeInt() == otherDateTime._getDateTimeInt()
 
-        morePrecDateTimeList = thisDateTimeList if self._precision >= otherDateTime._precision else otherDateTimeList
-        lessPrecDateTimeList = otherDateTimeList if self._precision >= otherDateTime._precision else thisDateTimeList
+        morePrecDateTimeList = (
+            thisDateTimeList if self._precision >= otherDateTime._precision else otherDateTimeList
+        )
+        lessPrecDateTimeList = (
+            otherDateTimeList if self._precision >= otherDateTime._precision else thisDateTimeList
+        )
 
-        for lessPrecDateTimeElementIndex, lessPrecDateTimeElement in enumerate(lessPrecDateTimeList):
+        for lessPrecDateTimeElementIndex, lessPrecDateTimeElement in enumerate(
+            lessPrecDateTimeList
+        ):
             if lessPrecDateTimeElement != morePrecDateTimeList[lessPrecDateTimeElementIndex]:
                 return False
 
@@ -185,7 +191,7 @@ class FP_Time(FP_TimeBase):
     matchGroupsIndices = [
         {"key": "hour", "index": 0},
         {"key": "minute", "index": 1},
-        {"key": "second", "index": 2}
+        {"key": "second", "index": 2},
     ]
 
     def __new__(cls, dateStr):
@@ -207,9 +213,11 @@ class FP_Time(FP_TimeBase):
 
         if self._timeMatchData:
             self._timeMatchStr = self._timeMatchData.group(0)
-            self._timeAsList = self._extractAsMatchList(self._timeMatchData, self.matchGroupsIndices)
+            self._timeAsList = self._extractAsMatchList(
+                self._timeMatchData, self.matchGroupsIndices
+            )
             self._precision = len(self._timeAsList)
-            self._pyTimeObject = datetime.datetime.strptime(self.asStr, '%H:%M:%S').time()
+            self._pyTimeObject = datetime.datetime.strptime(self.asStr, "%H:%M:%S").time()
 
     def getTimeMatchStr(self):
         return self._timeMatchStr
@@ -225,7 +233,7 @@ class FP_Time(FP_TimeBase):
             return datetime.timedelta(
                 hours=self._pyTimeObject.hour,
                 minutes=self._pyTimeObject.minute,
-                seconds=self._pyTimeObject.second
+                seconds=self._pyTimeObject.second,
             ).total_seconds()
         return None
 
@@ -253,14 +261,18 @@ class FP_DateTime(FP_TimeBase):
 
     def __init__(self, dateStr):
         self.asStr = dateStr if isinstance(dateStr, str) else None
-        self._dateTimeMatchData = re.match(dateTimeRE, self.asStr) if isinstance(self.asStr, str) else None
+        self._dateTimeMatchData = (
+            re.match(dateTimeRE, self.asStr) if isinstance(self.asStr, str) else None
+        )
         self._dateTimeMatchStr = None
         self._dateTimeAsList = []
         self._precision = 0
 
         if self._dateTimeMatchData:
             self._dateTimeMatchStr = self._dateTimeMatchData.group(0)
-            self._dateTimeAsList = self._extractAsMatchList(self._dateTimeMatchData, self.matchGroupsIndices)
+            self._dateTimeAsList = self._extractAsMatchList(
+                self._dateTimeMatchData, self.matchGroupsIndices
+            )
             self._precision = len(self._dateTimeAsList)
 
     def getDateTimeMatchStr(self):
@@ -287,7 +299,9 @@ class FP_DateTime(FP_TimeBase):
 
         integer_result = 0
         for prec in range(self._precision):
-            integer_result += int(self._dateTimeAsList[prec]) * self.datetime_multipliers[prec]['value']
+            integer_result += (
+                int(self._dateTimeAsList[prec]) * self.datetime_multipliers[prec]["value"]
+            )
 
         return integer_result
 
@@ -306,9 +320,9 @@ class ResourceNode:
 
     def __init__(self, data, path):
         """
-    If data is a resource (maybe a contained resource) reset the path
-    information to the resource type.
-    """
+        If data is a resource (maybe a contained resource) reset the path
+        information to the resource type.
+        """
         if type(data) == dict and "resourceType" in data:
             path = data["resourceType"]
 
