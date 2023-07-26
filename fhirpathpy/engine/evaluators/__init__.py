@@ -137,10 +137,13 @@ def quantity_literal(ctx, parentData, node):
     valueNode = node["children"][0]
     value = float(valueNode["terminalNodeText"][0])
     unitNode = valueNode["children"][0]
-    unit = unitNode["terminalNodeText"][0]
+    if len(unitNode["terminalNodeText"]) > 0:
+        unit = unitNode["terminalNodeText"][0]
     # Sometimes the unit is in a child node of the child
-    if unit is not None and "children" in unitNode and len(unitNode["children"]) > 0:
+    elif "children" in unitNode and len(unitNode["children"]) > 0:
         unit = unitNode["children"][0]["terminalNodeText"][0]
+    else:
+        unit = None
 
     return [nodes.FP_Quantity(value, unit)]
 
