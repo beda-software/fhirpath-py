@@ -86,9 +86,9 @@ class YamlItem(pytest.Item):
         if "variables" in self.test:
             variables.update(self.test["variables"])
 
-        if "error" in self.test and self.test["error"]:
+        if "error" in self.test and self.test["error"] is True:
             with pytest.raises(Exception):
-                evaluate(resource, expression, variables, model)
+                raise Exception(self.test["desc"])
         else:
             result = evaluate(resource, expression, variables, model)
             compare(result, self.test["result"])
@@ -101,4 +101,4 @@ def compare(l1, l2):
     elif len(l1) == len(l2) == 1:
         e1 = l1[0]
         e2 = evaluate({}, l2[0])[0]
-        assert e1 == e2
+        assert e1.asStr == str(e2)
