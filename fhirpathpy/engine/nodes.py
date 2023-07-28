@@ -295,7 +295,11 @@ class FP_DateTime(FP_TimeBase):
 
     def _getDateTimeObject(self):
         if self._dateTimeMatchData:
-            return datetime.datetime.fromisoformat(self.asStr)
+            if "Z" in self.asStr:
+                date_str = self.asStr.replace("Z", "+00:00")
+            else:
+                date_str = self.asStr
+            return datetime.datetime.fromisoformat(date_str)
         return None
 
     def _getDateTimeInt(self):
