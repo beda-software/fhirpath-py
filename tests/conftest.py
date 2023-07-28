@@ -101,4 +101,4 @@ def compare(l1, l2):
     elif len(l1) == len(l2) == 1:
         e1 = l1[0]
         e2 = evaluate({}, l2[0])[0]
-        assert e1.asStr == str(e2)
+        assert str(e1) == str(e2)

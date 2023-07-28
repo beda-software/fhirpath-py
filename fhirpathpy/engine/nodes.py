@@ -284,6 +284,9 @@ class FP_DateTime(FP_TimeBase):
             )
             self._precision = len(self._dateTimeAsList)
 
+    def __str__(self):
+        return self.asStr
+
     def getDateTimeMatchStr(self):
         return self._dateTimeMatchStr
 
