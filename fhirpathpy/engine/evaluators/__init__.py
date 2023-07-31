@@ -308,6 +308,7 @@ evaluators = {
     "ThisInvocation": this_invocation,
     "MemberInvocation": member_invocation,
     "FunctionInvocation": function_invocation,
+    "IndexInvocation": this_invocation,
     # expressions
     "PolarityExpression": polarity_expression,
     "IndexerExpression": indexer_expression,
