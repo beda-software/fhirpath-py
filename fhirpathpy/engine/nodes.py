@@ -97,6 +97,9 @@ class FP_Quantity(FP_Type):
     def __repr__(self):
         return f"{type(self)}<{self.asStr}>"
 
+    def __hash__(self):
+        return hash(self.value) ^ hash(self.unit)
+
     def __eq__(self, other):
         if isinstance(other, FP_Quantity):
             return self.value == other.value and self.unit == other.unit
