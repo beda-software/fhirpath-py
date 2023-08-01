@@ -66,5 +66,11 @@ def flatten(x):
 
 def uniq(arr):
     # Strong type fast implementation for unique values that preserves ordering
-    ordered_dict = OrderedDict([json.dumps(x, sort_keys=True), x] for x in arr)
+    ordered_dict = OrderedDict()
+    for x in arr:
+        try:
+            key = json.dumps(x, sort_keys=True)
+        except TypeError:
+            key = str(x)
+        ordered_dict[key] = x
     return list(ordered_dict.values())
