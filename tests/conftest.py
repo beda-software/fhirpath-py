@@ -1,6 +1,7 @@
 import json
 import yaml
 import pytest
+from fhirpathpy.engine.nodes import FP_Quantity
 
 from tests.context import models
 from tests.resources import resources
@@ -101,4 +102,7 @@ def compare(l1, l2):
     elif len(l1) == len(l2) == 1:
         e1 = l1[0]
         e2 = evaluate({}, l2[0])[0]
-        assert str(e1) == str(e2)
+        if isinstance(e1, FP_Quantity) and isinstance(e2, FP_Quantity):
+            assert e1 == e2
+        else:
+            assert str(e1) == str(e2)

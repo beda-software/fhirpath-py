@@ -85,6 +85,36 @@ class FP_Quantity(FP_Type):
         "'min'": True,
     }
 
+    years_and_months = [
+        "'a'",
+        "year",
+        "years",
+        "'mo'",
+        "month",
+        "months",
+    ]
+
+    weeks_days_and_time = [
+        "'wk'",
+        "week",
+        "weeks",
+        "'d'",
+        "day",
+        "days",
+        "'h'",
+        "hour",
+        "hours",
+        "'min'",
+        "minute",
+        "minutes",
+        "'s'",
+        "second",
+        "seconds",
+        "'ms'",
+        "millisecond",
+        "milliseconds",
+    ]
+
     def __init__(self, value, unit):
         super().__init__()
         self.asStr = f"{value} {unit}"
@@ -102,7 +132,36 @@ class FP_Quantity(FP_Type):
 
     def __eq__(self, other):
         if isinstance(other, FP_Quantity):
-            return self.value == other.value and self.unit == other.unit
+            if self.unit in self.years_and_months and other.unit in self.years_and_months:
+                self_value_in_months = self.value
+                other_value_in_months = other.value
+                if self.unit in ["'a'", "year", "years"]:
+                    self_value_in_months *= 12
+                if other.unit in ["'a'", "year", "years"]:
+                    other_value_in_months *= 12
+                return self_value_in_months == other_value_in_months
+            elif self.unit in self.weeks_days_and_time and other.unit in self.weeks_days_and_time:
+                weeks_multipliers = {key: 7 * 24 * 60 * 60 for key in ["'wk'", "week", "weeks"]}
+                days_multipliers = {key: 24 * 60 * 60 for key in ["'d'", "day", "days"]}
+                hours_multipliers = {key: 60 * 60 for key in ["'h'", "hour", "hours"]}
+                minutes_multipliers = {key: 60 for key in ["'min'", "minute", "minutes"]}
+                seconds_multipliers = {key: 1 for key in ["'s'", "second", "seconds"]}
+                milliseconds_multipliers = {
+                    key: 0.001 for key in ["'ms'", "millisecond", "milliseconds"]
+                }
+                datetime_multipliers = {
+                    **weeks_multipliers,
+                    **days_multipliers,
+                    **hours_multipliers,
+                    **minutes_multipliers,
+                    **seconds_multipliers,
+                    **milliseconds_multipliers,
+                }
+                self_value_in_seconds = self.value * datetime_multipliers[self.unit]
+                other_value_in_seconds = other.value * datetime_multipliers[other.unit]
+                return self_value_in_seconds == other_value_in_seconds
+            else:
+                return self.value == other.value and self.unit == other.unit
         else:
             return super().__eq__(other)
 
@@ -357,7 +416,6 @@ class ResourceNode:
         data_hash = hash(json.dumps(self.data, sort_keys=True))
         path_hash = hash(self.path)
         return hash((data_hash, path_hash))
-
 
     def toJSON(self):
         return json.dumps(self.data)
