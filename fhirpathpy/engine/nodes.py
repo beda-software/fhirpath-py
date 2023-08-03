@@ -85,7 +85,7 @@ class FP_Quantity(FP_Type):
         "'min'": True,
     }
 
-    years_and_months = [
+    _years_and_months = [
         "'a'",
         "year",
         "years",
@@ -94,7 +94,7 @@ class FP_Quantity(FP_Type):
         "months",
     ]
 
-    weeks_days_and_time = [
+    _weeks_days_and_time = [
         "'wk'",
         "week",
         "weeks",
@@ -115,6 +115,8 @@ class FP_Quantity(FP_Type):
         "milliseconds",
     ]
 
+    _year_month_conversion_factor = {"'a'": 12, "'mo'": 1}
+
     def __init__(self, value, unit):
         super().__init__()
         self.asStr = f"{value} {unit}"
@@ -132,7 +134,7 @@ class FP_Quantity(FP_Type):
 
     def __eq__(self, other):
         if isinstance(other, FP_Quantity):
-            if self.unit in self.years_and_months and other.unit in self.years_and_months:
+            if self.unit in self._years_and_months and other.unit in self._years_and_months:
                 self_value_in_months = self.value
                 other_value_in_months = other.value
                 if self.unit in ["'a'", "year", "years"]:
@@ -140,7 +142,7 @@ class FP_Quantity(FP_Type):
                 if other.unit in ["'a'", "year", "years"]:
                     other_value_in_months *= 12
                 return self_value_in_months == other_value_in_months
-            elif self.unit in self.weeks_days_and_time and other.unit in self.weeks_days_and_time:
+            elif self.unit in self._weeks_days_and_time and other.unit in self._weeks_days_and_time:
                 weeks_multipliers = {key: 7 * 24 * 60 * 60 for key in ["'wk'", "week", "weeks"]}
                 days_multipliers = {key: 24 * 60 * 60 for key in ["'d'", "day", "days"]}
                 hours_multipliers = {key: 60 * 60 for key in ["'h'", "hour", "hours"]}
@@ -164,6 +166,16 @@ class FP_Quantity(FP_Type):
                 return self.value == other.value and self.unit == other.unit
         else:
             return super().__eq__(other)
+
+    def conv_unit_to(fromUnit, value, toUnit):
+        ## 1 Year <-> 12 Months
+        from_year_month_magnitude = FP_Quantity._year_month_conversion_factor.get(fromUnit)
+        to_year_month_magnitude = FP_Quantity._year_month_conversion_factor.get(toUnit)
+
+        if from_year_month_magnitude and to_year_month_magnitude:
+            return FP_Quantity(from_year_month_magnitude * value / to_year_month_magnitude, toUnit)
+
+        return None
 
 
 class FP_TimeBase(FP_Type):

@@ -45,6 +45,7 @@ invocations = {
     "toString": {"fn": misc.to_string},
     "toDateTime": {"fn": misc.to_date_time},
     "toTime": {"fn": misc.to_time},
+    "toQuantity": {"fn": misc.to_quantity, "arity": {0: [], 1: ["String"]}},
     "indexOf": {"fn": strings.index_of, "arity": {1: ["String"]}, "nullable_input": True},
     "substring": {
         "fn": strings.substring,
