@@ -9,11 +9,13 @@ intRegex = re.compile(r"^[+-]?\d+$")
 numRegex = re.compile(r"^[+-]?\d+(\.\d+)?$")
 
 
-def iif_macro(ctx, data, cond, ok, fail):
+def iif_macro(ctx, data, cond, ok, fail=None):
     if util.is_true(cond(data)):
         return ok(data)
-
-    return fail(data)
+    elif fail:
+        return fail(data)
+    else:
+        return []
 
 
 def trace_fn(ctx, x, label=""):
