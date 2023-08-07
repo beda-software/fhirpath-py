@@ -98,16 +98,17 @@ param_check_table = {
 
 
 def make_param(ctx, parentData, node_type, param):
-    ctx["currentData"] = parentData
 
     if node_type == "Expr":
 
         def func(data):
-            return do_eval(ctx, util.arraify(data), param)
+            ctx["$this"] = util.arraify(data)
+            return do_eval(ctx, ctx["$this"], param)
 
         return func
 
     if node_type == "AnyAtRoot":
+        ctx["$this"] = ctx["$this"] if "$this" in ctx else ctx['dataRoot']
         return do_eval(ctx, ctx["dataRoot"], param)
 
     if node_type == "Identifier":
@@ -116,6 +117,7 @@ def make_param(ctx, parentData, node_type, param):
 
         raise Exception("Expected identifier node, got " + json.dumps(param))
 
+    ctx["$this"] = parentData
     res = do_eval(ctx, parentData, param)
 
     if node_type == "Any":

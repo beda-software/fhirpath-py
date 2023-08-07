@@ -129,3 +129,48 @@ def extension_test():
         "Patient.identifier.where(type.coding.extension('https://bluebutton.cms.gov/resources/codesystem/identifier-currency').valueCoding.code = 'current').where(system = 'http://hl7.org/fhir/sid/us-mbi').value",
     )
     assert result == ["7SM0A00AA00"]
+
+
+def reference_filter_test():
+    encounter = {
+        "meta": {
+            "lastUpdated": "2023-08-03T16:24:50.634670Z",
+            "versionId": "256452",
+            "extension": [{"url": "ex:createdAt", "valueInstant": "2023-07-31T18:06:57.172516Z"}],
+        },
+        "type": [
+            {
+                "coding": [
+                    {
+                        "code": "primary",
+                        "system": "http://prenosis.com/fhir/CodeSystem/encounter-type",
+                    }
+                ]
+            }
+        ],
+        "participant": [
+            {"individual": {"reference": "Practitioner/dr-johns"}},
+            {"individual": {"reference": "PractitionerRole/dr-brown-internal"}},
+        ],
+        "resourceType": "Encounter",
+        "status": "finished",
+        "id": "25c724fe-8664-4620-be95-ebf8b4784339",
+        "class": {
+            "code": "IMP",
+            "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+            "display": "inpatient encounter",
+        },
+        "identifier": [
+            {
+                "value": "00c4ba23-85a4-4a30-89d8-d907814028b6",
+                "system": "http://prenosis.com/fhir/CodeSystem/encounter-identifier",
+            }
+        ],
+        "period": {"end": "2023-07-01T18:53:48.034300Z", "start": "2023-07-01T18:06:56.034300Z"},
+        "subject": {"reference": "Patient/a3e9f617-fb12-447c-b931-96f60e0d7dab"},
+    }
+    result = evaluate(
+        encounter,
+        "Encounter.participant.individual.reference.where($this.matches('Practitioner/'))",
+    )
+    assert result == ["Practitioner/dr-johns"]
