@@ -49,7 +49,7 @@ def union_expression(ctx, parentData, node):
 
 
 def this_invocation(ctx, parentData, node):
-    return util.arraify(ctx["currentData"])
+    return util.arraify(ctx["$this"])
 
 
 def op_expression(ctx, parentData, node):
