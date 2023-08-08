@@ -1,5 +1,6 @@
 import numbers
 import fhirpathpy.engine.util as util
+import fhirpathpy.engine.nodes as nodes
 
 # Contains the FHIRPath Filtering and Projection functions.
 # (Section 5.2 of the FHIRPath 1.0.0 specification).
@@ -115,3 +116,14 @@ def check_fhir_type(ctx, x, tp):
 
 def of_type_fn(ctx, coll, tp):
     return list(filter(lambda x: check_fhir_type(ctx, util.get_data(x), tp), coll))
+
+
+def extension(ctx, data, url):
+    res = []
+    for d in data:
+        element = util.get_data(d)
+        if isinstance(element, dict):
+            exts = [e for e in element.get("extension", []) if e["url"] == url]
+            if len(exts) > 0:
+                res.append(nodes.ResourceNode.create_node(exts[0], "Extension"))
+    return res

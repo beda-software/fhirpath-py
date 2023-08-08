@@ -14,6 +14,7 @@ def save_to_resources(resources, resource_filename):
 
 save_to_resources(resources, "observation-example.json")
 save_to_resources(resources, "patient-example.json")
+save_to_resources(resources, "patient-example-2.json")
 save_to_resources(resources, "quantity-example.json")
 save_to_resources(resources, "questionnaire-example.json")
 save_to_resources(resources, "valueset-example-expansion.json")

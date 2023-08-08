@@ -27,6 +27,7 @@ invocations = {
     "count": {"fn": existence.count_fn},
     "repeat": {"fn": filtering.repeat_macro, "arity": {1: ["Expr"]}},
     "where": {"fn": filtering.where_macro, "arity": {1: ["Expr"]}},
+    "extension": {"fn": filtering.extension, "arity": {1: ["String"]}},
     "select": {"fn": filtering.select_macro, "arity": {1: ["Expr"]}},
     "single": {"fn": filtering.single_fn},
     "first": {"fn": filtering.first_fn},
@@ -42,8 +43,8 @@ invocations = {
     "toInteger": {"fn": misc.to_integer},
     "toDecimal": {"fn": misc.to_decimal},
     "toString": {"fn": misc.to_string},
-    # toDateTime:   {fn: misc.toDateTime},
-    # toTime:       {fn: misc.toTime},
+    "toDateTime": {"fn": misc.to_date_time},
+    "toTime": {"fn": misc.to_time},
     "indexOf": {"fn": strings.index_of, "arity": {1: ["String"]}, "nullable_input": True},
     "substring": {
         "fn": strings.substring,

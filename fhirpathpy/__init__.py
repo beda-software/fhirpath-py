@@ -6,7 +6,7 @@ from fhirpathpy.engine.nodes import FP_Type
 from fhirpathpy.dsl_impl import DSL
 
 __title__ = "fhirpathpy"
-__version__ = "0.1.2"
+__version__ = "0.2.2"
 __author__ = "beda.software"
 __license__ = "MIT"
 __copyright__ = "Copyright 2023 beda.software"
