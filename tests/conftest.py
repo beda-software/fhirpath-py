@@ -101,7 +101,7 @@ def compare(l1, l2):
         assert True
     elif len(l1) == len(l2) == 1:
         e1 = l1[0]
-        e2 = evaluate({}, l2[0])[0]
+        e2 = evaluate({}, l2[0])[0] if isinstance(l2[0], str) else l2[0]
         if isinstance(e1, FP_Quantity) and isinstance(e2, FP_Quantity):
             assert e1 == e2
         else:
