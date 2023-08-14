@@ -65,6 +65,7 @@ invocations = {
         "nullable_input": True,
     },
     "length": {"fn": strings.length, "nullable_input": True},
+    "toChars": {"fn": strings.toChars },
     "join": {"fn": strings.join, "arity": {0: [], 1: ["String"]}},
     "split": {"fn": strings.split, "arity": {1: ["String"]}, "nullable_input": True},
     "trim": {"fn": strings.trim, "nullable_input": True},

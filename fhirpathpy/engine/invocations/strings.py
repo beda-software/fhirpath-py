@@ -96,3 +96,10 @@ def replace_matches(ctx, coll, regex, repl):
 def length(ctx, coll):
     str = ensure_string_singleton(coll)
     return len(str)
+
+
+def toChars(ctx, coll):
+    if not coll:
+        return []
+    string = ensure_string_singleton(coll)
+    return list(string)
