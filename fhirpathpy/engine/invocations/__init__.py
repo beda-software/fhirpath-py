@@ -66,6 +66,7 @@ invocations = {
     },
     "length": {"fn": strings.length, "nullable_input": True},
     "split": {"fn": strings.split, "arity": {1: ["String"]}, "nullable_input": True},
+    "trim": {"fn": strings.trim, "nullable_input": True},
     "abs": {"fn": math.abs},
     "ceiling": {"fn": math.ceiling},
     "exp": {"fn": math.exp},

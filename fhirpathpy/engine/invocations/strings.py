@@ -58,6 +58,11 @@ def split(ctx, coll, delimiter):
     return string.split(delimiter)
 
 
+def trim(ctx, coll):
+    string = ensure_string_singleton(coll)
+    return string.strip()
+
+
 # test function
 def matches(ctx, coll, regex):
     string = ensure_string_singleton(coll)
