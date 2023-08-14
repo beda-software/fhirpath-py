@@ -53,6 +53,11 @@ def lower(ctx, coll):
     return string.lower()
 
 
+def split(ctx, coll, delimiter):
+    string = ensure_string_singleton(coll)
+    return string.split(delimiter)
+
+
 # test function
 def matches(ctx, coll, regex):
     string = ensure_string_singleton(coll)
