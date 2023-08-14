@@ -43,6 +43,16 @@ def contains_fn(ctx, coll, substr):
     return substr in string
 
 
+def upper(ctx, coll):
+    string = ensure_string_singleton(coll)
+    return string.upper()
+
+
+def lower(ctx, coll):
+    string = ensure_string_singleton(coll)
+    return string.lower()
+
+
 # test function
 def matches(ctx, coll, regex):
     string = ensure_string_singleton(coll)

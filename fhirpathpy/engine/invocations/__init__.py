@@ -55,6 +55,8 @@ invocations = {
     "startsWith": {"fn": strings.starts_with, "arity": {1: ["String"]}, "nullable_input": True},
     "endsWith": {"fn": strings.ends_with, "arity": {1: ["String"]}, "nullable_input": True},
     "contains": {"fn": strings.contains_fn, "arity": {1: ["String"]}, "nullable_input": True},
+    "upper": {"fn": strings.upper, "arity": {0: ["String"]}, "nullable_input": True},
+    "lower": {"fn": strings.lower, "arity": {0: ["String"]}, "nullable_input": True},
     "replace": {"fn": strings.replace, "arity": {2: ["String", "String"]}, "nullable_input": True},
     "matches": {"fn": strings.matches, "arity": {1: ["String"]}, "nullable_input": True},
     "replaceMatches": {
