@@ -63,7 +63,7 @@ def trim(ctx, coll):
     return string.strip()
 
 
-def join(ctx, coll, separator=None):
+def join(ctx, coll, separator=""):
     stringValues = []
     for n in coll:
         d = util.valData(n)
@@ -71,9 +71,6 @@ def join(ctx, coll, separator=None):
             stringValues.append(d)
         else:
             raise TypeError("Join requires a collection of strings.")
-
-    if separator is None:
-        separator = ""
 
     return separator.join(stringValues)
 
