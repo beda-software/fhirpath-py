@@ -74,9 +74,3 @@ def uniq(arr):
             key = str(x)
         ordered_dict[key] = x
     return list(ordered_dict.values())
-
-
-def valData(val):
-    # Returns the data value of the given parameter, which might be a ResourceNode.
-    # Otherwise, it returns the value that was passed in.
-    return val.data if isinstance(val, ResourceNode) else val

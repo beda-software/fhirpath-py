@@ -66,7 +66,7 @@ def trim(ctx, coll):
 def join(ctx, coll, separator=""):
     stringValues = []
     for n in coll:
-        d = util.valData(n)
+        d = util.get_data(n)
         if isinstance(d, str):
             stringValues.append(d)
         else:
