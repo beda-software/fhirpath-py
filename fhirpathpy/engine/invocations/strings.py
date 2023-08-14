@@ -63,6 +63,21 @@ def trim(ctx, coll):
     return string.strip()
 
 
+def join(ctx, coll, separator=None):
+    stringValues = []
+    for n in coll:
+        d = util.valData(n)
+        if isinstance(d, str):
+            stringValues.append(d)
+        else:
+            raise TypeError("Join requires a collection of strings.")
+
+    if separator is None:
+        separator = ""
+
+    return separator.join(stringValues)
+
+
 # test function
 def matches(ctx, coll, regex):
     string = ensure_string_singleton(coll)
