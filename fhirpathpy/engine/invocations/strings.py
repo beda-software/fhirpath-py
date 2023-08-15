@@ -20,13 +20,18 @@ def index_of(ctx, coll, substr):
 
 def substring(ctx, coll, start, length=None):
     string = ensure_string_singleton(coll)
-    start = int(start)
 
-    if length is None:
+    if isinstance(start, list) or start is None:
+        return []
+
+    start = int(start)
+    if start < 0 or start >= len(string):
+        return []
+
+    if length is None or length == []:
         return string[start:]
 
-    length = int(length)
-    return string[start : start + length]
+    return string[start : start + int(length)]
 
 
 def starts_with(ctx, coll, prefix):
