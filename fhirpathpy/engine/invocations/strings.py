@@ -140,6 +140,8 @@ def matches(ctx, coll, regex):
 
 def replace(ctx, coll, regex, repl):
     string = ensure_string_singleton(coll)
+    if not string or not regex or not repl:
+        return []
     return string.replace(regex, repl)
 
 
