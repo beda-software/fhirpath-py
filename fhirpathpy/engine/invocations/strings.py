@@ -133,8 +133,11 @@ def join(ctx, coll, separator=""):
 
 # test function
 def matches(ctx, coll, regex):
+    if not regex or not coll:
+        return []
+
     string = ensure_string_singleton(coll)
-    valid = re.compile(regex)
+    valid = re.compile(regex, re.DOTALL)
     return re.search(valid, string) is not None
 
 
