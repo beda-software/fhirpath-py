@@ -36,11 +36,15 @@ def substring(ctx, coll, start, length=None):
 
 def starts_with(ctx, coll, prefix):
     string = ensure_string_singleton(coll)
+    if not string or not isinstance(prefix, str):
+        return False
     return string.startswith(prefix)
 
 
 def ends_with(ctx, coll, postfix):
     string = ensure_string_singleton(coll)
+    if not string or not isinstance(postfix, str):
+        return False
     return string.endswith(postfix)
 
 
