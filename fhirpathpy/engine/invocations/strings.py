@@ -150,6 +150,9 @@ def replace(ctx, coll, regex, repl):
 
 def replace_matches(ctx, coll, regex, repl):
     string = ensure_string_singleton(coll)
+    if isinstance(regex, list) or isinstance(repl, list):
+        return []
+    repl = re.sub(r"\$(\d+)", r"\\\1", repl)
     valid = re.compile(regex)
     return re.sub(valid, repl, string)
 
