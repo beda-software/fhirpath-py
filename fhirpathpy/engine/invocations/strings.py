@@ -152,7 +152,10 @@ def replace_matches(ctx, coll, regex, repl):
     string = ensure_string_singleton(coll)
     if isinstance(regex, list) or isinstance(repl, list):
         return []
+
+    # extract capture groups $1, $2, $3 etc as in python \1, \2, \3
     repl = re.sub(r"\$(\d+)", r"\\\1", repl)
+
     valid = re.compile(regex)
     return re.sub(valid, repl, string)
 
