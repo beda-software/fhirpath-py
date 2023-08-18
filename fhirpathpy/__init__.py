@@ -64,6 +64,8 @@ def evaluate(resource, path, context={}, model=None):
     int: Description of return value
 
     """
+    if isinstance(path, DSL):
+        path = str(path)
     node = parse(path)
     return apply_parsed_path(resource, node, context, model)
 
