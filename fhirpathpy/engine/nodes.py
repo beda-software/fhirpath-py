@@ -300,7 +300,18 @@ class FP_Time(FP_TimeBase):
                 self._timeMatchData, self.matchGroupsIndices
             )
             self._precision = len(self._timeAsList)
-            self._pyTimeObject = datetime.datetime.strptime(self.asStr, "%H:%M:%S").time()
+            try:
+                self._pyTimeObject = datetime.datetime.strptime(self.asStr, "%H:%M:%S").time()
+            except ValueError:
+                self._pyTimeObject = datetime.datetime.strptime(self.asStr, "%H:%M:%S.%f").time()
+
+    def __str__(self):
+        if self._pyTimeObject:
+            time_str = self._pyTimeObject.isoformat()
+            if "." in time_str:
+                time_str = time_str[: time_str.index(".") + 4]
+            return time_str
+        return self.asStr
 
     def getTimeMatchStr(self):
         return self._timeMatchStr
@@ -359,6 +370,11 @@ class FP_DateTime(FP_TimeBase):
             self._precision = len(self._dateTimeAsList)
 
     def __str__(self):
+        if self._getDateTimeObject():
+            iso_str = self._getDateTimeObject().isoformat()
+            if "." in iso_str:
+                iso_str = iso_str[: iso_str.index(".") + 4] + iso_str[iso_str.index(".") + 7 :]
+            return iso_str
         return self.asStr
 
     def getDateTimeMatchStr(self):
