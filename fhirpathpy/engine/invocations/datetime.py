@@ -7,7 +7,7 @@ def now(ctx, data):
         now = constants.nowDate
         if not now.tzinfo:
             now = now.astimezone()
-        isoStr = now.replace(microsecond=0).isoformat()  # YYYY-MM-DDThh:mm:ss.ffffff+zz:zz
+        isoStr = now.replace().isoformat()  # YYYY-MM-DDThh:mm:ss.ffffff+zz:zz
         constants.now = FP_DateTime(isoStr)
     return constants.now
 
@@ -23,6 +23,6 @@ def today(ctx, data):
 def timeOfDay(ctx, data):
     if not constants.timeOfDay:
         now = constants.nowDate
-        isoStr = now.time().replace(microsecond=0).isoformat()  # hh:mm:ss.ffffff
+        isoStr = now.time().replace().isoformat()  # hh:mm:ss.ffffff
         constants.timeOfDay = FP_Time(isoStr)
     return constants.timeOfDay
