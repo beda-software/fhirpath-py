@@ -300,7 +300,10 @@ class FP_Time(FP_TimeBase):
                 self._timeMatchData, self.matchGroupsIndices
             )
             self._precision = len(self._timeAsList)
-            self._pyTimeObject = datetime.datetime.strptime(self.asStr, "%H:%M:%S").time()
+            try:
+                self._pyTimeObject = datetime.datetime.strptime(self.asStr, "%H:%M:%S").time()
+            except ValueError:
+                self._pyTimeObject = datetime.datetime.strptime(self.asStr, "%H:%M:%S.%f").time()
 
     def getTimeMatchStr(self):
         return self._timeMatchStr
