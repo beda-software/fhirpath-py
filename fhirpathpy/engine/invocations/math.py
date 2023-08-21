@@ -1,3 +1,4 @@
+from decimal import Decimal
 import math
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
@@ -77,10 +78,12 @@ def plus(ctx, xs, ys):
     vs string if decimals are represented as strings), in order to support
     "as" and "is", but that support is deferred for now.
     """
-    if type(x) == str and type(y) == str:
+    if isinstance(x, str) and isinstance(y, str):
         return x + y
 
     if util.is_number(x) and util.is_number(y):
+        if isinstance(x, float) or isinstance(y, float):
+            return float(Decimal(str(x)) + Decimal(str(y)))
         return x + y
 
     if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
