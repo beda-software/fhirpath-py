@@ -16,11 +16,17 @@ def is_empty(x):
 
 def ensure_number_singleton(x):
     data = util.get_data(x)
+    if isinstance(data, float):
+        data = Decimal(data)
+
     if not util.is_number(data):
         if not isinstance(data, list) or len(data) != 1:
             raise Exception("Expected list with number, but got " + str(data))
 
         value = util.get_data(data[0])
+
+        if isinstance(value, float):
+            value = Decimal(value)
 
         if not util.is_number(value):
             raise Exception("Expected number, but got " + str(x))
@@ -92,7 +98,7 @@ def abs(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return math.fabs(num)
+    return Decimal(math.fabs(num))
 
 
 def ceiling(ctx, x):
@@ -106,7 +112,7 @@ def exp(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return math.exp(num)
+    return Decimal(math.exp(num))
 
 
 def floor(ctx, x):
@@ -121,7 +127,7 @@ def ln(ctx, x):
         return []
 
     num = ensure_number_singleton(x)
-    return math.log(num)
+    return Decimal(math.log(num))
 
 
 def log(ctx, x, base):
@@ -131,7 +137,7 @@ def log(ctx, x, base):
     num = ensure_number_singleton(x)
     num2 = ensure_number_singleton(base)
 
-    return math.log(num, num2)
+    return Decimal(math.log(num, num2))
 
 
 def power(ctx, x, degree):
@@ -144,7 +150,7 @@ def power(ctx, x, degree):
     if num < 0 or math.floor(num2) != num2:
         return []
 
-    return math.pow(num, num2)
+    return Decimal(math.pow(num, num2))
 
 
 def rround(ctx, x, acc):
@@ -156,7 +162,7 @@ def rround(ctx, x, acc):
         return round(num)
 
     num2 = ensure_number_singleton(acc)
-    degree = math.pow(10, num2)
+    degree = Decimal(math.pow(10, num2))
 
     return round(num * degree) / degree
 
@@ -169,7 +175,7 @@ def sqrt(ctx, x):
     if num < 0:
         return []
 
-    return math.sqrt(num)
+    return Decimal(math.sqrt(num))
 
 
 def truncate(ctx, x):
