@@ -1,3 +1,4 @@
+from decimal import Decimal
 import re
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
@@ -67,7 +68,7 @@ def to_quantity(ctx, coll, to_unit=None):
         v = util.get_data(coll[0])
         quantity_regex_res = None
 
-        if isinstance(v, (int, float)):
+        if isinstance(v, (int, Decimal)):
             result = nodes.FP_Quantity(v, "'1'")
         elif isinstance(v, nodes.FP_Quantity):
             result = v
@@ -83,7 +84,7 @@ def to_quantity(ctx, coll, to_unit=None):
 
             # UCUM unit code in the input string must be surrounded with single quotes
             if not time or nodes.FP_Quantity.timeUnitsToUCUM.get(time):
-                result = nodes.FP_Quantity(float(value), unit or time or "'1'")
+                result = nodes.FP_Quantity(Decimal(value), unit or time or "'1'")
 
         if result and to_unit and result.unit != to_unit:
             result = nodes.FP_Quantity.conv_unit_to(result.unit, result.value, to_unit)
@@ -97,18 +98,18 @@ def to_decimal(ctx, coll):
 
     value = util.get_data(coll[0])
 
-    if value == False:
+    if value is False:
         return 0
 
-    if value == True:
+    if value is True:
         return 1.0
 
     if util.is_number(value):
         return value
 
-    if type(value) == str:
+    if isinstance(value, str):
         if re.match(numRegex, value) is not None:
-            return float(value)
+            return Decimal(value)
 
         raise Exception("Could not convert to decimal: " + value)
 

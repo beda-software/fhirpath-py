@@ -39,8 +39,6 @@ def minus(ctx, xs, ys):
         y = util.get_data(ys[0])
 
         if util.is_number(x) and util.is_number(y):
-            if isinstance(x, float) or isinstance(y, float):
-                return Decimal(str(x)) - Decimal(str(y))
             return x - y
 
         if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
@@ -84,8 +82,6 @@ def plus(ctx, xs, ys):
         return x + y
 
     if util.is_number(x) and util.is_number(y):
-        if isinstance(x, float) or isinstance(y, float):
-            return Decimal(str(x)) + Decimal(str(y))
         return x + y
 
     if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):

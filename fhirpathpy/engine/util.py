@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 from collections import OrderedDict
 from functools import reduce
@@ -21,7 +22,7 @@ def get_data(value):
 
 
 def is_number(value):
-    return isinstance(value, (int, float, complex)) and not isinstance(value, bool)
+    return isinstance(value, (int, Decimal, complex)) and not isinstance(value, bool)
 
 
 def is_capitalized(x):

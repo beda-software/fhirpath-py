@@ -1,3 +1,4 @@
+from decimal import Decimal
 import numbers
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
@@ -100,19 +101,19 @@ def skip_fn(ctx, x, n):
 
 
 def check_fhir_type(ctx, x, tp):
-    if tp == "string" and type(x) == str:
+    if tp == "string" and isinstance(x, str):
         return True
 
-    if tp == "boolean" and type(x) == bool:
+    if tp == "boolean" and isinstance(x, bool):
         return True
 
     if tp == "object":
         return isinstance(x, dict)
 
-    if tp == "integer" and type(x) == int:
+    if tp == "integer" and isinstance(x, int):
         return True
 
-    if tp == "decimal" and (type(x) == int or type(x) == float):
+    if tp == "decimal" and isinstance(x, (int, Decimal)):
         return True
 
     return False

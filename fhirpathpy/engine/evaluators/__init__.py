@@ -1,3 +1,4 @@
+from decimal import Decimal
 from functools import reduce
 
 import re
@@ -14,10 +15,10 @@ def boolean_literal(ctx, parentData, node):
 
 
 def number_literal(ctx, parentData, node):
-    float_number = float(node["text"])
-    int_number = int(float_number)
+    decimal_number = Decimal(node["text"])
+    int_number = int(decimal_number)
 
-    return [int_number] if float_number == int_number else [float_number]
+    return [int_number] if decimal_number == int_number else [decimal_number]
 
 
 def identifier(ctx, parentData, node):
@@ -135,7 +136,7 @@ def string_literal(ctx, parentData, node):
 
 def quantity_literal(ctx, parentData, node):
     valueNode = node["children"][0]
-    value = float(valueNode["terminalNodeText"][0])
+    value = Decimal(valueNode["terminalNodeText"][0])
     unitNode = valueNode["children"][0]
     if len(unitNode["terminalNodeText"]) > 0:
         unit = unitNode["terminalNodeText"][0]
