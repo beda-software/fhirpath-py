@@ -162,7 +162,7 @@ def rround(ctx, x, acc):
         return round(num)
 
     num2 = ensure_number_singleton(acc)
-    degree = Decimal(math.pow(10, num2))
+    degree = 10 ** Decimal(num2)
 
     return round(num * degree) / degree
 

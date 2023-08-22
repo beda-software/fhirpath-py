@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 import math
 import pytest
 from freezegun import freeze_time
@@ -57,7 +58,7 @@ def simple_logic_expressions_test(resource, path, expected):
         ({"a": 42.75}, "a.floor()", [42]),
         ({"a": 42.25}, "a.round(-1)", [40]),
         ({"a": 42.25}, "a.round(0)", [42]),
-        ({"a": 42.25}, "a.round(1)", [42.2]),
+        ({"a": 42.25}, "a.round(1)", [Decimal("42.2")]),
         ({"a": 9}, "a.sqrt()", [3]),
         ({"a": 3}, "a.exp()", [math.exp(3)]),
         ({"a": 3}, "a.ln()", [math.log(3)]),
