@@ -17,7 +17,10 @@ class set_paths:
 
 def get_data(value):
     if isinstance(value, ResourceNode):
-        return value.data
+        value = value.data
+
+    if isinstance(value, float):
+        return Decimal(str(value))
     return value
 
 
