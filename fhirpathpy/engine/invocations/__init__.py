@@ -43,6 +43,7 @@ invocations = {
     "toInteger": {"fn": misc.to_integer},
     "toDecimal": {"fn": misc.to_decimal},
     "toString": {"fn": misc.to_string},
+    "toDate": {"fn": misc.to_date},
     "toDateTime": {"fn": misc.to_date_time},
     "toTime": {"fn": misc.to_time},
     "toQuantity": {"fn": misc.to_quantity, "arity": {0: [], 1: ["String"]}},
