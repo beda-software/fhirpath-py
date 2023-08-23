@@ -167,7 +167,7 @@ def to_date(ctx, coll):
     rtn = []
 
     if ln > 1:
-        raise Exception("to_date called for a collection of length " + str(ln))
+        raise Exception("to_date called for a collection of length " + ln)
 
     if ln == 1:
         value = util.get_data(coll[0])
