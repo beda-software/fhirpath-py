@@ -1,4 +1,5 @@
 import datetime
+from datetime import timezone
 import json
 import re
 import time
@@ -300,10 +301,17 @@ class FP_Time(FP_TimeBase):
                 self._timeMatchData, self.matchGroupsIndices
             )
             self._precision = len(self._timeAsList)
-            try:
-                self._pyTimeObject = datetime.datetime.strptime(self.asStr, "%H:%M:%S").time()
-            except ValueError:
-                self._pyTimeObject = datetime.datetime.strptime(self.asStr, "%H:%M:%S.%f").time()
+            formats = ["%H:%M:%S%z", "%H:%M:%S.%f%z", "%H:%M:%S", "%H:%M:%S.%f"]
+
+            for fmt in formats:
+                try:
+                    parsed_datetime = datetime.datetime.strptime(self.asStr, fmt)
+                    if parsed_datetime.tzinfo:
+                        parsed_datetime = parsed_datetime.astimezone(timezone.utc)
+                    self._pyTimeObject = parsed_datetime.time()
+                    break
+                except ValueError:
+                    continue
 
     def __str__(self):
         if self._pyTimeObject:
