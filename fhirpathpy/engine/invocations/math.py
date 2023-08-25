@@ -136,10 +136,7 @@ def log(ctx, x, base):
     num = Decimal(ensure_number_singleton(x))
     num2 = Decimal(ensure_number_singleton(base))
 
-    result = num.ln() / num2.ln()
-    result = result.quantize(Decimal("1.000000000000000"))
-
-    return result
+    return (num.ln() / num2.ln()).quantize(Decimal("1.000000000000000"))
 
 
 def power(ctx, x, degree):
