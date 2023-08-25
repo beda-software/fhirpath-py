@@ -1,5 +1,4 @@
 from decimal import Decimal
-import math
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 
@@ -98,28 +97,28 @@ def abs(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return Decimal(math.fabs(num))
+    return Decimal(num).copy_abs()
 
 
 def ceiling(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return math.ceil(num)
+    return Decimal(num).to_integral_value(rounding="ROUND_CEILING")
 
 
 def exp(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return Decimal(math.exp(num))
+    return Decimal(num).exp()
 
 
 def floor(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return math.floor(num)
+    return Decimal(num).to_integral_value(rounding="ROUND_FLOOR")
 
 
 def ln(ctx, x):
@@ -127,37 +126,40 @@ def ln(ctx, x):
         return []
 
     num = ensure_number_singleton(x)
-    return Decimal(math.log(num))
+    return Decimal(num).ln()
 
 
 def log(ctx, x, base):
     if is_empty(x) or is_empty(base):
         return []
 
-    num = ensure_number_singleton(x)
-    num2 = ensure_number_singleton(base)
+    num = Decimal(ensure_number_singleton(x))
+    num2 = Decimal(ensure_number_singleton(base))
 
-    return Decimal(math.log(num, num2))
+    result = num.ln() / num2.ln()
+    result = result.quantize(Decimal("1.000000000000000"))
+
+    return result
 
 
 def power(ctx, x, degree):
     if is_empty(x) or is_empty(degree):
         return []
 
-    num = ensure_number_singleton(x)
-    num2 = ensure_number_singleton(degree)
+    num = Decimal(ensure_number_singleton(x))
+    num2 = Decimal(ensure_number_singleton(degree))
 
-    if num < 0 or math.floor(num2) != num2:
+    if num < 0 or num2.to_integral_value(rounding="ROUND_FLOOR") != num2:
         return []
 
-    return Decimal(math.pow(num, num2))
+    return pow(num, num2)
 
 
 def rround(ctx, x, acc):
     if is_empty(x):
         return []
 
-    num = ensure_number_singleton(x)
+    num = Decimal(ensure_number_singleton(x))
     if is_empty(acc):
         return round(num)
 
@@ -175,11 +177,11 @@ def sqrt(ctx, x):
     if num < 0:
         return []
 
-    return Decimal(math.sqrt(num))
+    return Decimal(num).sqrt()
 
 
 def truncate(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return math.trunc(num)
+    return Decimal(num).to_integral_value(rounding="ROUND_DOWN")

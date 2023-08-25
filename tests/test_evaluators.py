@@ -1,6 +1,5 @@
 import datetime
 from decimal import Decimal
-import math
 import pytest
 from freezegun import freeze_time
 
@@ -60,10 +59,10 @@ def simple_logic_expressions_test(resource, path, expected):
         ({"a": 42.25}, "a.round(0)", [42]),
         ({"a": 42.25}, "a.round(1)", [Decimal("42.2")]),
         ({"a": 9}, "a.sqrt()", [3]),
-        ({"a": 3}, "a.exp()", [math.exp(3)]),
-        ({"a": 3}, "a.ln()", [math.log(3)]),
-        ({"a": 3}, "a.log(3)", [math.log(3, 3)]),
-        ({"a": 3}, "a.truncate()", [math.trunc(3)]),
+        ({"a": 3}, "a.exp()", [Decimal(3).exp()]),
+        ({"a": 3}, "a.ln()", [Decimal(3).ln()]),
+        ({"a": 3}, "a.log(3)", [Decimal(3).ln() / Decimal(3).ln()]),
+        ({"a": 3}, "a.truncate()", [Decimal(3).to_integral_value(rounding="ROUND_DOWN")]),
     ],
 )
 def math_functions_test(resource, path, expected):
