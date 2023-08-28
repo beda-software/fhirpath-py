@@ -28,6 +28,9 @@ def equivalence(ctx, x, y):
     if type(x[0]) in DATETIME_NODES_LIST or type(y[0]) in DATETIME_NODES_LIST:
         return datetime_equality(ctx, x, y)
 
+    if isinstance(x[0], str) and isinstance(y[0], str):
+        return " ".join(x[0].lower().split()) == " ".join(y[0].lower().split())
+
     return x == y
 
 
@@ -58,6 +61,7 @@ def unequal(ctx, a, b):
 
 def equival(ctx, a, b):
     equivalence_result = equivalence(ctx, a, b)
+    print("equivalence_result", equivalence_result)
     return util.arraify(equivalence_result, instead_none=False)
 
 
