@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
@@ -30,6 +31,15 @@ def equivalence(ctx, x, y):
 
     if isinstance(x[0], str) and isinstance(y[0], str):
         return " ".join(x[0].lower().split()) == " ".join(y[0].lower().split())
+
+    if isinstance(x[0], Decimal) or isinstance(y[0], Decimal):
+        precision_x = len(str(x[0]).split(".")[1]) if "." in str(x[0]) else 0
+        precision_y = len(str(y[0]).split(".")[1]) if "." in str(y[0]) else 0
+        least_precision = min(precision_x, precision_y)
+        rounding_format = Decimal("10") ** -least_precision
+        rounded_x = Decimal(x[0]).quantize(rounding_format)
+        rounded_y = Decimal(y[0]).quantize(rounding_format)
+        return rounded_x == rounded_y
 
     return x == y
 
