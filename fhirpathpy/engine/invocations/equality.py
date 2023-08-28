@@ -29,9 +29,14 @@ def equivalence(ctx, x, y):
     if type(x[0]) in DATETIME_NODES_LIST or type(y[0]) in DATETIME_NODES_LIST:
         return datetime_equality(ctx, x, y)
 
+    # string: the strings must be the same
+    # while ignoring case and normalizing whitespace.
     if isinstance(x[0], str) and isinstance(y[0], str):
         return " ".join(x[0].lower().split()) == " ".join(y[0].lower().split())
 
+    # decimal: values must be equal, comparison is done on values rounded
+    # to the precision of the least precise operand.
+    # Trailing zeroes are ignored in determining precision.
     if isinstance(x[0], Decimal) or isinstance(y[0], Decimal):
         precision_x = len(str(x[0]).split(".")[1]) if "." in str(x[0]) else 0
         precision_y = len(str(y[0]).split(".")[1]) if "." in str(y[0]) else 0
