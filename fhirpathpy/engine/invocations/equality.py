@@ -61,7 +61,6 @@ def unequal(ctx, a, b):
 
 def equival(ctx, a, b):
     equivalence_result = equivalence(ctx, a, b)
-    print("equivalence_result", equivalence_result)
     return util.arraify(equivalence_result, instead_none=False)
 
 
