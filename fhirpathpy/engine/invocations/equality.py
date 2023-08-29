@@ -24,7 +24,8 @@ def normalize_string(s):
 
 
 def decimal_places(a):
-    match = str(a).split(".")
+    d = Decimal(str(a))
+    match = f"{d:.{abs(d.as_tuple().exponent)}f}".rstrip("0").rstrip(".").split(".")
     return len(match[1]) if len(match) > 1 else 0
 
 
