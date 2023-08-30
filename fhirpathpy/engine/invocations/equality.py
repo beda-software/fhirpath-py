@@ -1,6 +1,5 @@
 from decimal import Decimal
 import json
-from types import NoneType
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 
