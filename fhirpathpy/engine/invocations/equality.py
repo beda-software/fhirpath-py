@@ -1,5 +1,6 @@
 from decimal import Decimal
 import json
+from types import NoneType
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 
@@ -169,6 +170,8 @@ def typecheck(a, b):
 def lt(ctx, a, b):
     if len(a) == 0 or len(b) == 0:
         return []
+    if a[0] is None or b[0] is None:
+        return []
 
     vals = typecheck(a, b)
     a0 = vals[0]
@@ -182,6 +185,8 @@ def lt(ctx, a, b):
 
 def gt(ctx, a, b):
     if len(a) == 0 or len(b) == 0:
+        return []
+    if a[0] is None or b[0] is None:
         return []
 
     vals = typecheck(a, b)
@@ -197,6 +202,8 @@ def gt(ctx, a, b):
 def lte(ctx, a, b):
     if len(a) == 0 or len(b) == 0:
         return []
+    if a[0] is None or b[0] is None:
+        return []
 
     vals = typecheck(a, b)
     a0 = vals[0]
@@ -210,6 +217,8 @@ def lte(ctx, a, b):
 
 def gte(ctx, a, b):
     if len(a) == 0 or len(b) == 0:
+        return []
+    if a[0] is None or b[0] is None:
         return []
 
     vals = typecheck(a, b)
