@@ -336,6 +336,7 @@ class FP_Time(FP_TimeBase):
                 hours=self._pyTimeObject.hour,
                 minutes=self._pyTimeObject.minute,
                 seconds=self._pyTimeObject.second,
+                microseconds=self._pyTimeObject.microsecond,
             ).total_seconds()
         return None
 
