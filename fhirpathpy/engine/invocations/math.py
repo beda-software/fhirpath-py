@@ -35,6 +35,10 @@ def ensure_number_singleton(x):
 
 
 def amp(ctx, x="", y=""):
+    if isinstance(x, list) and not x:
+        x = ""
+    if isinstance(y, list) and not y:
+        y = ""
     return x + y
 
 
