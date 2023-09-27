@@ -106,3 +106,5 @@ def compare(l1, l2):
             assert e1 == e2
         else:
             assert str(e1) == str(e2)
+    else:
+        assert False, f"{l1} != {l2}"
