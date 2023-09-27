@@ -186,6 +186,9 @@ def create_reduce_member_invocation(model, key):
         toAdd = None
         toAdd_ = None
 
+        if isinstance(res.data, nodes.FP_Quantity):
+            toAdd = res.data.value
+
         if isinstance(actualTypes, list):
             # Use actualTypes to find the field's value
             for actualType in actualTypes:
