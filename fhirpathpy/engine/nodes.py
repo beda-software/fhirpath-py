@@ -1,5 +1,6 @@
 import datetime
 from datetime import timezone
+from decimal import Decimal
 import json
 import re
 import time
@@ -144,14 +145,15 @@ class FP_Quantity(FP_Type):
                     other_value_in_months *= 12
                 return self_value_in_months == other_value_in_months
             elif self.unit in self._weeks_days_and_time and other.unit in self._weeks_days_and_time:
-                weeks_multipliers = {key: 7 * 24 * 60 * 60 for key in ["'wk'", "week", "weeks"]}
-                days_multipliers = {key: 24 * 60 * 60 for key in ["'d'", "day", "days"]}
-                hours_multipliers = {key: 60 * 60 for key in ["'h'", "hour", "hours"]}
-                minutes_multipliers = {key: 60 for key in ["'min'", "minute", "minutes"]}
-                seconds_multipliers = {key: 1 for key in ["'s'", "second", "seconds"]}
+                weeks_multipliers = {key: Decimal("604800") for key in ["'wk'", "week", "weeks"]}
+                days_multipliers = {key: Decimal("86400") for key in ["'d'", "day", "days"]}
+                hours_multipliers = {key: Decimal("3600") for key in ["'h'", "hour", "hours"]}
+                minutes_multipliers = {key: Decimal("60") for key in ["'min'", "minute", "minutes"]}
+                seconds_multipliers = {key: Decimal("1") for key in ["'s'", "second", "seconds"]}
                 milliseconds_multipliers = {
-                    key: 0.001 for key in ["'ms'", "millisecond", "milliseconds"]
+                    key: Decimal("0.001") for key in ["'ms'", "millisecond", "milliseconds"]
                 }
+
                 datetime_multipliers = {
                     **weeks_multipliers,
                     **days_multipliers,
