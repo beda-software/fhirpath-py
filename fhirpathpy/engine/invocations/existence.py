@@ -1,9 +1,10 @@
+from decimal import Decimal
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 import fhirpathpy.engine.invocations.filtering as filtering
 
 """
-This file holds code to hande the FHIRPath Existence functions 
+This file holds code to hande the FHIRPath Existence functions
 (5.1 in the specification).
 """
 
@@ -82,12 +83,71 @@ def superset_of_fn(ctx, coll1, coll2):
 
 
 def distinct_fn(ctx, x):
+    # TODO: refactor
+    conversion_factors_to_milliseconds = {
+        "weeks": Decimal("604800000"),
+        "'wk'": Decimal("604800000"),
+        "week": Decimal("604800000"),
+        "days": Decimal("86400000"),
+        "'d'": Decimal("86400000"),
+        "day": Decimal("86400000"),
+        "hours": Decimal("3600000"),
+        "'h'": Decimal("3600000"),
+        "hour": Decimal("3600000"),
+        "minutes": Decimal("60000"),
+        "'min'": Decimal("60000"),
+        "minute": Decimal("60000"),
+        "seconds": Decimal("1000"),
+        "'s'": Decimal("1000"),
+        "second": Decimal("1000"),
+        "milliseconds": Decimal("1"),
+        "'ms'": Decimal("1"),
+        "millisecond": Decimal("1"),
+    }
+
+    conversion_factors_to_months = {
+        "years": Decimal("12"),
+        "'a'": Decimal("12"),
+        "year": Decimal("12"),
+        "months": Decimal("1"),
+        "'mo'": Decimal("1"),
+        "month": Decimal("1"),
+    }
+
     if all([isinstance(v, nodes.ResourceNode) for v in x]):
         data = [v.data for v in x]
 
         unique = util.uniq(data)
 
         return [nodes.ResourceNode.create_node(item) for item in unique]
+
+    if all([isinstance(v, nodes.FP_Quantity) for v in x]):
+        converted_intervals = []
+
+        if all(interval.unit in conversion_factors_to_months for interval in x):
+            for interval in x:
+                unit = interval.unit
+                if unit in conversion_factors_to_months:
+                    converted_intervals.append(
+                        nodes.FP_Quantity(
+                            value=interval.value * conversion_factors_to_months[unit], unit="months"
+                        )
+                    )
+
+        elif all(interval.unit in conversion_factors_to_milliseconds for interval in x):
+            for interval in x:
+                unit = interval.unit
+                if unit in conversion_factors_to_milliseconds:
+                    converted_intervals.append(
+                        nodes.FP_Quantity(
+                            value=interval.value * conversion_factors_to_milliseconds[unit],
+                            unit="milliseconds",
+                        )
+                    )
+
+        unique_converted_intervals = util.uniq(converted_intervals)
+
+        return unique_converted_intervals
 
     return util.uniq(x)
 
