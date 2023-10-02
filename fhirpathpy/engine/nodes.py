@@ -119,6 +119,15 @@ class FP_Quantity(FP_Type):
 
     _year_month_conversion_factor = {"'a'": 12, "'mo'": 1}
 
+    datetime_multipliers = {
+        **{key: Decimal("604800") for key in ["'wk'", "week", "weeks"]},
+        **{key: Decimal("86400") for key in ["'d'", "day", "days"]},
+        **{key: Decimal("3600") for key in ["'h'", "hour", "hours"]},
+        **{key: Decimal("60") for key in ["'min'", "minute", "minutes"]},
+        **{key: Decimal("1") for key in ["'s'", "second", "seconds"]},
+        **{key: Decimal("0.001") for key in ["'ms'", "millisecond", "milliseconds"]},
+    }
+
     def __init__(self, value, unit):
         super().__init__()
         self.asStr = f"{value} {unit}"
@@ -132,7 +141,16 @@ class FP_Quantity(FP_Type):
         return f"{type(self)}<{self.asStr}>"
 
     def __hash__(self):
-        return hash(self.value) ^ hash(self.unit)
+        if self.unit in self._years_and_months:
+            value_in_months = self.value
+            if self.unit in ["'a'", "year", "years"]:
+                value_in_months *= 12
+            return hash(("months", value_in_months))
+        elif self.unit in self._weeks_days_and_time:
+            value_in_seconds = self.value * self.datetime_multipliers[self.unit]
+            return hash(("seconds", value_in_seconds))
+        else:
+            return hash((self.value, self.unit))
 
     def __eq__(self, other):
         if isinstance(other, FP_Quantity):
@@ -145,25 +163,8 @@ class FP_Quantity(FP_Type):
                     other_value_in_months *= 12
                 return self_value_in_months == other_value_in_months
             elif self.unit in self._weeks_days_and_time and other.unit in self._weeks_days_and_time:
-                weeks_multipliers = {key: Decimal("604800") for key in ["'wk'", "week", "weeks"]}
-                days_multipliers = {key: Decimal("86400") for key in ["'d'", "day", "days"]}
-                hours_multipliers = {key: Decimal("3600") for key in ["'h'", "hour", "hours"]}
-                minutes_multipliers = {key: Decimal("60") for key in ["'min'", "minute", "minutes"]}
-                seconds_multipliers = {key: Decimal("1") for key in ["'s'", "second", "seconds"]}
-                milliseconds_multipliers = {
-                    key: Decimal("0.001") for key in ["'ms'", "millisecond", "milliseconds"]
-                }
-
-                datetime_multipliers = {
-                    **weeks_multipliers,
-                    **days_multipliers,
-                    **hours_multipliers,
-                    **minutes_multipliers,
-                    **seconds_multipliers,
-                    **milliseconds_multipliers,
-                }
-                self_value_in_seconds = self.value * datetime_multipliers[self.unit]
-                other_value_in_seconds = other.value * datetime_multipliers[other.unit]
+                self_value_in_seconds = self.value * self.datetime_multipliers[self.unit]
+                other_value_in_seconds = other.value * self.datetime_multipliers[other.unit]
                 return self_value_in_seconds == other_value_in_seconds
             else:
                 return self.value == other.value and self.unit == other.unit
