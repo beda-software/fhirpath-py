@@ -110,10 +110,10 @@ def check_fhir_type(ctx, x, tp):
     if tp == "object":
         return isinstance(x, dict)
 
-    if tp == "integer" and isinstance(x, int):
+    if tp == "integer" and isinstance(x, int) and not isinstance(x, bool):
         return True
 
-    if tp == "decimal" and isinstance(x, (int, Decimal)):
+    if tp == "decimal" and isinstance(x, (int, Decimal)) and not isinstance(x, bool):
         return True
 
     return False
