@@ -113,7 +113,7 @@ def check_fhir_type(ctx, x, tp):
     if tp == "integer" and isinstance(x, int) and not isinstance(x, bool):
         return True
 
-    if tp == "decimal" and isinstance(x, (int, Decimal)) and not isinstance(x, bool):
+    if tp == "decimal" and isinstance(x, Decimal):
         return True
 
     return False
