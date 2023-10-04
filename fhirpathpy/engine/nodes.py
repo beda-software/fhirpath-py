@@ -179,6 +179,14 @@ class FP_Quantity(FP_Type):
         if from_year_month_magnitude and to_year_month_magnitude:
             return FP_Quantity(from_year_month_magnitude * value / to_year_month_magnitude, toUnit)
 
+        elif (
+            fromUnit in FP_Quantity._weeks_days_and_time
+            and toUnit in FP_Quantity._weeks_days_and_time
+        ):
+            value_in_seconds = value * FP_Quantity.datetime_multipliers.get(fromUnit)
+            new_value = value_in_seconds / FP_Quantity.datetime_multipliers.get(toUnit)
+            return FP_Quantity(new_value, toUnit)
+
         return None
 
 
