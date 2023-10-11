@@ -3,6 +3,7 @@ from fhirpathpy.parser import parse
 from fhirpathpy.engine import do_eval
 from fhirpathpy.engine.util import arraify, get_data, set_paths
 from fhirpathpy.engine.nodes import FP_Type
+from fhirpathpy.dsl_impl import DSL
 
 __title__ = "fhirpathpy"
 __version__ = "0.2.2"
@@ -63,6 +64,8 @@ def evaluate(resource, path, context={}, model=None):
     int: Description of return value
 
     """
+    if isinstance(path, DSL):
+        path = str(path)
     node = parse(path)
     return apply_parsed_path(resource, node, context, model)
 
@@ -82,3 +85,6 @@ def compile(path, model=None):
     For example, you could pass in the result of require("fhirpath/fhir-context/r4")
     """
     return set_paths(apply_parsed_path, parsedPath=parse(path), model=model)
+
+
+dsl = DSL()

@@ -6,6 +6,8 @@ from freezegun import freeze_time
 from fhirpathpy import evaluate
 from fhirpathpy.engine.invocations.constants import constants
 
+from fhirpathpy import dsl
+
 
 @pytest.mark.parametrize(
     ("resource", "path", "expected"),
@@ -212,7 +214,7 @@ def now_function_test():
         old_now_value = evaluate({}, 'now()')
         frozen_datetime.tick(1.0)
         new_now_value = evaluate({}, 'now()')
-    
+
     assert old_now_value != new_now_value
 
 
@@ -245,4 +247,15 @@ def combining_functions_test(resource, path, expected):
     ],
 )
 def path_functions_test(resource, path, expected):
+    assert evaluate(resource, path) == expected
+
+
+@pytest.mark.parametrize(
+    ("resource", "path", "expected"),
+    [
+        ({"a": "lorem ipsum"}, "a.contains('sum')", [True]),
+        ({"a": "lorem ipsum"}, dsl.a.contains('sum'), [True]),
+    ],
+)
+def convert_dsl_path_test(resource, path, expected):
     assert evaluate(resource, path) == expected
