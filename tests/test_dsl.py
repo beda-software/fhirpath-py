@@ -39,3 +39,6 @@ def dsl_test():
         )
         == "(%QuestionnaireResponse.repeat(item).where(linkId='test-type').answer.children().Coding.code = 'trainingTest' or %QuestionnaireResponse.repeat(item).where(linkId='sample-set').answer.count() = 6).not()"
     )
+
+    assert str(dsl.Patient.id + "foo") == "(Patient.id + 'foo')"
+    assert str("/Patient/" + dsl.Patient.id) == "('/Patient/' + Patient.id)"

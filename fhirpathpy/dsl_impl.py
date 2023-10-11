@@ -51,6 +51,12 @@ class DSL:
     def __str__(self):
         return self.path
 
+    def __add__(self, item):
+        return DSL(f"({self.path} + {format_value(item)})")
+
+    def __radd__(self, item):
+        return DSL(f"({format_value(item)} + {self.path})")
+
 
 def format_value(value):
     if isinstance(value, str):
