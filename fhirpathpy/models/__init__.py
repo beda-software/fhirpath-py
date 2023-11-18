@@ -13,9 +13,7 @@ dirs = [f for f in os.listdir(current_dir)]
 for d in dirs:
     pd = os.path.join(current_dir, d)
     if os.path.isdir(pd):
-        print(d)
         for f in os.listdir(pd):
             with open(os.path.join(pd, f)) as fd:
                 if f.endswith(".json"):
-                    print(pd,f)
                     models[d][f[:-5]] = json.loads(fd.read())
