@@ -390,6 +390,8 @@ class FP_DateTime(FP_TimeBase):
             self._precision = len(self._dateTimeAsList)
 
     def __str__(self):
+        if self.asStr and len(self.asStr) <= 4:
+            return self.asStr
         if self._getDateTimeObject():
             iso_str = self._getDateTimeObject().isoformat()
             if "." in iso_str:
