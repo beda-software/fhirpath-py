@@ -6,7 +6,7 @@ import re
 import time
 
 dateFormat = "([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])"
-timeRE = "([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\.[0-9]+)?"
+timeRE = r"^T?([01][0-9]|2[0-3]):([0-5][0-9])(?::([0-5][0-9]|60))?(\.[0-9]+)?([-+][0-2][0-9]:?[0-5][0-9])?$"
 dateTimeRE = "%s(T%s(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?" % (dateFormat, timeRE)
 
 
@@ -312,7 +312,18 @@ class FP_Time(FP_TimeBase):
                 self._timeMatchData, self.matchGroupsIndices
             )
             self._precision = len(self._timeAsList)
-            formats = ["%H:%M:%S%z", "%H:%M:%S.%f%z", "%H:%M:%S", "%H:%M:%S.%f"]
+            formats = [
+                "T%H:%M:%S%z",
+                "T%H:%M:%S.%f%z",
+                "T%H:%M:%S",
+                "T%H:%M:%S.%f",
+                "T%H:%M%z",
+                "%H:%M:%S%z",
+                "%H:%M:%S.%f%z",
+                "%H:%M:%S",
+                "%H:%M:%S.%f",
+                "%H:%M%z",
+            ]
 
             for fmt in formats:
                 try:
