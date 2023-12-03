@@ -3,6 +3,7 @@ import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 import fhirpathpy.engine.invocations.filtering as filtering
 
+
 """
 This file holds code to hande the FHIRPath Existence functions
 (5.1 in the specification).
@@ -83,8 +84,7 @@ def superset_of_fn(ctx, coll1, coll2):
 
 
 def distinct_fn(ctx, x):
-    # TODO: refactor
-    conversion_factors_to_milliseconds = {
+    conversion_factors = {
         "weeks": Decimal("604800000"),
         "'wk'": Decimal("604800000"),
         "week": Decimal("604800000"),
@@ -103,9 +103,6 @@ def distinct_fn(ctx, x):
         "milliseconds": Decimal("1"),
         "'ms'": Decimal("1"),
         "millisecond": Decimal("1"),
-    }
-
-    conversion_factors_to_months = {
         "years": Decimal("12"),
         "'a'": Decimal("12"),
         "year": Decimal("12"),
@@ -114,40 +111,27 @@ def distinct_fn(ctx, x):
         "month": Decimal("1"),
     }
 
-    if all([isinstance(v, nodes.ResourceNode) for v in x]):
+    if all(isinstance(v, nodes.ResourceNode) for v in x):
         data = [v.data for v in x]
-
         unique = util.uniq(data)
-
         return [nodes.ResourceNode.create_node(item) for item in unique]
 
-    if all([isinstance(v, nodes.FP_Quantity) for v in x]):
-        converted_intervals = []
+    if all(isinstance(v, nodes.FP_Quantity) for v in x):
+        converted_values = {}
+        original_values = {}
 
-        if all(interval.unit in conversion_factors_to_months for interval in x):
-            for interval in x:
-                unit = interval.unit
-                if unit in conversion_factors_to_months:
-                    converted_intervals.append(
-                        nodes.FP_Quantity(
-                            value=interval.value * conversion_factors_to_months[unit], unit="months"
-                        )
-                    )
+        for interval in x:
+            unit = interval.unit
+            if unit in conversion_factors:
+                converted_value = interval.value * conversion_factors[unit]
+                if converted_value not in converted_values:
+                    converted_values[converted_value] = interval.value
+                    original_values[converted_value] = interval
 
-        elif all(interval.unit in conversion_factors_to_milliseconds for interval in x):
-            for interval in x:
-                unit = interval.unit
-                if unit in conversion_factors_to_milliseconds:
-                    converted_intervals.append(
-                        nodes.FP_Quantity(
-                            value=interval.value * conversion_factors_to_milliseconds[unit],
-                            unit="milliseconds",
-                        )
-                    )
+        if len(converted_values) == 1:
+            return [list(original_values.values())[0]]
 
-        unique_converted_intervals = util.uniq(converted_intervals)
-
-        return unique_converted_intervals
+        return [original_values[val] for val in util.uniq(converted_values.values())]
 
     return util.uniq(x)
 
