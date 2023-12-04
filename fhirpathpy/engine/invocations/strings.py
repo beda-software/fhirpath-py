@@ -147,6 +147,8 @@ def matches(ctx, coll, regex):
 
 def replace(ctx, coll, regex, repl):
     string = ensure_string_singleton(coll)
+    if regex == "" and isinstance(repl, str):
+        return repl + repl.join(character for character in string) + repl
     if not string or not regex:
         return []
     return string.replace(regex, repl)
