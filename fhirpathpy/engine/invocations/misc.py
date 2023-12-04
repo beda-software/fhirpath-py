@@ -76,6 +76,11 @@ def to_quantity(ctx, coll, to_unit=None):
             result = nodes.FP_Quantity(1 if v else 0, "'1'")
         elif isinstance(v, str):
             quantity_regex_res = quantity_regex.match(v)
+        elif isinstance(v, dict):
+            value = v.get("value")
+            unit = v.get("unit")
+            if isinstance(value, (int, float, Decimal)) and unit is not None:
+                result = nodes.FP_Quantity(Decimal(value), unit)
 
         if quantity_regex_res:
             value = quantity_regex_res.group(quantity_regex_map["value"])
