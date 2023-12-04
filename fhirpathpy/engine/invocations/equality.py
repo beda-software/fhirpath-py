@@ -61,6 +61,9 @@ def equivalence(ctx, x, y):
     if isinstance(a, Decimal) or isinstance(b, Decimal):
         return is_equivalent(a, b)
 
+    if isinstance(a, nodes.FP_Quantity) or isinstance(b, nodes.FP_Quantity):
+        return a.deep_equal(b)
+
     return x == y
 
 

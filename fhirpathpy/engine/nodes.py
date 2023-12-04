@@ -156,19 +156,22 @@ class FP_Quantity(FP_Type):
     def __eq__(self, other):
         if isinstance(other, FP_Quantity):
             if self.unit in self._years_and_months and other.unit in self._years_and_months:
-                self_value_in_months = self.value
-                other_value_in_months = other.value
-                if self.unit in ["'a'", "year", "years"]:
-                    self_value_in_months *= 12
-                if other.unit in ["'a'", "year", "years"]:
-                    other_value_in_months *= 12
-                return self_value_in_months == other_value_in_months
+                return self._compare_years_and_months(other)
             elif self.unit in self._weeks_days_and_time and other.unit in self._weeks_days_and_time:
                 self_value_in_seconds = self.value * self.datetime_multipliers[self.unit]
                 other_value_in_seconds = other.value * self.datetime_multipliers[other.unit]
                 return self_value_in_seconds == other_value_in_seconds
             else:
                 return self.value == other.value and self.unit == other.unit
+        else:
+            return super().__eq__(other)
+
+    def deep_equal(self, other):
+        if isinstance(other, FP_Quantity):
+            if self.unit in self._years_and_months and other.unit in self._years_and_months:
+                return self._compare_years_and_months(other, year_units=["'a'", "year", "years"])
+            else:
+                return self.__eq__(other)
         else:
             return super().__eq__(other)
 
@@ -201,6 +204,16 @@ class FP_Quantity(FP_Type):
             return FP_Quantity(from_magnitude * value / to_magnitude, toUnit)
 
         return None
+
+    def _compare_years_and_months(self, other, year_units=["year", "years"]):
+        self_value_in_months = self.value
+        other_value_in_months = other.value
+
+        if self.unit in year_units:
+            self_value_in_months *= 12
+        if other.unit in year_units:
+            other_value_in_months *= 12
+        return self_value_in_months == other_value_in_months
 
 
 class FP_TimeBase(FP_Type):
