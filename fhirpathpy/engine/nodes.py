@@ -1,6 +1,6 @@
 import datetime
 from datetime import timezone
-from decimal import Decimal
+from decimal import ROUND_UP, Decimal
 import json
 import re
 import time
@@ -119,6 +119,7 @@ class FP_Quantity(FP_Type):
 
     _year_month_conversion_factor = {"'a'": 12, "'mo'": 1}
     _m_cm_mm_conversion_factor = {"'m'": 1.0, "'cm'": 0.01, "'mm'": 0.001}
+    _lbs_kg_conversion_factor = {"'kg'": 1.0, "lbs": 0.453592}
 
     datetime_multipliers = {
         **{key: Decimal("604800") for key in ["'wk'", "week", "weeks"]},
@@ -176,10 +177,8 @@ class FP_Quantity(FP_Type):
             return super().__eq__(other)
 
     def conv_unit_to(fromUnit, value, toUnit):
-        ## 1 Year <-> 12 Months
         from_year_month_magnitude = FP_Quantity._year_month_conversion_factor.get(fromUnit)
         to_year_month_magnitude = FP_Quantity._year_month_conversion_factor.get(toUnit)
-
         if from_year_month_magnitude and to_year_month_magnitude:
             return FP_Quantity(from_year_month_magnitude * value / to_year_month_magnitude, toUnit)
 
@@ -202,6 +201,15 @@ class FP_Quantity(FP_Type):
                     to_m_cm_mm_magnitude
                 )
             return FP_Quantity(from_magnitude * value / to_magnitude, toUnit)
+
+        from_lbs_kg_magnitude = FP_Quantity._lbs_kg_conversion_factor.get(fromUnit)
+        to_lbs_kg_magnitude = FP_Quantity._lbs_kg_conversion_factor.get(toUnit)
+        if from_lbs_kg_magnitude and to_lbs_kg_magnitude:
+            converted_value = (Decimal(from_lbs_kg_magnitude) * value) / Decimal(
+                to_lbs_kg_magnitude
+            )
+            rounded_value = converted_value.quantize(Decimal('1.'), rounding=ROUND_UP)
+            return FP_Quantity(rounded_value, toUnit)
 
         return None
 
