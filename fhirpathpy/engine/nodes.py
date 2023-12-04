@@ -118,6 +118,7 @@ class FP_Quantity(FP_Type):
     ]
 
     _year_month_conversion_factor = {"'a'": 12, "'mo'": 1}
+    _m_cm_mm_conversion_factor = {"'m'": 1.0, "'cm'": 0.01, "'mm'": 0.001}
 
     datetime_multipliers = {
         **{key: Decimal("604800") for key in ["'wk'", "week", "weeks"]},
@@ -186,6 +187,18 @@ class FP_Quantity(FP_Type):
             value_in_seconds = value * FP_Quantity.datetime_multipliers.get(fromUnit)
             new_value = value_in_seconds / FP_Quantity.datetime_multipliers.get(toUnit)
             return FP_Quantity(new_value, toUnit)
+
+        from_m_cm_mm_magnitude = FP_Quantity._m_cm_mm_conversion_factor.get(fromUnit)
+        to_m_cm_mm_magnitude = FP_Quantity._m_cm_mm_conversion_factor.get(toUnit)
+        if from_m_cm_mm_magnitude and to_m_cm_mm_magnitude:
+            if (
+                fromUnit in FP_Quantity._m_cm_mm_conversion_factor
+                or toUnit in FP_Quantity._m_cm_mm_conversion_factor
+            ):
+                from_magnitude, to_magnitude = Decimal(from_m_cm_mm_magnitude), Decimal(
+                    to_m_cm_mm_magnitude
+                )
+            return FP_Quantity(from_magnitude * value / to_magnitude, toUnit)
 
         return None
 
