@@ -35,6 +35,8 @@ def substring(ctx, coll, start, length=None):
 
 
 def starts_with(ctx, coll, prefix):
+    if util.is_empty(prefix):
+        return []
     string = ensure_string_singleton(coll)
     if not string or not isinstance(prefix, str):
         return False
@@ -42,6 +44,8 @@ def starts_with(ctx, coll, prefix):
 
 
 def ends_with(ctx, coll, postfix):
+    if util.is_empty(postfix):
+        return []
     string = ensure_string_singleton(coll)
     if not string or not isinstance(postfix, str):
         return False
