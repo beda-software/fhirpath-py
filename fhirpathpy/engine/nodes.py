@@ -208,7 +208,7 @@ class FP_Quantity(FP_Type):
             converted_value = (Decimal(from_lbs_kg_magnitude) * value) / Decimal(
                 to_lbs_kg_magnitude
             )
-            rounded_value = converted_value.quantize(Decimal('1.'), rounding=ROUND_UP)
+            rounded_value = converted_value.quantize(Decimal("1."), rounding=ROUND_UP)
             return FP_Quantity(rounded_value, toUnit)
 
         return None
@@ -520,3 +520,58 @@ class ResourceNode:
         if isinstance(data, ResourceNode):
             return data
         return ResourceNode(data, path)
+
+
+class TypeInfo:
+    model = None
+    System = "System"
+    FHIR = "FHIR"
+
+    def __init__(self, name, namespace):
+        self.name = name
+        self.namespace = namespace
+
+    @staticmethod
+    def is_type(type_name, super_type):
+        while type_name:
+            if type_name == super_type:
+                return True
+            type_name = TypeInfo.model.type2Parent.get(type_name)
+        return False
+
+    def is_(self, other):
+        if isinstance(other, TypeInfo) and (
+            not self.namespace or not other.namespace or self.namespace == other.namespace
+        ):
+            if TypeInfo.model and (not self.namespace or self.namespace == TypeInfo.FHIR):
+                return TypeInfo.is_type(self.name, other.name)
+            else:
+                return self.name == other.name
+        return False
+
+    @staticmethod
+    def create_by_value_in_namespace(namespace, value):
+        name = type(value).__name__
+
+        if isinstance(value, int):
+            name = "integer"
+        elif isinstance(value, float) or isinstance(value, Decimal):
+            name = "decimal"
+        elif isinstance(value, FP_DateTime):
+            name = "dateTime"
+        elif isinstance(value, FP_Time):
+            name = "time"
+        elif isinstance(value, FP_Quantity):
+            name = "Quantity"
+
+        if namespace == TypeInfo.System:
+            name = name.capitalize()
+
+        return TypeInfo(name, namespace)
+
+    @staticmethod
+    def from_value(value):
+        if isinstance(value, ResourceNode):
+            return value.get_type_info()
+        else:
+            return TypeInfo.create_by_value_in_namespace(TypeInfo.System, value)

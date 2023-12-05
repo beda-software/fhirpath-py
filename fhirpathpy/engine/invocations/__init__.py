@@ -10,6 +10,7 @@ import fhirpathpy.engine.invocations.misc as misc
 import fhirpathpy.engine.invocations.equality as equality
 import fhirpathpy.engine.invocations.logic as logic
 import fhirpathpy.engine.invocations.datetime as datetime
+import fhirpathpy.engine.invocations.types as types
 
 invocations = {
     "empty": {"fn": existence.empty_fn},
@@ -33,6 +34,7 @@ invocations = {
     "first": {"fn": filtering.first_fn},
     "last": {"fn": filtering.last_fn},
     "ofType": {"fn": filtering.of_type_fn, "arity": {1: ["Identifier"]}},
+    "is": {"fn": types.is_fn, "arity": {1: ["TypeSpecifier"]}},
     "tail": {"fn": filtering.tail_fn},
     "take": {"fn": filtering.take_fn, "arity": {1: ["Integer"]}},
     "skip": {"fn": filtering.skip_fn, "arity": {1: ["Integer"]}},
