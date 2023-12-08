@@ -62,6 +62,7 @@ invocations = {
         "nullable_input": True,
     },
     "length": {"fn": strings.length, "nullable_input": True},
+    "join": {"fn": strings.join, "arity": {1: ["String"]}},
     "abs": {"fn": math.abs},
     "ceiling": {"fn": math.ceiling},
     "exp": {"fn": math.exp},

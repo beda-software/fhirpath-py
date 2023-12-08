@@ -12,6 +12,16 @@ def ensure_string_singleton(x):
     raise Exception("Expected string, but got " + str(x))
 
 
+def ensure_string_collection(x):
+    collection = []
+    for node in x:
+        d = util.get_data(node)
+        if type(d) != str:
+            raise Exception("Expected string, but got " + str(d))
+        collection.append(d)
+    return collection
+
+
 def index_of(ctx, coll, substr):
     string = ensure_string_singleton(coll)
     return string.find(substr)
@@ -64,3 +74,8 @@ def replace_matches(ctx, coll, regex, repl):
 def length(ctx, coll):
     str = ensure_string_singleton(coll)
     return len(str)
+
+
+def join(ctx, coll, separator):
+    str_coll = ensure_string_collection(coll)
+    return separator.join(str_coll)
