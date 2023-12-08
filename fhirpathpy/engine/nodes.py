@@ -1,13 +1,12 @@
-import datetime
-from datetime import timezone
+from datetime import datetime, timedelta, timezone
 from decimal import ROUND_UP, Decimal
 import json
 import re
 import time
 
-dateFormat = "([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])"
-timeRE = r"^T?([01][0-9]|2[0-3]):([0-5][0-9])(?::([0-5][0-9]|60))?(\.[0-9]+)?([-+][0-2][0-9]:?[0-5][0-9])?$"
-dateTimeRE = "%s(T%s(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)))?)?)?" % (dateFormat, timeRE)
+
+timeRE = r"^T?([0-9]{2})(?::([0-9]{2}))(?::([0-9]{2}))?(?:\.([0-9]+))?(Z|(\+|-)[0-9]{2}:[0-9]{2})?$"
+dateTimeRE = r"^(?P<year>[0-9]{4})(?:-(?P<month>[0-9]{2})(?:-(?P<day>[0-9]{2}))?)?(?:T(?P<hour>[0-9]{2})(?::(?P<minute>[0-9]{2}))?(?::(?P<second>[0-9]{2}))?(?:\.(?P<millisecond>[0-9]+))?(?P<timezone>Z|(\+|-)[0-9]{2}:[0-9]{2})?)?$"
 
 
 class FP_Type:
@@ -235,14 +234,19 @@ class FP_TimeBase(FP_Type):
         {"key": "tz", "value": (60 * 60)},
     ]
 
-    def _extractAsMatchList(self, matchDate, matchGroupsIndices):
-        dateTimeListResult = []
-        if matchDate and matchGroupsIndices:
-            timeMatchGroups = [group for group in matchDate.groups() if group]
-            for matchGroupsIndex in matchGroupsIndices:
-                if len(timeMatchGroups) >= matchGroupsIndex["index"]:
-                    dateTimeListResult.append(timeMatchGroups[matchGroupsIndex["index"]])
-        return dateTimeListResult
+    def _extractAsMatchList(self, matchData, matchGroupsIndices, is_date=True):
+        result = []
+        for matchGroupIndex in matchGroupsIndices:
+            if is_date:
+                group = matchData.group(matchGroupIndex["key"])
+            else:
+                index = matchGroupIndex["index"]
+                group = matchData.group(index) if index <= matchData.lastindex else None
+            result.append(group if group is not None else None)
+        return result
+
+    def _calculatePrecision(self, dt_list):
+        return sum(1 for i in dt_list if i is not None)
 
     def _getMatchAsList(self):
         raise NotImplementedError()
@@ -271,26 +275,64 @@ class FP_TimeBase(FP_Type):
         if type(otherDateTime) != type(self):
             return False
 
-        thisDateTimeList = self._getMatchAsList()
-        otherDateTimeList = otherDateTime._getMatchAsList()
+        thisdt_list = self._getMatchAsList()
+        otherdt_list = otherDateTime._getMatchAsList()
 
-        if self._precision == otherDateTime._precision:
+        normalized_thisdt_list = self._normalize_datetime(thisdt_list)
+        normalized_otherdt_list = self._normalize_datetime(otherdt_list)
+
+        indices_to_remove = [
+            i
+            for i in range(len(normalized_thisdt_list))
+            if normalized_thisdt_list[i] == normalized_otherdt_list[i] == None
+        ]
+
+        for i in reversed(indices_to_remove):
+            del normalized_thisdt_list[i]
+            del normalized_otherdt_list[i]
+
+        normalized_thisdt_precision = self._calculatePrecision(normalized_thisdt_list)
+        normalized_otherdt_precision = self._calculatePrecision(normalized_otherdt_list)
+
+        if normalized_thisdt_precision == normalized_otherdt_precision:
             return self._getDateTimeInt() == otherDateTime._getDateTimeInt()
 
-        morePrecDateTimeList = (
-            thisDateTimeList if self._precision >= otherDateTime._precision else otherDateTimeList
-        )
-        lessPrecDateTimeList = (
-            otherDateTimeList if self._precision >= otherDateTime._precision else thisDateTimeList
-        )
+        if normalized_thisdt_precision != normalized_otherdt_precision:
+            min_precision = min(normalized_thisdt_precision, normalized_otherdt_precision)
+            for i in range(min_precision):
+                if normalized_thisdt_list[i] is None or normalized_otherdt_list[i] is None:
+                    return None
+                if normalized_thisdt_list[i] != normalized_otherdt_list[i]:
+                    return False
+            return None
 
-        for lessPrecDateTimeElementIndex, lessPrecDateTimeElement in enumerate(
-            lessPrecDateTimeList
-        ):
-            if lessPrecDateTimeElement != morePrecDateTimeList[lessPrecDateTimeElementIndex]:
-                return False
+    def _normalize_datetime(self, dt_list):
+        def to_str(number):
+            return "0" + str(number) if 0 < number < 10 else str(number)
 
-        return None
+        if len(dt_list) < 6:
+            year, month, day = (None, None, None)
+            hour, minute, second = (int(dt_list[i]) if dt_list[i] else None for i in range(3))
+            timezone_str = dt_list[4] if len(dt_list) > 4 else None
+        else:
+            year, month, day = (int(dt_list[i]) if dt_list[i] else None for i in range(3))
+            hour, minute, second = (int(dt_list[i]) if dt_list[i] else None for i in range(3, 6))
+            timezone_str = dt_list[7] if len(dt_list) > 7 else None
+
+        dt = datetime(year or 2023, month or 1, day or 1, hour or 0, minute or 0, second or 0)
+        if timezone_str and timezone_str != "Z":
+            tz_hours, tz_minutes = map(int, timezone_str[1:].split(":"))
+            tz_delta = timedelta(hours=tz_hours, minutes=tz_minutes)
+            dt = dt - tz_delta if timezone_str.startswith("+") else dt + tz_delta
+
+        return [
+            to_str(dt.year) if year is not None else None,
+            to_str(dt.month) if month is not None else None,
+            to_str(dt.day) if day is not None else None,
+            to_str(dt.hour) if hour is not None else None,
+            to_str(dt.minute) if minute is not None else None,
+            to_str(dt.second) if second is not None else None,
+        ]
 
     def compare(self, otherDateTime):
         if type(otherDateTime) != type(self):
@@ -318,9 +360,11 @@ class FP_TimeBase(FP_Type):
 
 class FP_Time(FP_TimeBase):
     matchGroupsIndices = [
-        {"key": "hour", "index": 0},
-        {"key": "minute", "index": 1},
-        {"key": "second", "index": 2},
+        {"key": "hour", "index": 1},
+        {"key": "minute", "index": 2},
+        {"key": "second", "index": 3},
+        {"key": "millisecond", "index": 4},
+        {"key": "timezone", "index": 5},
     ]
 
     def __new__(cls, dateStr):
@@ -343,9 +387,9 @@ class FP_Time(FP_TimeBase):
         if self._timeMatchData:
             self._timeMatchStr = self._timeMatchData.group(0)
             self._timeAsList = self._extractAsMatchList(
-                self._timeMatchData, self.matchGroupsIndices
+                self._timeMatchData, self.matchGroupsIndices, is_date=False
             )
-            self._precision = len(self._timeAsList)
+            self._precision = self._calculatePrecision(self._timeAsList)
             formats = [
                 "T%H:%M:%S%z",
                 "T%H:%M:%S.%f%z",
@@ -361,7 +405,7 @@ class FP_Time(FP_TimeBase):
 
             for fmt in formats:
                 try:
-                    parsed_datetime = datetime.datetime.strptime(self.asStr, fmt)
+                    parsed_datetime = datetime.strptime(self.asStr, fmt)
                     if parsed_datetime.tzinfo:
                         parsed_datetime = parsed_datetime.astimezone(timezone.utc)
                     self._pyTimeObject = parsed_datetime.time()
@@ -388,7 +432,7 @@ class FP_Time(FP_TimeBase):
         :return: If self.timeMatchData returns DateTime object converted to seconds int, else returns None
         """
         if self._pyTimeObject:
-            return datetime.timedelta(
+            return timedelta(
                 hours=self._pyTimeObject.hour,
                 minutes=self._pyTimeObject.minute,
                 seconds=self._pyTimeObject.second,
@@ -405,6 +449,7 @@ class FP_DateTime(FP_TimeBase):
         {"key": "hour", "index": 8},
         {"key": "minute", "index": 9},
         {"key": "second", "index": 10},
+        {"key": "millisecond", "index": 11},
         {"key": "timezone", "index": 12},
     ]
     minPrecision = 3
@@ -432,7 +477,7 @@ class FP_DateTime(FP_TimeBase):
             self._dateTimeAsList = self._extractAsMatchList(
                 self._dateTimeMatchData, self.matchGroupsIndices
             )
-            self._precision = len(self._dateTimeAsList)
+            self._precision = self._calculatePrecision(self._dateTimeAsList)
 
     def __str__(self):
         if self.asStr and len(self.asStr) <= 4:
@@ -456,7 +501,7 @@ class FP_DateTime(FP_TimeBase):
                 date_str = self.asStr.replace("Z", "+00:00")
             else:
                 date_str = self.asStr
-            return datetime.datetime.fromisoformat(date_str)
+            return datetime.fromisoformat(date_str)
         return None
 
     def _getDateTimeInt(self):
@@ -496,7 +541,7 @@ class ResourceNode:
         If data is a resource (maybe a contained resource) reset the path
         information to the resource type.
         """
-        if type(data) == dict and "resourceType" in data:
+        if isinstance(data, dict) and "resourceType" in data:
             path = data["resourceType"]
 
         self.path = path

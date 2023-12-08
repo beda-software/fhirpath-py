@@ -71,7 +71,7 @@ def datetime_equality(ctx, x, y):
     datetime_x = x[0]
     datetime_y = y[0]
     if datetime_x is None or datetime_y is None:
-        return False
+        return None
     if type(datetime_x) not in DATETIME_NODES_LIST:
         v_x = util.get_data(datetime_x)
         datetime_x = nodes.FP_DateTime(v_x) or nodes.FP_Time(v_x)
