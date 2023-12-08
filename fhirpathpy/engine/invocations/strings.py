@@ -76,6 +76,8 @@ def length(ctx, coll):
     return len(str)
 
 
-def join(ctx, coll, separator):
+def join(ctx, coll, separator=''):
     str_coll = ensure_string_collection(coll)
+    if len(str_coll) == 0:
+        return []
     return separator.join(str_coll)
