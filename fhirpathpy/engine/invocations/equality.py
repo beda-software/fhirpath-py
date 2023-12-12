@@ -180,6 +180,12 @@ def lt(ctx, a, b):
     b0 = vals[1]
 
     if isinstance(a0, nodes.FP_Type):
+        if (
+            isinstance(a0, nodes.FP_TimeBase)
+            and a0.compare(b0) == 0
+            and a0._precision != b0._precision
+        ):
+            return None
         return a0.compare(b0) == -1
 
     return a0 < b0
@@ -196,6 +202,12 @@ def gt(ctx, a, b):
     b0 = vals[1]
 
     if isinstance(a0, nodes.FP_Type):
+        if (
+            isinstance(a0, nodes.FP_TimeBase)
+            and a0.compare(b0) == 0
+            and a0._precision != b0._precision
+        ):
+            return None
         return a0.compare(b0) == 1
 
     return a0 > b0

@@ -5,7 +5,9 @@ import re
 import time
 
 
-timeRE = r"^T?([0-9]{2})(?::([0-9]{2}))(?::([0-9]{2}))?(?:\.([0-9]+))?(Z|(\+|-)[0-9]{2}:[0-9]{2})?$"
+timeRE = (
+    r"^T?([0-9]{2})(?::([0-9]{2}))?(?::([0-9]{2}))?(?:\.([0-9]+))?(Z|(\+|-)[0-9]{2}(:[0-9]{2})?)?$"
+)
 dateTimeRE = r"^(?P<year>[0-9]{4})(?:-(?P<month>[0-9]{2})(?:-(?P<day>[0-9]{2}))?)?(?:T(?P<hour>[0-9]{2})(?::(?P<minute>[0-9]{2}))?(?::(?P<second>[0-9]{2}))?(?:\.(?P<millisecond>[0-9]+))?(?P<timezone>Z|(\+|-)[0-9]{2}:[0-9]{2})?)?$"
 
 
@@ -341,12 +343,30 @@ class FP_TimeBase(FP_Type):
         thisDateTimeList = self._getMatchAsList()
         otherDateTimeList = otherDateTime._getMatchAsList()
 
-        if self._precision != otherDateTime._precision:
-            for precision in range(self._precision):
-                if len(otherDateTimeList) >= precision:
-                    if thisDateTimeList[precision] > otherDateTimeList[precision]:
-                        return 1
-                return -1
+        normalized_thisdt_list = self._normalize_datetime(thisDateTimeList)
+        normalized_otherdt_list = self._normalize_datetime(otherDateTimeList)
+        indices_to_remove = [
+            i
+            for i in range(len(normalized_thisdt_list))
+            if normalized_thisdt_list[i] == normalized_otherdt_list[i] == None
+        ]
+        for i in reversed(indices_to_remove):
+            del normalized_thisdt_list[i]
+            del normalized_otherdt_list[i]
+
+        normalized_thisdt_precision = self._calculatePrecision(normalized_thisdt_list)
+        normalized_otherdt_precision = self._calculatePrecision(normalized_otherdt_list)
+
+        if normalized_thisdt_precision != normalized_otherdt_precision:
+            min_precision = min(normalized_thisdt_precision, normalized_otherdt_precision)
+            for i in range(min_precision):
+                if normalized_thisdt_list[i] is None or normalized_otherdt_list[i] is None:
+                    return -1
+                if normalized_thisdt_list[i] > normalized_otherdt_list[i]:
+                    return 1
+                if normalized_thisdt_list[i] < normalized_otherdt_list[i]:
+                    return -1
+            return 0
 
         thisDateTimeInt = self._getDateTimeInt()
         otherDateTimeInt = otherDateTime._getDateTimeInt()
@@ -401,6 +421,8 @@ class FP_Time(FP_TimeBase):
                 "%H:%M:%S",
                 "%H:%M:%S.%f",
                 "%H:%M%z",
+                "%H:%M",
+                "%H%z",
             ]
 
             for fmt in formats:
