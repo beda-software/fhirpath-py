@@ -323,6 +323,7 @@ evaluators = {
     "InequalityExpression": op_expression,
     "AdditiveExpression": op_expression,
     "MultiplicativeExpression": op_expression,
+    "TypeExpression": alias_op_expression({"is": "isOp", "as": "asOp"}),
     "EqualityExpression": op_expression,
     "OrExpression": op_expression,
     "ImpliesExpression": op_expression,

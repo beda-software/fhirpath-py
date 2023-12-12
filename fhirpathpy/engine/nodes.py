@@ -579,6 +579,20 @@ class ResourceNode:
         path_hash = hash(self.path)
         return hash((data_hash, path_hash))
 
+    def get_type_info(self):
+        namespace = TypeInfo.FHIR
+
+        match = re.match(r"^System\.(.*)$", self.path)
+        if match:
+            return TypeInfo(namespace=TypeInfo.System, name=match.group(1))
+        elif "." not in self.path:
+            return TypeInfo(namespace=namespace, name=self.path)
+
+        if not TypeInfo.model:
+            return TypeInfo.create_by_value_in_namespace(namespace=namespace, value=self.data)
+
+        return TypeInfo(namespace=namespace, name="BackboneElement")
+
     def toJSON(self):
         return json.dumps(self.data)
 
@@ -620,7 +634,7 @@ class TypeInfo:
     def create_by_value_in_namespace(namespace, value):
         name = type(value).__name__
 
-        if isinstance(value, int):
+        if isinstance(value, int) and not isinstance(value, bool):
             name = "integer"
         elif isinstance(value, float) or isinstance(value, Decimal):
             name = "decimal"
@@ -630,6 +644,9 @@ class TypeInfo:
             name = "time"
         elif isinstance(value, FP_Quantity):
             name = "Quantity"
+
+        if name == "bool":
+            name = "Boolean"
 
         if namespace == TypeInfo.System:
             name = name.capitalize()
