@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 import re
 import fhirpathpy.engine.util as util
@@ -42,11 +43,9 @@ def to_integer(ctx, coll):
 
         return []
 
-    if str(value):
+    if isinstance(value, str):
         if re.match(intRegex, value) is not None:
             return int(value)
-
-        raise Exception("Could not convert to ineger: " + value)
 
     return []
 
@@ -115,8 +114,6 @@ def to_decimal(ctx, coll):
     if isinstance(value, str):
         if re.match(numRegex, value) is not None:
             return Decimal(value)
-
-        raise Exception("Could not convert to decimal: " + value)
 
     return []
 
