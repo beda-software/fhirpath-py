@@ -11,6 +11,7 @@ import fhirpathpy.engine.invocations.equality as equality
 import fhirpathpy.engine.invocations.logic as logic
 import fhirpathpy.engine.invocations.datetime as datetime
 import fhirpathpy.engine.invocations.types as types
+import fhirpathpy.engine.invocations.aggregate as aggregate
 
 invocations = {
     "empty": {"fn": existence.empty_fn},
@@ -44,6 +45,7 @@ invocations = {
     "iif": {"fn": misc.iif_macro, "arity": {2: ["Expr", "Expr"], 3: ["Expr", "Expr", "Expr"]}},
     "trace": {"fn": misc.trace_fn, "arity": {0: [], 1: ["String"]}},
     "toInteger": {"fn": misc.to_integer},
+    "toBoolean": {"fn": misc.to_boolean},
     "toDecimal": {"fn": misc.to_decimal},
     "toString": {"fn": misc.to_string},
     "toDate": {"fn": misc.to_date},
@@ -113,4 +115,12 @@ invocations = {
     "and": {"fn": logic.and_op, "arity": {2: [["Boolean"], ["Boolean"]]}},
     "xor": {"fn": logic.xor_op, "arity": {2: [["Boolean"], ["Boolean"]]}},
     "implies": {"fn": logic.implies_op, "arity": {2: [["Boolean"], ["Boolean"]]}},
+    "avg": {"fn": aggregate.avg_fn},
+    "sum": {"fn": aggregate.sum_fn},
+    "min": {"fn": aggregate.min_fn},
+    "max": {"fn": aggregate.max_fn},
+    "convertsToBoolean": {"fn": misc.create_converts_to_fn(misc.to_boolean, 'bool')},
+    "convertsToInteger": {"fn": misc.create_converts_to_fn(misc.to_integer, 'int')},
+    "convertsToDecimal": {"fn": misc.create_converts_to_fn(misc.to_decimal, 'float')},
+    "convertsToString": {"fn": misc.create_converts_to_fn(misc.to_string, 'str')},
 }

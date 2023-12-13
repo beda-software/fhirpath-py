@@ -183,3 +183,47 @@ def to_date(ctx, coll):
             rtn.append(dateObject)
 
     return rtn
+
+
+def create_converts_to_fn(to_function, _type):
+    if isinstance(_type, str):
+        def in_function(ctx, coll):
+            if len(coll) != 1:
+                return []
+            return type(to_function(ctx, coll)).__name__ == _type
+        return in_function
+
+    def in_function(ctx, coll):
+        if len(coll) != 1:
+            return []
+
+        return isinstance(to_function(ctx, coll), _type)
+
+    return in_function
+
+
+def to_boolean(ctx, coll):
+    true_strings = ['true', 't', 'yes', 'y', '1', '1.0']
+    false_strings = ['false', 'f', 'no', 'n', '0', '0.0']
+
+    if len(coll) != 1:
+        return []
+
+    val = coll[0]
+    var_type = type(val).__name__
+
+    if var_type == "bool":
+        return val
+    elif var_type == "int" or var_type == "float":
+        if val == 1 or val == 1.0:
+            return True
+        elif val == 0 or val == 0.0:
+            return False
+    elif var_type == "str":
+        lower_case_var = val.lower()
+        if lower_case_var in true_strings:
+            return True
+        if lower_case_var in false_strings:
+            return False
+
+    return []
