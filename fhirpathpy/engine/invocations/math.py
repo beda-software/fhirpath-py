@@ -61,10 +61,14 @@ def mul(ctx, x, y):
 
 
 def div(ctx, x, y):
+    if y == 0:
+        return []
     return x / y
 
 
 def intdiv(ctx, x, y):
+    if y == 0:
+        return []
     return int(x / y)
 
 
