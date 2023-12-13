@@ -20,6 +20,7 @@ invocations = {
     "not": {"fn": existence.not_fn},
     "exists": {"fn": existence.exists_macro, "arity": {0: [], 1: ["Expr"]}},
     "all": {"fn": existence.all_macro, "arity": {1: ["Expr"]}},
+    "union": {"fn": combining.union_op,   "arity": {1: ["AnyAtRoot"]}},
     "allTrue": {"fn": existence.all_true_fn},
     "anyTrue": {"fn": existence.any_true_fn},
     "allFalse": {"fn": existence.all_false_fn},
