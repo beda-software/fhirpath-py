@@ -1,6 +1,6 @@
-import logging
-from decimal import Decimal
 import re
+from decimal import Decimal
+
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 
@@ -103,13 +103,13 @@ def to_decimal(ctx, coll):
     value = util.get_data(coll[0])
 
     if value is False:
-        return 0
+        return Decimal(0)
 
     if value is True:
-        return 1.0
+        return Decimal(1.0)
 
     if util.is_number(value):
-        return value
+        return Decimal(value)
 
     if isinstance(value, str):
         if re.match(numRegex, value) is not None:

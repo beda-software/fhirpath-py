@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import fhirpathpy.engine.invocations.collections as collections
 import fhirpathpy.engine.invocations.existence as existence
 import fhirpathpy.engine.invocations.filtering as filtering
@@ -121,6 +123,6 @@ invocations = {
     "max": {"fn": aggregate.max_fn},
     "convertsToBoolean": {"fn": misc.create_converts_to_fn(misc.to_boolean, 'bool')},
     "convertsToInteger": {"fn": misc.create_converts_to_fn(misc.to_integer, 'int')},
-    "convertsToDecimal": {"fn": misc.create_converts_to_fn(misc.to_decimal, 'float')},
+    "convertsToDecimal": {"fn": misc.create_converts_to_fn(misc.to_decimal, Decimal)},
     "convertsToString": {"fn": misc.create_converts_to_fn(misc.to_string, 'str')},
 }
