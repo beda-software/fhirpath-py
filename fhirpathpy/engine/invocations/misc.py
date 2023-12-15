@@ -144,7 +144,7 @@ def to_date_time(ctx, coll):
         if dateTimeObject:
             rtn.append(dateTimeObject)
 
-    return rtn
+    return util.get_data(rtn[0])
 
 
 def to_time(ctx, coll):
@@ -161,7 +161,7 @@ def to_time(ctx, coll):
         if timeObject:
             rtn.append(timeObject)
 
-    return rtn
+    return util.get_data(rtn[0])
 
 
 def to_date(ctx, coll):
@@ -179,7 +179,7 @@ def to_date(ctx, coll):
         if dateObject:
             rtn.append(dateObject)
 
-    return rtn
+    return util.get_data(rtn[0])
 
 
 def create_converts_to_fn(to_function, _type):

@@ -11,3 +11,7 @@ def union_op(ctx, coll1, coll2):
 
 def combine_fn(ctx, coll1, coll2):
     return coll1 + coll2
+
+
+def exclude_fn(ctx, coll1, coll2):
+    return [element for element in coll1 if element not in coll2]

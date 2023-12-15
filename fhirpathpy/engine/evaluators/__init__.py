@@ -53,6 +53,10 @@ def this_invocation(ctx, parentData, node):
     return util.arraify(ctx["$this"])
 
 
+def total_invocation(ctx, parentData, node):
+    return util.arraify(ctx["$total"])
+
+
 def op_expression(ctx, parentData, node):
     op = node["terminalNodeText"][0]
     return engine.infix_invoke(ctx, op, parentData, node["children"])
@@ -313,6 +317,7 @@ evaluators = {
     "MemberInvocation": member_invocation,
     "FunctionInvocation": function_invocation,
     "IndexInvocation": this_invocation,
+    "TotalInvocation": total_invocation,
     # expressions
     "PolarityExpression": polarity_expression,
     "IndexerExpression": indexer_expression,

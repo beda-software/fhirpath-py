@@ -25,3 +25,11 @@ def max_fn(ctx, x):
         return []
 
     return max(x)
+
+
+def aggregate_macro(ctx, data, expr, initial_value=None):
+    ctx["$total"] = initial_value
+    for i, x in enumerate(data):
+        ctx["$index"] = i
+        ctx["$total"] = expr(x)
+    return ctx["$total"]

@@ -14,6 +14,7 @@ import fhirpathpy.engine.invocations.logic as logic
 import fhirpathpy.engine.invocations.datetime as datetime
 import fhirpathpy.engine.invocations.types as types
 import fhirpathpy.engine.invocations.aggregate as aggregate
+from fhirpathpy.engine.nodes import FP_DateTime, FP_Quantity, FP_Time
 
 invocations = {
     "empty": {"fn": existence.empty_fn},
@@ -21,6 +22,7 @@ invocations = {
     "exists": {"fn": existence.exists_macro, "arity": {0: [], 1: ["Expr"]}},
     "all": {"fn": existence.all_macro, "arity": {1: ["Expr"]}},
     "union": {"fn": combining.union_op,   "arity": {1: ["AnyAtRoot"]}},
+    "exclude": {"fn": combining.exclude_fn,   "arity": {1: ["AnyAtRoot"]}},
     "allTrue": {"fn": existence.all_true_fn},
     "anyTrue": {"fn": existence.any_true_fn},
     "allFalse": {"fn": existence.all_false_fn},
@@ -122,8 +124,13 @@ invocations = {
     "sum": {"fn": aggregate.sum_fn},
     "min": {"fn": aggregate.min_fn},
     "max": {"fn": aggregate.max_fn},
+    "aggregate": {"fn": aggregate.aggregate_macro, "arity": {1: ["Expr"], 2: ["Expr", "Any"]}},
     "convertsToBoolean": {"fn": misc.create_converts_to_fn(misc.to_boolean, 'bool')},
     "convertsToInteger": {"fn": misc.create_converts_to_fn(misc.to_integer, 'int')},
     "convertsToDecimal": {"fn": misc.create_converts_to_fn(misc.to_decimal, Decimal)},
     "convertsToString": {"fn": misc.create_converts_to_fn(misc.to_string, 'str')},
+    "convertsToDate": {"fn": misc.create_converts_to_fn(misc.to_date, FP_DateTime)},
+    "convertsToDateTime": {"fn": misc.create_converts_to_fn(misc.to_date_time, FP_DateTime)},
+    "convertsToTime": {"fn": misc.create_converts_to_fn(misc.to_time, FP_Time)},
+    "convertsToQuantity": {"fn": misc.create_converts_to_fn(misc.to_quantity, FP_Quantity)},
 }
