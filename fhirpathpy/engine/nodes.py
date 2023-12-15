@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
+from dateutil.relativedelta import relativedelta
 from decimal import ROUND_UP, Decimal
+import math
 import json
 import re
 import time
@@ -117,6 +119,31 @@ class FP_Quantity(FP_Type):
         "millisecond",
         "milliseconds",
     ]
+
+    _arithmetic_duration_units = {
+        "years": "year",
+        "months": "month",
+        "weeks": "week",
+        "days": "day",
+        "hours": "hour",
+        "minutes": "minute",
+        "seconds": "second",
+        "milliseconds": "millisecond",
+        "year": "year",
+        "month": "month",
+        "week": "week",
+        "day": "day",
+        "hour": "hour",
+        "minute": "minute",
+        "second": "second",
+        "millisecond": "millisecond",
+        "'wk'": "week",
+        "'d'": "day",
+        "'h'": "hour",
+        "'min'": "minute",
+        "'s'": "second",
+        "'ms'": "millisecond",
+    }
 
     _year_month_conversion_factor = {"'a'": 12, "'mo'": 1}
     _m_cm_mm_conversion_factor = {"'m'": 1.0, "'cm'": 0.01, "'mm'": 0.001}
@@ -377,6 +404,110 @@ class FP_TimeBase(FP_Type):
             return 0
         return 1
 
+    def plus(self, time_quantity):
+        value = int(time_quantity.value)
+        time_unit = FP_Quantity._arithmetic_duration_units.get(time_quantity.unit)
+        if time_unit is None:
+            valid_units = ", ".join(FP_Quantity._arithmetic_duration_units.keys())
+            raise ValueError(
+                f"For date/time arithmetic, the unit of the quantity must be one of the following time-based units: {valid_units}"
+            )
+        dt_list = self._getMatchAsList()
+        if isinstance(self, FP_DateTime):
+            precision = self._calculatePrecision(dt_list)
+            date_obj = self._convertDatetime(dt_list)
+            if time_unit == "year":
+                result = date_obj + relativedelta(years=value)
+            if time_unit == "month":
+                result = date_obj + relativedelta(months=value)
+            if time_unit in ["day", "week"]:
+                if time_unit == "week":
+                    value *= 7
+                if precision == 1:
+                    years = math.floor(value / 365) if value >= 0 else math.ceil(value / 365)
+                    result = date_obj + relativedelta(years=years)
+                elif precision == 2:
+                    months = math.floor(value / 30) if value >= 0 else math.ceil(value / 30)
+                    result = date_obj + relativedelta(months=months)
+                else:
+                    result = date_obj + relativedelta(days=value)
+            if time_unit in ["hour"]:
+                if precision == 2:
+                    months = (
+                        math.floor(value / (24 * 30))
+                        if value >= 0
+                        else math.ceil(value / (24 * 30))
+                    )
+                    result = date_obj + relativedelta(months=months)
+                if precision == 3:
+                    days = math.floor(value / 24) if value >= 0 else math.ceil(value / 24)
+                    result = date_obj + relativedelta(days=days)
+            if time_unit in ["minute", "second", "millisecond"]:
+                if precision == 4:
+                    if time_unit == "minute":
+                        hours = math.floor(value / 60) if value >= 0 else math.ceil(value / 60)
+                        result = date_obj + relativedelta(hours=hours)
+                    if time_unit == "second":
+                        hours = (
+                            math.floor(value / (60 * 60))
+                            if value >= 0
+                            else math.ceil(value / (60 * 60))
+                        )
+                        result = date_obj + relativedelta(hours=hours)
+                    if time_unit == "millisecond":
+                        hours = (
+                            math.floor(value / (60 * 60 * 1000))
+                            if value >= 0
+                            else math.ceil(value / (60 * 60 * 1000))
+                        )
+                        result = date_obj + relativedelta(hours=hours)
+                if precision == 5:
+                    if time_unit == "minute":
+                        minutes = math.floor(value) if value >= 0 else math.ceil(value)
+                        result = date_obj + relativedelta(minutes=minutes)
+                    if time_unit == "second":
+                        minutes = math.floor(value / 60) if value >= 0 else math.ceil(value / 60)
+                        result = date_obj + relativedelta(minutes=minutes)
+                    if time_unit == "millisecond":
+                        minutes = (
+                            math.floor(value / (60 * 1000))
+                            if value >= 0
+                            else math.ceil(value / (60 * 1000))
+                        )
+                        result = date_obj + relativedelta(minutes=minutes)
+            return self._extractDateByPrecision(result, precision)
+        if isinstance(self, FP_Time):
+            precision = self._calculateTimePrecision(dt_list)
+            date_obj = self._convertTime(dt_list)
+            if precision == 2:
+                if time_unit == "hour":
+                    result = date_obj + relativedelta(minutes=value * 60)
+                if time_unit == "minute":
+                    result = date_obj + relativedelta(minutes=value)
+                if time_unit == "second":
+                    minutes = math.floor(value / 60) if value >= 0 else math.ceil(value / 60)
+                    result = date_obj + relativedelta(minutes=minutes)
+                if time_unit == "millisecond":
+                    minutes = (
+                        math.floor(value / (60 * 1000))
+                        if value >= 0
+                        else math.ceil(value / (60 * 1000))
+                    )
+                    result = date_obj + relativedelta(minutes=minutes)
+            if precision in [3, 4]:
+                if time_unit == "hour":
+                    result = date_obj + relativedelta(minutes=value * 60)
+                if time_unit == "minute":
+                    result = date_obj + relativedelta(minutes=value)
+                if time_unit == "second":
+                    milliseconds = float(str(time_quantity).split()[0]) * 1000
+                    result = date_obj + relativedelta(microseconds=milliseconds * 1000)
+                if time_unit == "millisecond":
+                    result = date_obj + relativedelta(microseconds=value * 1000)
+            return (
+                self._extractTimeByPrecision(result, precision if precision < 3 else 4) + dt_list[4]
+            )
+
 
 class FP_Time(FP_TimeBase):
     matchGroupsIndices = [
@@ -462,6 +593,20 @@ class FP_Time(FP_TimeBase):
             ).total_seconds()
         return None
 
+    def _extractTimeByPrecision(self, date_obj, precision):
+        format = {1: "T%H", 2: "T%H:%M", 3: "T%H:%M:%S", 4: "T%H:%M:%S.%f"}
+        return date_obj.strftime(format.get(precision)) if precision in format else None
+
+    def _calculateTimePrecision(self, dt_list):
+        return sum(1 for i in dt_list[0:4] if i is not None)
+
+    def _convertTime(self, time_list):
+        hour = time_list[0] if time_list[0] is not None else 00
+        minute = time_list[1] if time_list[1] is not None else 00
+        second = time_list[2] if time_list[2] is not None else 00
+        millisecond = time_list[3] if time_list[3] is not None else 000
+        return datetime.strptime(f"{hour}:{minute}:{second}.{millisecond}", "%H:%M:%S.%f")
+
 
 class FP_DateTime(FP_TimeBase):
     matchGroupsIndices = [
@@ -544,6 +689,30 @@ class FP_DateTime(FP_TimeBase):
             )
 
         return integer_result
+
+    def _extractDateByPrecision(self, date_obj, precision):
+        format = {
+            1: "%Y",
+            2: "%Y-%m",
+            3: "%Y-%m-%d",
+            4: "%Y-%m-%dT%H",
+            5: "%Y-%m-%dT%H:%M",
+            6: "%Y-%m-%dT%H:%M:%S",
+            7: "%Y-%m-%dT%H:%M:%S.%f",
+        }
+        return date_obj.strftime(format.get(precision)) if precision in format else None
+
+    def _convertDatetime(self, date_list):
+        n_date_list = self._normalize_datetime(date_list)
+        year = n_date_list[0] if n_date_list[0] is not None else "0"
+        month = n_date_list[1] if n_date_list[1] is not None else "01"
+        day = n_date_list[2] if n_date_list[2] is not None else "01"
+        hour = n_date_list[3] if n_date_list[3] is not None else "00"
+        minute = n_date_list[4] if n_date_list[4] is not None else "00"
+        second = n_date_list[5] if n_date_list[5] is not None else "00"
+        millisecond = date_list[6] if date_list[6] is not None else "000"
+        date_string = f"{year}-{month}-{day} {hour}:{minute}:{second}.{millisecond}"
+        return datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S.%f")
 
 
 class ResourceNode:
