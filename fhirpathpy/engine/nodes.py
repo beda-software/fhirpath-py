@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
+from dateutil import parser
 from decimal import ROUND_UP, Decimal
 import math
 import json
@@ -668,7 +669,7 @@ class FP_DateTime(FP_TimeBase):
                 date_str = self.asStr.replace("Z", "+00:00")
             else:
                 date_str = self.asStr
-            return datetime.fromisoformat(date_str)
+            return parser.parse(date_str)
         return None
 
     def _getDateTimeInt(self):
