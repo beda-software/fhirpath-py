@@ -63,7 +63,7 @@ def mul(ctx, x, y):
 def div(ctx, x, y):
     if y == 0:
         return []
-    return x / y
+    return rround(ctx, x/y, 8)
 
 
 def intdiv(ctx, x, y):
