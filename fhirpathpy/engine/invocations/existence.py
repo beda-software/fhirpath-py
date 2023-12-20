@@ -41,7 +41,8 @@ def exists_macro(ctx, coll, expr=None):
 
 
 def all_macro(ctx, colls, expr):
-    for coll in colls:
+    for i, coll in enumerate(colls):
+        ctx["$index"] = i
         if not util.is_true(expr(coll)):
             return [False]
 

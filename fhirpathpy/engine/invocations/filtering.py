@@ -23,14 +23,27 @@ def where_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
-    return util.flatten([x for x in data if check_macro_expr(expr, x)])
+    result = []
+
+    for i, x in enumerate(data):
+        ctx["$index"] = i
+        if check_macro_expr(expr, x):
+            result.append(x)
+
+    return util.flatten(result)
 
 
 def select_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
-    return util.flatten([expr(x) for x in data])
+    result = []
+
+    for i, x in enumerate(data):
+        ctx["$index"] = i
+        result.append(expr(x))
+
+    return util.flatten(result)
 
 
 def repeat_macro(ctx, data, expr):
