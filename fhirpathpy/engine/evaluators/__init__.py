@@ -48,6 +48,8 @@ def param_list(ctx, parentData, node):
 def union_expression(ctx, parentData, node):
     return engine.infix_invoke(ctx, "|", parentData, node["children"])
 
+def index_invocation(ctx, parentData, node):
+    return util.arraify(ctx["$index"])
 
 def this_invocation(ctx, parentData, node):
     return util.arraify(ctx["$this"])
@@ -316,7 +318,7 @@ evaluators = {
     "ThisInvocation": this_invocation,
     "MemberInvocation": member_invocation,
     "FunctionInvocation": function_invocation,
-    "IndexInvocation": this_invocation,
+    "IndexInvocation": index_invocation,
     "TotalInvocation": total_invocation,
     # expressions
     "PolarityExpression": polarity_expression,
