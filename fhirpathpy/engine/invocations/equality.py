@@ -182,7 +182,7 @@ def lt(ctx, a, b):
     if isinstance(a0, nodes.FP_Type):
         if (
             isinstance(a0, nodes.FP_TimeBase)
-            and a0.compare(b0) == 0
+            and a0.compare(b0) is None
             and a0._precision != b0._precision
         ):
             return None
@@ -204,7 +204,7 @@ def gt(ctx, a, b):
     if isinstance(a0, nodes.FP_Type):
         if (
             isinstance(a0, nodes.FP_TimeBase)
-            and a0.compare(b0) == 0
+            and a0.compare(b0) is None
             and a0._precision != b0._precision
         ):
             return None
@@ -226,7 +226,7 @@ def lte(ctx, a, b):
     if isinstance(a0, nodes.FP_Type):
         if (
             isinstance(a0, nodes.FP_TimeBase)
-            and a0.compare(b0) == 0
+            and a0.compare(b0) is None
             and a0._precision != b0._precision
         ):
             return None
@@ -248,7 +248,7 @@ def gte(ctx, a, b):
     if isinstance(a0, nodes.FP_Type):
         if (
             isinstance(a0, nodes.FP_TimeBase)
-            and a0.compare(b0) == 0
+            and a0.compare(b0) is None
             and a0._precision != b0._precision
         ):
             return None

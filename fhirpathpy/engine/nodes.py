@@ -394,7 +394,7 @@ class FP_TimeBase(FP_Type):
                     return 1
                 if normalized_thisdt_list[i] < normalized_otherdt_list[i]:
                     return -1
-            return 0
+            return None
 
         thisDateTimeInt = self._getDateTimeInt()
         otherDateTimeInt = otherDateTime._getDateTimeInt()
