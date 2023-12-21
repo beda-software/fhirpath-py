@@ -1,7 +1,7 @@
 from fhirpathpy.engine.nodes import TypeInfo
 
 def type_fn(ctx, coll):
-    return [TypeInfo.from_value(value) for value in coll]
+    return [TypeInfo.from_value(value).__dict__ for value in coll]
 
 
 def is_fn(ctx, coll, type_info):
