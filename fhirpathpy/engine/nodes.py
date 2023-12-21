@@ -816,7 +816,7 @@ class TypeInfo:
             name = "Quantity"
 
         if name == "bool":
-            name = "Boolean"
+            name = "boolean"
 
         if namespace == TypeInfo.System:
             name = name.capitalize()
