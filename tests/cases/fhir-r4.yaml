@@ -3180,7 +3180,7 @@ tests:
           - true
       - desc: '** testDivide5'
         inputfile: patient-example.json
-        expression: 1.2 / 1.8 = 0.66666667
+        expression: 1.2 / 1.8 = 0.6666666666666666666666666667
         result:
           - true
       - desc: '** testDivide6'
