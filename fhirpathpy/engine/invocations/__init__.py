@@ -40,6 +40,7 @@ invocations = {
     "first": {"fn": filtering.first_fn},
     "last": {"fn": filtering.last_fn},
     "ofType": {"fn": filtering.of_type_fn, "arity": {1: ["Identifier"]}},
+    "type": {"fn": types.type_fn, "arity": {0: []}},
     "is": {"fn": types.is_fn, "arity": {1: ["TypeSpecifier"]}},
     "as": {"fn": types.as_fn, "arity": {1: ["TypeSpecifier"]}},
     "tail": {"fn": filtering.tail_fn},
