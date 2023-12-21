@@ -109,6 +109,7 @@ invocations = {
     "containsOp": {"fn": collections.contains, "arity": {2: ["Any", "Any"]}},
     "inOp": {"fn": collections.inn, "arity": {2: ["Any", "Any"]}},
     "isOp": {"fn": types.is_fn,  "arity": {2: ["Any", "TypeSpecifier"]}},
+    "asOp": {"fn": types.as_fn,  "arity": {2: ["Any", "TypeSpecifier"]}},
     "&": {"fn": math.amp, "arity": {2: ["String", "String"]}},
     "+": {"fn": math.plus, "arity": {2: ["Any", "Any"]}, "nullable": True},
     "-": {"fn": math.minus, "arity": {2: ["Any", "Any"]}, "nullable": True},
