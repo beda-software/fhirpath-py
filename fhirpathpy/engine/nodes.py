@@ -792,7 +792,7 @@ class TypeInfo:
         while type_name:
             if type_name == super_type:
                 return True
-            type_name = TypeInfo.model.type2Parent.get(type_name)
+            type_name = TypeInfo.model.get("type2Parent").get(type_name)
         return False
 
     def is_(self, other):

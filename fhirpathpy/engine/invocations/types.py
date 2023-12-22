@@ -5,6 +5,8 @@ def type_fn(ctx, coll):
 
 
 def is_fn(ctx, coll, type_info):
+    # TODO: It's incorrect place to setup model. Fix it.
+    TypeInfo.model = ctx.get("model")
     if not coll:
         return []
     if len(coll) > 1:
