@@ -16,7 +16,10 @@ def equality(ctx, x, y):
     if type(x[0]) in DATETIME_NODES_LIST or type(y[0]) in DATETIME_NODES_LIST:
         return datetime_equality(ctx, x, y)
 
-    return x == y
+    if len(x) != len(y):
+        return False
+
+    return util.parse_value(x[0]) == util.parse_value(y[0])
 
 
 def normalize_string(s):
@@ -61,8 +64,11 @@ def equivalence(ctx, x, y):
     if isinstance(a, Decimal) or isinstance(b, Decimal):
         return is_equivalent(a, b)
 
-    if isinstance(a, nodes.FP_Quantity) or isinstance(b, nodes.FP_Quantity):
-        return a.deep_equal(b)
+    x_val = util.parse_value(x[0])
+    y_val = util.parse_value(y[0])
+
+    if isinstance(x_val, nodes.FP_Quantity) and isinstance(y_val, nodes.FP_Quantity):
+        return x_val.deep_equal(y_val)
 
     return x == y
 

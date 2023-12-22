@@ -2,7 +2,7 @@ from decimal import Decimal
 import json
 from collections import OrderedDict
 from functools import reduce
-from fhirpathpy.engine.nodes import ResourceNode
+from fhirpathpy.engine.nodes import ResourceNode, FP_Quantity
 
 
 class set_paths:
@@ -22,6 +22,19 @@ def get_data(value):
     if isinstance(value, float):
         return Decimal(str(value))
     return value
+
+
+def parse_value(value):
+    def parse_complex_value(v):
+        num_value, unit = v.get("value"), v.get("code")
+        return FP_Quantity(num_value, f"'{unit}'") if num_value and unit else None
+
+    return (
+        parse_complex_value(value.data)
+        if getattr(value, "get_type_info", lambda: None)()
+        and value.get_type_info().name == "Quantity"
+        else value
+    )
 
 
 def is_number(value):

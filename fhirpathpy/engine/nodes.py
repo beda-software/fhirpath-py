@@ -186,6 +186,8 @@ class FP_Quantity(FP_Type):
     def __eq__(self, other):
         if isinstance(other, FP_Quantity):
             if self.unit in self._years_and_months and other.unit in self._years_and_months:
+                if self.unit == "'a'" or other.unit == "'a'":
+                    return False
                 return self._compare_years_and_months(other)
             elif self.unit in self._weeks_days_and_time and other.unit in self._weeks_days_and_time:
                 self_value_in_seconds = self.value * self.datetime_multipliers[self.unit]
@@ -751,6 +753,9 @@ class ResourceNode:
 
     def get_type_info(self):
         namespace = TypeInfo.FHIR
+
+        if self.path is None:
+            return None
 
         match = re.match(r"^System\.(.*)$", self.path)
         if match:
