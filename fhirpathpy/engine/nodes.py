@@ -779,7 +779,7 @@ class ResourceNode:
         if not TypeInfo.model:
             return TypeInfo.create_by_value_in_namespace(namespace=namespace, value=self.data)
 
-        return TypeInfo(namespace=namespace, name="BackboneElement")
+        return TypeInfo(namespace=namespace, name=self.path)
 
     def toJSON(self):
         return json.dumps(self.data)
@@ -805,7 +805,8 @@ class TypeInfo:
         while type_name:
             if type_name == super_type:
                 return True
-            type_name = TypeInfo.model.get("type2Parent").get(type_name)
+            # TODO: Double check it
+            type_name = TypeInfo.model.get("type2Parent").get(type_name) or TypeInfo.model.get("path2Type").get(type_name)
         return False
 
     def is_(self, other):

@@ -15,6 +15,7 @@ def is_fn(ctx, coll, type_info):
 
 
 def as_fn(ctx, coll, type_info):
+    TypeInfo.model = ctx.get("model")
     if not coll:
         return []
     if len(coll) > 1:
