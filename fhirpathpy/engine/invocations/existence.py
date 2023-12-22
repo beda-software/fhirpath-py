@@ -1,4 +1,5 @@
 from decimal import Decimal
+from fhirpathpy.engine.invocations import misc
 from fhirpathpy.engine.invocations.misc import to_boolean
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
@@ -21,21 +22,17 @@ def count_fn(ctx, value):
     return 0
 
 
-# engine.notFn = function(coll) {
-#   let d = misc.singleton(coll, 'Boolean');
-#   return (typeof (d) === 'boolean') ? !d : [];
-# };
-
 def not_fn(ctx, x):
     if len(x) != 1:
         return []
 
     data = util.get_data(x[0])
+    data = misc.singleton(x, "Boolean")
 
-    if type(data) == bool:
+    if isinstance(data, bool):
         return not data
 
-    return not to_boolean(ctx, x)
+    return []
 
 
 def exists_macro(ctx, coll, expr=None):

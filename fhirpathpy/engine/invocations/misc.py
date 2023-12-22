@@ -224,3 +224,34 @@ def to_boolean(ctx, coll):
             return False
 
     return []
+
+
+def boolean_singleton(coll):
+    d = util.get_data(coll[0])
+    if isinstance(d, bool):
+        return d
+    elif len(coll) == 1:
+        return True
+
+def string_singleton(coll):
+    d = util.get_data(coll[0])
+    if isinstance(d, str):
+        return d
+
+singleton_eval_by_type = {
+    "Boolean": boolean_singleton,
+    "String": string_singleton,
+}
+
+def singleton(coll, type):
+    if len(coll) > 1:
+        raise Exception("Unexpected collection {coll}; expected singleton of type {type}".format(coll=coll, type=type))
+    elif len(coll) == 0:
+        return []
+    to_singleton = singleton_eval_by_type[type]
+    if to_singleton:
+        val = to_singleton(coll)
+        if (val is not None):
+            return val
+        raise Exception("Expected {type}, but got: {coll}".format(type=type.lower(), coll=coll))
+    raise Exception("Not supported type {}".format(type))
