@@ -149,6 +149,7 @@ class FP_Quantity(FP_Type):
     _year_month_conversion_factor = {"'a'": 12, "'mo'": 1}
     _m_cm_mm_conversion_factor = {"'m'": 1.0, "'cm'": 0.01, "'mm'": 0.001}
     _lbs_kg_conversion_factor = {"'kg'": 1.0, "lbs": 0.453592}
+    _g_mg_conversion_factor = {"'g'": 1.0, "'mg'": 0.001}
 
     datetime_multipliers = {
         **{key: Decimal("604800") for key in ["'wk'", "week", "weeks"]},
@@ -194,6 +195,11 @@ class FP_Quantity(FP_Type):
                 other_value_in_seconds = other.value * self.datetime_multipliers[other.unit]
                 return self_value_in_seconds == other_value_in_seconds
             else:
+                if self.unit != other.unit:
+                    converted = FP_Quantity.conv_unit_to(self.unit, self.value, other.unit)
+                    if converted is not None:
+                        return other.value == converted.value and other.unit == converted.unit
+
                 return self.value == other.value and self.unit == other.unit
         else:
             return super().__eq__(other)
@@ -239,6 +245,13 @@ class FP_Quantity(FP_Type):
             converted_value = (Decimal(from_lbs_kg_magnitude) * value) / Decimal(
                 to_lbs_kg_magnitude
             )
+            rounded_value = converted_value.quantize(Decimal("1."), rounding=ROUND_UP)
+            return FP_Quantity(rounded_value, toUnit)
+
+        from_g_mg_magnitude = FP_Quantity._g_mg_conversion_factor.get(fromUnit)
+        to_g_mg_magnitude = FP_Quantity._g_mg_conversion_factor.get(toUnit)
+        if from_g_mg_magnitude and to_g_mg_magnitude:
+            converted_value = (Decimal(from_g_mg_magnitude) * value) / Decimal(to_g_mg_magnitude)
             rounded_value = converted_value.quantize(Decimal("1."), rounding=ROUND_UP)
             return FP_Quantity(rounded_value, toUnit)
 
