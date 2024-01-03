@@ -230,7 +230,7 @@ def create_reduce_member_invocation(model, key):
 
 
 def member_invocation(ctx, parentData, node):
-    key = engine.do_eval(ctx, parentData, node["children"][0])[0]
+    key = engine.do_eval(ctx, parentData, node["children"][0])[0].replace("`", "")
     model = ctx["model"]
 
     if isinstance(parentData, list):
