@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
 from dateutil import parser
-from decimal import ROUND_UP, Decimal
+from decimal import ROUND_HALF_UP, ROUND_UP, Decimal
 import math
 import json
 import re
@@ -148,7 +148,7 @@ class FP_Quantity(FP_Type):
 
     _year_month_conversion_factor = {"'a'": 12, "'mo'": 1}
     _m_cm_mm_conversion_factor = {"'m'": 1.0, "'cm'": 0.01, "'mm'": 0.001}
-    _lbs_kg_conversion_factor = {"'kg'": 1.0, "lbs": 0.453592}
+    _lbs_kg_conversion_factor = {"'kg'": 1.0, "lbs": 0.453592, "'[lb_av]'": 0.453592}
     _g_mg_conversion_factor = {"'g'": 1.0, "'mg'": 0.001}
 
     datetime_multipliers = {
@@ -209,6 +209,11 @@ class FP_Quantity(FP_Type):
             if self.unit in self._years_and_months and other.unit in self._years_and_months:
                 return self._compare_years_and_months(other, year_units=["'a'", "year", "years"])
             else:
+                if self.unit != other.unit:
+                    converted = FP_Quantity.conv_unit_to(self.unit, self.value, other.unit)
+                    reverse_converted = FP_Quantity.conv_unit_to(converted.unit, converted.value, self.unit)
+                    if converted is not None:
+                        return self.value == reverse_converted.value and self.unit == reverse_converted.unit
                 return self.__eq__(other)
         else:
             return super().__eq__(other)
@@ -251,10 +256,9 @@ class FP_Quantity(FP_Type):
         from_g_mg_magnitude = FP_Quantity._g_mg_conversion_factor.get(fromUnit)
         to_g_mg_magnitude = FP_Quantity._g_mg_conversion_factor.get(toUnit)
         if from_g_mg_magnitude and to_g_mg_magnitude:
-            converted_value = (Decimal(from_g_mg_magnitude) * value) / Decimal(to_g_mg_magnitude)
-            rounded_value = converted_value.quantize(Decimal("1."), rounding=ROUND_UP)
-            return FP_Quantity(rounded_value, toUnit)
-
+            value = Decimal(value) * Decimal(FP_Quantity._g_mg_conversion_factor[fromUnit])
+            result = (value / Decimal(FP_Quantity._g_mg_conversion_factor[toUnit])).quantize(Decimal('1.'), rounding=ROUND_HALF_UP)
+            return FP_Quantity(result, toUnit)
         return None
 
     def _compare_years_and_months(self, other, year_units=["year", "years"]):
@@ -838,7 +842,10 @@ class TypeInfo:
             name = "boolean"
 
         if namespace == TypeInfo.System:
-            name = name.capitalize()
+            if name == "dateTime":
+                name = "DateTime"
+            else:
+                name = name.capitalize()
 
         return TypeInfo(name, namespace)
 
