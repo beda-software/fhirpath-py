@@ -37,7 +37,16 @@ def apply_parsed_path(resource, parsedPath, context={}, model=None):
         data = get_data(node)
 
         if isinstance(node, list):
-            return [visit(item) for item in data]
+            res = []
+            for item in data:
+                # Filter out intenal representation of primitive extensions
+                i = visit(item)
+                if isinstance(i, dict):
+                    keys = list(i.keys())
+                    if keys == ["extension"]:
+                        continue
+                res.append(i)
+            return res
 
         if isinstance(data, dict) and not isinstance(data, FP_Type):
             for key, value in data.items():
