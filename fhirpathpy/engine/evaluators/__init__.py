@@ -48,8 +48,10 @@ def param_list(ctx, parentData, node):
 def union_expression(ctx, parentData, node):
     return engine.infix_invoke(ctx, "|", parentData, node["children"])
 
+
 def index_invocation(ctx, parentData, node):
     return util.arraify(ctx["$index"])
+
 
 def this_invocation(ctx, parentData, node):
     return util.arraify(ctx["$this"])
@@ -168,49 +170,39 @@ def time_literal(ctx, parentData, node):
 def create_reduce_member_invocation(model, key):
     def func(acc, res):
         res = nodes.ResourceNode.create_node(res)
-
-        childPath = ""
-        if res.path is not None:
-            childPath = res.path + "." + key
-
-        if (
-            model is not None
-            and "pathsDefinedElsewhere" in model
-            and childPath in model["pathsDefinedElsewhere"]
-        ):
-            childPath = model["pathsDefinedElsewhere"][childPath]
+        childPath = f"{res.path}.{key}" if res.path else key
 
         actualTypes = None
-
-        if (
-            model is not None
-            and "choiceTypePaths" in model
-            and childPath in model["choiceTypePaths"]
-        ):
-            actualTypes = model["choiceTypePaths"][childPath]
-
         toAdd = None
         toAdd_ = None
+
+        if isinstance(model, dict):
+            childPath = model["pathsDefinedElsewhere"].get(childPath, childPath)
+            actualTypes = model["choiceTypePaths"].get(childPath)
 
         if isinstance(res.data, nodes.FP_Quantity):
             toAdd = res.data.value
 
-        if isinstance(actualTypes, list):
+        if actualTypes and isinstance(res.data, dict):
             # Use actualTypes to find the field's value
             for actualType in actualTypes:
-                field = key + actualType
-                if isinstance(res.data, (dict, list)):
-                    toAdd = res.data.get(field)
-                    toAdd_ = res.data.get(f"_{field}")
-                    if toAdd is not None or toAdd_ is not None:
-                        childPath = actualType
-                        break
-        else:
-            if isinstance(res.data, (dict, list)):
-                toAdd = res.data.get(key)
-                toAdd_ = res.data.get(f"_{key}")
-                if key == "extension":
-                    childPath = "Extension"
+                field = f"{key}{actualType}"
+                toAdd = res.data.get(field)
+                toAdd_ = res.data.get(f"_{field}")
+                if toAdd is not None or toAdd_ is not None:
+                    childPath += actualType
+                    break
+        elif isinstance(res.data, dict):
+            toAdd = res.data.get(key)
+            toAdd_ = res.data.get(f"_{key}")
+            if key == "extension":
+                childPath = "Extension"
+
+        childPath = (
+            model["path2Type"].get(childPath, childPath)
+            if isinstance(model, dict) and "path2Type" in model
+            else childPath
+        )
 
         if util.is_some(toAdd):
             if isinstance(toAdd, list):

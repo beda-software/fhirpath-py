@@ -667,6 +667,8 @@ class FP_DateTime(FP_TimeBase):
             self._precision = self._calculatePrecision(self._dateTimeAsList)
 
     def __str__(self):
+        if re.match(r'^\d{4}-\d{2}-\d{2}$', self.asStr):
+            return self.asStr
         if self.asStr and len(self.asStr) <= 4:
             return self.asStr
         if self._getDateTimeObject():
@@ -745,9 +747,10 @@ class ResourceNode:
     * @param path the node's path in the resource (e.g. Patient.name).  If the
     *  data's type can be determined from data, that will take precedence over
     *  this parameter.
+    * @param _data additional data stored in a property named with "_" prepended.
     """
 
-    def __init__(self, data, path):
+    def __init__(self, data, path, _data=None):
         """
         If data is a resource (maybe a contained resource) reset the path
         information to the resource type.
@@ -757,6 +760,7 @@ class ResourceNode:
 
         self.path = path
         self.data = data
+        self._data = _data
 
     def __eq__(self, value):
         if isinstance(value, ResourceNode):
@@ -789,10 +793,10 @@ class ResourceNode:
         return json.dumps(self.data)
 
     @staticmethod
-    def create_node(data, path=None):
+    def create_node(data, path=None, _data=None):
         if isinstance(data, ResourceNode):
             return data
-        return ResourceNode(data, path)
+        return ResourceNode(data, path, _data)
 
 
 class TypeInfo:
