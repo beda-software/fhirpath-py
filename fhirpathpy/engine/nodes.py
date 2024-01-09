@@ -787,7 +787,7 @@ class ResourceNode:
         if not TypeInfo.model:
             return TypeInfo.create_by_value_in_namespace(namespace=namespace, value=self.data)
 
-        return TypeInfo(namespace=namespace, name=self.path)
+        return TypeInfo(namespace=namespace, name='BackboneElement')
 
     def toJSON(self):
         return json.dumps(self.data)
