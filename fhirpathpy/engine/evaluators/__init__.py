@@ -170,7 +170,7 @@ def time_literal(ctx, parentData, node):
 def create_reduce_member_invocation(model, key):
     def func(acc, res):
         res = nodes.ResourceNode.create_node(res)
-        childPath = f"{res.path}.{key}" if res.path else key
+        childPath = f"{res.path}.{key}" if res.path else f"_.{key}"
 
         actualTypes = None
         toAdd = None
