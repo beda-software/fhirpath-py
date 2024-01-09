@@ -118,6 +118,16 @@ def check_length(value):
         )
 
 
+def remove_duplicate_extension(list):
+    """
+    This is a temporary solution for cases where the list contains 2 items with the same key,
+    like birthDate and _birthDate. Needs to be fixed to a better solution.
+    """
+    if len(list) == 2 and isinstance(list[1], nodes.ResourceNode) and "extension" in list[1].data:
+        return list[:1]
+    return list
+
+
 def typecheck(a, b):
     """
     Checks that the types of a and b are suitable for comparison in an
@@ -131,6 +141,9 @@ def typecheck(a, b):
     returns the singleton values of the arrays a, and b.  If one was an FP_Type and the other was convertible, the coverted value will be retureed
     """
     rtn = None
+
+    a = remove_duplicate_extension(a)
+    b = remove_duplicate_extension(b)
 
     check_length(a)
     check_length(b)
