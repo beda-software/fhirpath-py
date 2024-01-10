@@ -91,3 +91,9 @@ def uniq(arr):
             key = str(x)
         ordered_dict[key] = x
     return list(ordered_dict.values())
+
+def val_data_converted(val):
+    if isinstance(val, ResourceNode):
+        val = val.convert_data()
+
+    return val

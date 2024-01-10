@@ -1,4 +1,5 @@
 from decimal import Decimal
+from fhirpathpy.engine.invocations.equality import remove_duplicate_extension
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 
@@ -42,10 +43,13 @@ def amp(ctx, x="", y=""):
     return x + y
 
 
-def minus(ctx, xs, ys):
+def minus(ctx, xs_, ys_):
+    xs = remove_duplicate_extension(xs_)
+    ys = remove_duplicate_extension(ys_)
+
     if len(xs) == 1 and len(ys) == 1:
-        x = util.get_data(xs[0])
-        y = util.get_data(ys[0])
+        x = util.get_data(util.val_data_converted(xs[0]))
+        y = util.get_data(util.val_data_converted(ys[0]))
 
         if util.is_number(x) and util.is_number(y):
             return x - y
@@ -81,12 +85,15 @@ def mod(ctx, x, y):
 
 # HACK: for only polymorphic function
 # Actually, "minus" is now also polymorphic
-def plus(ctx, xs, ys):
+def plus(ctx, xs_, ys_):
+    xs = remove_duplicate_extension(xs_)
+    ys = remove_duplicate_extension(ys_)
+
     if len(xs) != 1 or len(ys) != 1:
         raise Exception("Cannot " + str(xs) + " + " + str(ys))
 
-    x = util.get_data(xs[0])
-    y = util.get_data(ys[0])
+    x = util.get_data(util.val_data_converted(xs[0]))
+    y = util.get_data(util.val_data_converted(ys[0]))
 
     """
     In the future, this and other functions might need to return ResourceNode

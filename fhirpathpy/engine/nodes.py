@@ -211,9 +211,14 @@ class FP_Quantity(FP_Type):
             else:
                 if self.unit != other.unit:
                     converted = FP_Quantity.conv_unit_to(self.unit, self.value, other.unit)
-                    reverse_converted = FP_Quantity.conv_unit_to(converted.unit, converted.value, self.unit)
+                    reverse_converted = FP_Quantity.conv_unit_to(
+                        converted.unit, converted.value, self.unit
+                    )
                     if converted is not None:
-                        return self.value == reverse_converted.value and self.unit == reverse_converted.unit
+                        return (
+                            self.value == reverse_converted.value
+                            and self.unit == reverse_converted.unit
+                        )
                 return self.__eq__(other)
         else:
             return super().__eq__(other)
@@ -257,7 +262,9 @@ class FP_Quantity(FP_Type):
         to_g_mg_magnitude = FP_Quantity._g_mg_conversion_factor.get(toUnit)
         if from_g_mg_magnitude and to_g_mg_magnitude:
             value = Decimal(value) * Decimal(FP_Quantity._g_mg_conversion_factor[fromUnit])
-            result = (value / Decimal(FP_Quantity._g_mg_conversion_factor[toUnit])).quantize(Decimal('1.'), rounding=ROUND_HALF_UP)
+            result = (value / Decimal(FP_Quantity._g_mg_conversion_factor[toUnit])).quantize(
+                Decimal("1."), rounding=ROUND_HALF_UP
+            )
             return FP_Quantity(result, toUnit)
         return None
 
@@ -528,6 +535,11 @@ class FP_TimeBase(FP_Type):
                 self._extractTimeByPrecision(result, precision if precision < 3 else 4) + dt_list[4]
             )
 
+    @staticmethod
+    def check_string(cls, str_val):
+        val = cls(str_val)
+        return val
+
 
 class FP_Time(FP_TimeBase):
     matchGroupsIndices = [
@@ -667,7 +679,7 @@ class FP_DateTime(FP_TimeBase):
             self._precision = self._calculatePrecision(self._dateTimeAsList)
 
     def __str__(self):
-        if re.match(r'^\d{4}-\d{2}-\d{2}$', self.asStr):
+        if re.match(r"^\d{4}-\d{2}-\d{2}$", self.asStr):
             return self.asStr
         if self.asStr and len(self.asStr) <= 4:
             return self.asStr
@@ -787,7 +799,7 @@ class ResourceNode:
         if not TypeInfo.model:
             return TypeInfo.create_by_value_in_namespace(namespace=namespace, value=self.data)
 
-        return TypeInfo(namespace=namespace, name='BackboneElement')
+        return TypeInfo(namespace=namespace, name="BackboneElement")
 
     def toJSON(self):
         return json.dumps(self.data)
@@ -798,11 +810,24 @@ class ResourceNode:
             return data
         return ResourceNode(data, path, _data)
 
+    def convert_data(self):
+        data = self.data
+        cls = TypeInfo.type_to_class_with_check_string.get(self.path)
+        if cls:
+            data = FP_TimeBase.check_string(cls, data) or data
+        return data
+
 
 class TypeInfo:
     model = None
     System = "System"
     FHIR = "FHIR"
+
+    type_to_class_with_check_string = {
+        "date": FP_DateTime,
+        "dateTime": FP_DateTime,
+        "time": FP_Time,
+    }
 
     def __init__(self, name, namespace):
         self.name = name
@@ -813,8 +838,15 @@ class TypeInfo:
         while type_name:
             if type_name == super_type:
                 return True
-            # TODO: Double check it
-            type_name = TypeInfo.model.get("type2Parent").get(type_name) or TypeInfo.model.get("path2Type").get(type_name)
+
+            if TypeInfo.model is not None:
+                parent_type = TypeInfo.model.get("type2Parent", {}).get(type_name)
+                if parent_type is None:
+                    parent_type = TypeInfo.model.get("path2Type", {}).get(type_name)
+                type_name = parent_type
+            else:
+                return False
+
         return False
 
     def is_(self, other):
