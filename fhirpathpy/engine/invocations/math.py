@@ -48,7 +48,7 @@ def minus(ctx, xs_, ys_):
     ys = remove_duplicate_extension(ys_)
 
     if len(xs) != 1 or len(ys) != 1:
-        raise Exception("Cannot " + str(xs) + " + " + str(ys))
+        raise Exception("Cannot " + str(xs) + " - " + str(ys))
 
     x = util.get_data(util.val_data_converted(xs[0]))
     y = util.get_data(util.val_data_converted(ys[0]))
