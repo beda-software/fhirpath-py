@@ -540,6 +540,16 @@ class FP_TimeBase(FP_Type):
         val = cls(str_val)
         return val
 
+    @staticmethod
+    def get_match_data(str_val):
+        match = re.match(dateTimeRE, str_val)
+        if match:
+            return FP_DateTime(str_val)
+        match = re.match(timeRE, str_val)
+        if match:
+            return FP_Time(str_val)
+        return None
+
 
 class FP_Time(FP_TimeBase):
     matchGroupsIndices = [

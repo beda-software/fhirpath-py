@@ -47,15 +47,22 @@ def minus(ctx, xs_, ys_):
     xs = remove_duplicate_extension(xs_)
     ys = remove_duplicate_extension(ys_)
 
-    if len(xs) == 1 and len(ys) == 1:
-        x = util.get_data(util.val_data_converted(xs[0]))
-        y = util.get_data(util.val_data_converted(ys[0]))
+    if len(xs) != 1 or len(ys) != 1:
+        raise Exception("Cannot " + str(xs) + " + " + str(ys))
 
-        if util.is_number(x) and util.is_number(y):
-            return x - y
+    x = util.get_data(util.val_data_converted(xs[0]))
+    y = util.get_data(util.val_data_converted(ys[0]))
 
-        if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
-            return x.plus(nodes.FP_Quantity(-y.value, y.unit))
+    if util.is_number(x) and util.is_number(y):
+        return x - y
+
+    if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
+        return x.plus(nodes.FP_Quantity(-y.value, y.unit))
+
+    if isinstance(x, str) and isinstance(y, nodes.FP_Quantity):
+        x_ = nodes.FP_TimeBase.get_match_data(x)
+        if x_ is not None:
+            return x_.plus(nodes.FP_Quantity(-y.value, y.unit))
 
     raise Exception("Cannot " + str(xs) + " - " + str(ys))
 
@@ -109,6 +116,13 @@ def plus(ctx, xs_, ys_):
 
     if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
         return x.plus(y)
+
+    if isinstance(x, str) and isinstance(y, nodes.FP_Quantity):
+        x_ = nodes.FP_TimeBase.get_match_data(x)
+        if x_ is not None:
+            return x_.plus(y)
+
+    raise Exception("Cannot " + str(xs) + " + " + str(ys))
 
 
 def abs(ctx, x):
