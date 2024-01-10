@@ -839,13 +839,10 @@ class TypeInfo:
             if type_name == super_type:
                 return True
 
-            if TypeInfo.model is not None:
-                parent_type = TypeInfo.model.get("type2Parent", {}).get(type_name)
-                if parent_type is None:
-                    parent_type = TypeInfo.model.get("path2Type", {}).get(type_name)
-                type_name = parent_type
-            else:
-                return False
+            # TODO: Double check it
+            type_name = TypeInfo.model.get("type2Parent").get(type_name) or TypeInfo.model.get(
+                "path2Type"
+            ).get(type_name)
 
         return False
 
