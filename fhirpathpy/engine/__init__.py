@@ -63,6 +63,9 @@ def doInvoke(ctx, fn_name, data, raw_params):
 
         raise Exception(fn_name + " expects no params")
 
+    if invocation["fn"].__name__ == "trace_fn" and raw_params is not None:
+        raw_params = raw_params[:1]
+
     paramsNumber = 0
     if isinstance(raw_params, list):
         paramsNumber = len(raw_params)
