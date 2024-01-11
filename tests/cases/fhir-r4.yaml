@@ -3245,7 +3245,7 @@ tests:
           - true
       - desc: '** testRound2'
         inputfile: patient-example.json
-        expression: 3.14159.round(3) = 2
+        expression: 3.14159.round(3) = 3.142
         result:
           - true
     disable: true
