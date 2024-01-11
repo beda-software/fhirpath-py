@@ -100,11 +100,10 @@ def literal_term(ctx, parentData, node):
     return [node["text"]]
 
 
-# TODO
 def external_constant_term(ctx, parent_data, node):
     ext_constant = node["children"][0]
     ext_identifier = ext_constant["children"][0]
-    varName = identifier(ctx, parent_data, ext_identifier)[0]
+    varName = identifier(ctx, parent_data, ext_identifier)[0].replace("`", "")
 
     if not varName in ctx["vars"]:
         return []
@@ -113,6 +112,9 @@ def external_constant_term(ctx, parent_data, node):
 
     # For convenience, we all variable values to be passed in without their array
     # wrapper.  However, when evaluating, we need to put the array back in.
+
+    if value is None:
+        return []
 
     if not isinstance(value, list):
         return [value]
