@@ -360,6 +360,13 @@ class FP_TimeBase(FP_Type):
                     return None
                 if normalized_thisdt_list[i] != normalized_otherdt_list[i]:
                     return False
+                tz_thisdt_list = len(thisdt_list) >= 8 and thisdt_list[7] is not None
+                tz_otherdt_list = len(otherdt_list) >= 8 and otherdt_list[7] is not None
+                if (tz_thisdt_list and not tz_otherdt_list) or (
+                    tz_otherdt_list and not tz_thisdt_list
+                ):
+                    return False
+
             return None
 
     def _normalize_datetime(self, dt_list):
