@@ -28,20 +28,23 @@ class YamlFile(pytest.File):
 
         return any(key.startswith("group") for key in test.keys())
 
-    def collect_tests(self, suites, subject):
+    def collect_tests(self, suites, subject, is_group_disabled=False):
         for suite in suites:
+            current_group_disabled = is_group_disabled or suite.get("disable", False)
             if self.is_group(suite):
                 name = next(iter(suite))
                 tests = suite[name]
-                for test in self.collect_tests(tests, subject):
+                for test in self.collect_tests(tests, subject, current_group_disabled):
                     yield test
             else:
-                for test in self.collect_test(suite, subject):
+                for test in self.collect_test(suite, subject, current_group_disabled):
                     yield test
 
-    def collect_test(self, test, subject):
+    def collect_test(self, test, subject, is_group_disabled):
         name = test["desc"] if "desc" in test else ""
-        is_disabled = "disable" in test and test["disable"]
+        is_disabled = (
+            is_group_disabled if is_group_disabled else "disable" in test and test["disable"]
+        )
 
         if "expression" in test and not is_disabled:
             if isinstance(test["expression"], list):
