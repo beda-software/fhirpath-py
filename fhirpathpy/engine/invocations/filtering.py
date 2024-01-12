@@ -113,25 +113,6 @@ def skip_fn(ctx, x, n):
     return x[int(n) :]
 
 
-def check_fhir_type(ctx, x, tp):
-    if tp == "string" and isinstance(x, str):
-        return True
-
-    if tp == "boolean" and isinstance(x, bool):
-        return True
-
-    if tp == "object":
-        return isinstance(x, dict)
-
-    if tp == "integer" and isinstance(x, int) and not isinstance(x, bool):
-        return True
-
-    if tp == "decimal" and isinstance(x, Decimal):
-        return True
-
-    return False
-
-
 def of_type_fn(ctx, coll, tp):
     return [value for value in coll if nodes.TypeInfo.from_value(value).is_(tp)]
 
