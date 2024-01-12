@@ -887,6 +887,10 @@ class TypeInfo:
             name = "time"
         elif isinstance(value, FP_Quantity):
             name = "Quantity"
+        elif isinstance(value, str):
+            name = "string"
+        elif isinstance(value, dict):
+            name = "object"
 
         if name == "bool":
             name = "boolean"

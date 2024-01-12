@@ -133,7 +133,7 @@ def check_fhir_type(ctx, x, tp):
 
 
 def of_type_fn(ctx, coll, tp):
-    return list(filter(lambda x: check_fhir_type(ctx, util.get_data(x), tp), coll))
+    return [value for value in coll if nodes.TypeInfo.from_value(value).is_(tp)]
 
 
 def extension(ctx, data, url):
