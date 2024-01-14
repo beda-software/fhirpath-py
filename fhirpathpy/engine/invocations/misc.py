@@ -64,7 +64,7 @@ def to_quantity(ctx, coll, to_unit=None):
     if len(coll) > 1:
         raise Exception("Could not convert to quantity: input collection contains multiple items")
     elif len(coll) == 1:
-        v = util.get_data(coll[0])
+        v = util.val_data_converted(coll[0])
         quantity_regex_res = None
 
         if isinstance(v, (int, Decimal)):
@@ -75,20 +75,13 @@ def to_quantity(ctx, coll, to_unit=None):
             result = nodes.FP_Quantity(1 if v else 0, "'1'")
         elif isinstance(v, str):
             quantity_regex_res = quantity_regex.match(v)
-        elif isinstance(v, dict):
-            value = v.get("value")
-            unit = v.get("unit")
-            if isinstance(value, (int, float, Decimal)) and unit is not None:
-                result = nodes.FP_Quantity(Decimal(value), unit)
+            if quantity_regex_res:
+                value = quantity_regex_res.group(quantity_regex_map["value"])
+                unit = quantity_regex_res.group(quantity_regex_map["unit"])
+                time = quantity_regex_res.group(quantity_regex_map["time"])
 
-        if quantity_regex_res:
-            value = quantity_regex_res.group(quantity_regex_map["value"])
-            unit = quantity_regex_res.group(quantity_regex_map["unit"])
-            time = quantity_regex_res.group(quantity_regex_map["time"])
-
-            # UCUM unit code in the input string must be surrounded with single quotes
-            if not time or nodes.FP_Quantity.timeUnitsToUCUM.get(time):
-                result = nodes.FP_Quantity(Decimal(value), unit or time or "'1'")
+                if not time or nodes.FP_Quantity.timeUnitsToUCUM.get(time):
+                    result = nodes.FP_Quantity(Decimal(value), unit or time or "'1'")
 
         if result and to_unit and result.unit != to_unit:
             result = nodes.FP_Quantity.conv_unit_to(result.unit, result.value, to_unit)

@@ -832,6 +832,11 @@ class ResourceNode:
         cls = TypeInfo.type_to_class_with_check_string.get(self.path)
         if cls:
             data = FP_TimeBase.check_string(cls, data) or data
+        if isinstance(data, dict) and data["system"] == "http://unitsofmeasure.org":
+            data = FP_Quantity(
+                data['value'],
+                FP_Quantity.timeUnitsToUCUM.get(data['code'], "'" + data['code'] + "'")
+            )
         return data
 
 
