@@ -80,6 +80,25 @@ def equivalence(ctx, x, y):
     if isinstance(x_val, nodes.FP_Quantity) and isinstance(y_val, nodes.FP_Quantity):
         return x_val.deep_equal(y_val)
 
+    if isinstance(a, (dict, list)) and isinstance(b, (dict, list)):
+        def deep_equal(a, b):
+            if isinstance(a, dict) and isinstance(b, dict):
+                if a.keys() != b.keys():
+                    return False
+                return all(deep_equal(a[key], b[key]) for key in a)
+            elif isinstance(a, list) and isinstance(b, list):
+                return len(a) == len(b) and all(
+                    deep_equal(x, y) for x, y in zip(sorted(a), sorted(b))
+                )
+            elif isinstance(a, str) and isinstance(b, str):
+                return normalize_string(a) == normalize_string(b)
+            elif isinstance(a, (int, float)) and isinstance(b, (int, float)):
+                return abs(a - b) < 0.5
+            else:
+                return a == b
+
+        return deep_equal(a, b)
+
     return x == y
 
 
