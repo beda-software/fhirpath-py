@@ -22,10 +22,12 @@ def equality(ctx, x, y):
     a = util.parse_value(x[0])
     b = util.parse_value(y[0])
 
-    if isinstance(a, nodes.FP_Quantity) and isinstance(b, nodes.FP_Quantity):
-        y_unit = getattr(b, 'unit', None)
-        if y_unit in nodes.FP_Quantity.mapUCUMCodeToTimeUnits.values():
-            return a.deep_equal(b)
+    if (
+        isinstance(a, nodes.FP_Quantity)
+        and isinstance(b, nodes.FP_Quantity)
+        and getattr(b, "unit", None) in nodes.FP_Quantity.mapUCUMCodeToTimeUnits.values()
+    ):
+        return a.deep_equal(b)
 
     return a == b
 
