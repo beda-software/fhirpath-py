@@ -313,7 +313,8 @@ class FP_TimeBase(FP_Type):
         return result
 
     def _calculatePrecision(self, dt_list):
-        return sum(1 for i in dt_list if i is not None)
+        return sum(all(x not in i for x in ['+', '-']) for i in dt_list if i is not None)
+
 
     def _getMatchAsList(self):
         raise NotImplementedError()
