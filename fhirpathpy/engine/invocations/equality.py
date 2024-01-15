@@ -19,7 +19,15 @@ def equality(ctx, x, y):
     if len(x) != len(y):
         return False
 
-    return util.parse_value(x[0]) == util.parse_value(y[0])
+    a = util.parse_value(x[0])
+    b = util.parse_value(y[0])
+
+    if isinstance(a, nodes.FP_Quantity) and isinstance(b, nodes.FP_Quantity):
+        y_unit = getattr(b, 'unit', None)
+        if y_unit in nodes.FP_Quantity.mapUCUMCodeToTimeUnits.values():
+            return a.deep_equal(b)
+
+    return a == b
 
 
 def normalize_string(s):

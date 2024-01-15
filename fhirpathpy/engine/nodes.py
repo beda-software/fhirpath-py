@@ -79,6 +79,17 @@ class FP_Quantity(FP_Type):
         "'ms'": "'ms'",
     }
 
+    mapUCUMCodeToTimeUnits = {
+        "'a'": "year",
+        "'mo'": "month",
+        "'wk'": "week",
+        "'d'": "day",
+        "'h'": "hour",
+        "'min'": "minute",
+        "'s'": "second",
+        "'ms'": "millisecond",
+    }
+
     """
     A map of the UCUM units that must be paired with integer values when doing arithmetic.
     """
