@@ -127,7 +127,7 @@ def make_param(ctx, parentData, node_type, param):
 
     if node_type == "AnyAtRoot":
         ctx["$this"] = ctx["$this"] if "$this" in ctx else ctx["dataRoot"]
-        return do_eval(ctx, ctx["dataRoot"], param)
+        return do_eval(ctx, ctx["$this"], param)
 
     if node_type == "Identifier":
         if param["type"] == "TermExpression":
