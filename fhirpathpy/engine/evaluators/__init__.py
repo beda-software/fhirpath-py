@@ -199,6 +199,9 @@ def create_reduce_member_invocation(model, key):
             toAdd_ = res.data.get(f"_{key}")
             if key == "extension":
                 childPath = "Extension"
+        else:
+            if key == "length":
+                toAdd = len(res.data)
 
         childPath = (
             model["path2Type"].get(childPath, childPath)
