@@ -207,11 +207,11 @@ def time_functions_test():
         lambda: datetime.datetime(year=2020, month=8, day=20, hour=17, minute=52, second=15)
     ):
         assert (
-            datetime.datetime.fromisoformat(evaluate({}, "now()")[0]).timestamp()
+            datetime.datetime.fromisoformat(evaluate({}, "now()")[0].getDateTimeMatchStr()).timestamp()
             == datetime.datetime.now().replace(tzinfo=tz_offset).timestamp()
         )
         assert evaluate({}, "today()") == ["2020-08-20"]
-        assert evaluate({}, "timeOfDay()") == ["17:52:15"]
+        assert [evaluate({}, "timeOfDay()")[0].getTimeMatchStr()] == ["17:52:15"]
 
 
 def now_function_test():
