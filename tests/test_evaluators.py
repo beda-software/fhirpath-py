@@ -202,13 +202,13 @@ def misc_functions_test(resource, path, expected):
 def time_functions_test():
     local_tz = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
 
-    tz_offset = datetime.timezone(datetime.timedelta(hours=2))
+    # tz_offset = datetime.timezone(datetime.timedelta(hours=2))
     with freeze_time(
         lambda: datetime.datetime(year=2020, month=8, day=20, hour=17, minute=52, second=15)
     ):
         assert (
             datetime.datetime.fromisoformat(evaluate({}, "now()")[0].getDateTimeMatchStr()).timestamp()
-            == datetime.datetime.now().replace(tzinfo=tz_offset).timestamp()
+            == datetime.datetime.now().replace(tzinfo=local_tz).timestamp()
         )
         assert evaluate({}, "today()") == ["2020-08-20"]
         assert [evaluate({}, "timeOfDay()")[0].getTimeMatchStr()] == ["17:52:15"]
