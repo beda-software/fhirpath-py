@@ -2,7 +2,7 @@ from fhirpathpy.engine.invocations.constants import constants
 from fhirpathpy.parser import parse
 from fhirpathpy.engine import do_eval
 from fhirpathpy.engine.util import arraify, get_data, set_paths
-from fhirpathpy.engine.nodes import FP_Type
+from fhirpathpy.engine.nodes import FP_Type, ResourceNode
 
 __title__ = "fhirpathpy"
 __version__ = "0.2.1"
@@ -72,7 +72,13 @@ def evaluate(resource, path, context={}, model=None):
     int: Description of return value
 
     """
-    node = parse(path)
+    if isinstance(path, dict):
+        node = parse(path["expression"])
+        if "base" in path:
+            resource = ResourceNode.create_node(resource, path['base'])
+    else:
+        node = parse(path)
+
     return apply_parsed_path(resource, node, context, model)
 
 
