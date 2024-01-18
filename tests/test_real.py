@@ -1,6 +1,7 @@
 from fhirpathpy import evaluate, compile
 import pickle
 
+
 def find_concept_test():
     env = {}
     env["Source"] = {
@@ -76,9 +77,7 @@ def aidbox_polimorphici_test():
         "resourceType": "QuestionnaireResponse",
         "item": {"linkId": "foo", "answer": {"value": {"Coding": {"code": 1}}}},
     }
-    assert evaluate(qr, "QuestionnaireResponse.item.answer.value.Coding") == [
-        {"code": 1}
-    ]
+    assert evaluate(qr, "QuestionnaireResponse.item.answer.value.Coding") == [{"code": 1}]
 
 
 def pickle_test():
@@ -99,9 +98,7 @@ def extension_test():
     patient = {
         "identifier": [
             {
-                "period": {
-                    "start": "2020-01-01"
-                },
+                "period": {"start": "2020-01-01"},
                 "system": "http://hl7.org/fhir/sid/us-mbi",
                 "type": {
                     "coding": [
@@ -114,20 +111,23 @@ def extension_test():
                                     "valueCoding": {
                                         "code": "current",
                                         "display": "Current",
-                                        "system": "https://bluebutton.cms.gov/resources/codesystem/identifier-currency"
-                                    }
+                                        "system": "https://bluebutton.cms.gov/resources/codesystem/identifier-currency",
+                                    },
                                 }
                             ],
-                            "system": "http://terminology.hl7.org/CodeSystem/v2-0203"
+                            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
                         }
                     ]
                 },
-                "value": "7SM0A00AA00"
+                "value": "7SM0A00AA00",
             }
         ],
-        "resourceType": "Patient"
+        "resourceType": "Patient",
     }
-    result = evaluate(patient, "Patient.identifier.where(type.coding.extension('https://bluebutton.cms.gov/resources/codesystem/identifier-currency').valueCoding.code = 'current').where(system = 'http://hl7.org/fhir/sid/us-mbi').value")
+    result = evaluate(
+        patient,
+        "Patient.identifier.where(type.coding.extension('https://bluebutton.cms.gov/resources/codesystem/identifier-currency').valueCoding.code = 'current').where(system = 'http://hl7.org/fhir/sid/us-mbi').value",
+    )
     assert result == ["7SM0A00AA00"]
 
 

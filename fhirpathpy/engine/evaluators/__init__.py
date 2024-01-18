@@ -1,3 +1,4 @@
+from decimal import Decimal
 from functools import reduce
 
 import re
@@ -14,10 +15,10 @@ def boolean_literal(ctx, parentData, node):
 
 
 def number_literal(ctx, parentData, node):
-    float_number = float(node["text"])
-    int_number = int(float_number)
+    decimal_number = Decimal(node["text"])
+    int_number = int(decimal_number)
 
-    return [int_number] if float_number == int_number else [float_number]
+    return [int_number] if decimal_number == int_number else [decimal_number]
 
 
 def identifier(ctx, parentData, node):
@@ -48,8 +49,16 @@ def union_expression(ctx, parentData, node):
     return engine.infix_invoke(ctx, "|", parentData, node["children"])
 
 
+def index_invocation(ctx, parentData, node):
+    return util.arraify(ctx["$index"])
+
+
 def this_invocation(ctx, parentData, node):
     return util.arraify(ctx["$this"])
+
+
+def total_invocation(ctx, parentData, node):
+    return util.arraify(ctx["$total"])
 
 
 def op_expression(ctx, parentData, node):
@@ -62,9 +71,7 @@ def alias_op_expression(mapFn):
         op = node["terminalNodeText"][0]
 
         if not op in mapFn:
-            raise Exception(
-                "Do not know how to alias " + op + " by " + json.dumps(mapFn)
-            )
+            raise Exception("Do not know how to alias " + op + " by " + json.dumps(mapFn))
 
         alias = mapFn[op]
         return engine.infix_invoke(ctx, alias, parentData, node["children"])
@@ -93,11 +100,10 @@ def literal_term(ctx, parentData, node):
     return [node["text"]]
 
 
-# TODO
 def external_constant_term(ctx, parent_data, node):
     ext_constant = node["children"][0]
     ext_identifier = ext_constant["children"][0]
-    varName = identifier(ctx, parent_data, ext_identifier)[0]
+    varName = identifier(ctx, parent_data, ext_identifier)[0].replace("`", "")
 
     if not varName in ctx["vars"]:
         return []
@@ -107,10 +113,18 @@ def external_constant_term(ctx, parent_data, node):
     # For convenience, we all variable values to be passed in without their array
     # wrapper.  However, when evaluating, we need to put the array back in.
 
+    if value is None:
+        return []
+
     if not isinstance(value, list):
         return [value]
 
     return value
+
+
+def match(m):
+    code = m.group(1)
+    return chr(int(code[1:], 16))
 
 
 def string_literal(ctx, parentData, node):
@@ -118,31 +132,29 @@ def string_literal(ctx, parentData, node):
     rtn = re.sub(r"^['\"]|['\"]$", "", node["text"])
 
     rtn = rtn.replace("\\'", "'")
+    rtn = rtn.replace("\\`", "`")
     rtn = rtn.replace('\\"', '"')
     rtn = rtn.replace("\\r", "\r")
     rtn = rtn.replace("\\n", "\n")
     rtn = rtn.replace("\\t", "\t")
     rtn = rtn.replace("\\f", "\f")
     rtn = rtn.replace("\\\\", "\\")
-
-    # TODO
-    #  rtn = rtn.replace(/\\(u\d{4}|.)/g, function(match, submatch) {
-    #     if (submatch.length > 1)
-    #       return String.fromCharCode('0x'+submatch.slice(1));
-    #     else
-    #       return submatch;
+    rtn = re.sub(r"\\(u\d{4})", match, rtn)
 
     return [rtn]
 
 
 def quantity_literal(ctx, parentData, node):
     valueNode = node["children"][0]
-    value = float(valueNode["terminalNodeText"][0])
+    value = Decimal(valueNode["terminalNodeText"][0])
     unitNode = valueNode["children"][0]
-    unit = unitNode.terminalNodeText[0]
+    if len(unitNode["terminalNodeText"]) > 0:
+        unit = unitNode["terminalNodeText"][0]
     # Sometimes the unit is in a child node of the child
-    if unit is not None and len(unitNode["children"]) > 0:
+    elif "children" in unitNode and len(unitNode["children"]) > 0:
         unit = unitNode["children"][0]["terminalNodeText"][0]
+    else:
+        unit = None
 
     return [nodes.FP_Quantity(value, unit)]
 
@@ -160,46 +172,42 @@ def time_literal(ctx, parentData, node):
 def create_reduce_member_invocation(model, key):
     def func(acc, res):
         res = nodes.ResourceNode.create_node(res)
-
-        childPath = ""
-        if res.path is not None:
-            childPath = res.path + "." + key
-
-        if (
-            model is not None
-            and "pathsDefinedElsewhere" in model
-            and childPath in model["pathsDefinedElsewhere"]
-        ):
-            childPath = model["pathsDefinedElsewhere"][childPath]
+        childPath = f"{res.path}.{key}" if res.path else f"_.{key}"
 
         actualTypes = None
-
-        if (
-            model is not None
-            and "choiceTypePaths" in model
-            and childPath in model["choiceTypePaths"]
-        ):
-            actualTypes = model["choiceTypePaths"][childPath]
-
         toAdd = None
         toAdd_ = None
 
-        if isinstance(actualTypes, list):
+        if isinstance(model, dict):
+            childPath = model["pathsDefinedElsewhere"].get(childPath, childPath)
+            actualTypes = model["choiceTypePaths"].get(childPath)
+
+        if isinstance(res.data, nodes.FP_Quantity):
+            toAdd = res.data.value
+
+        if actualTypes and isinstance(res.data, dict):
             # Use actualTypes to find the field's value
             for actualType in actualTypes:
-                field = key + actualType
-                if isinstance(res.data, (dict, list)):
-                    toAdd = res.data.get(field)
-                    toAdd_ = res.data.get(f"_{field}")
-                    if toAdd is not None or toAdd_ is not None:
-                        childPath = actualType
-                        break
+                field = f"{key}{actualType}"
+                toAdd = res.data.get(field)
+                toAdd_ = res.data.get(f"_{field}")
+                if toAdd is not None or toAdd_ is not None:
+                    childPath += actualType
+                    break
+        elif isinstance(res.data, dict):
+            toAdd = res.data.get(key)
+            toAdd_ = res.data.get(f"_{key}")
+            if key == "extension":
+                childPath = "Extension"
         else:
-            if isinstance(res.data, (dict, list)):
-                toAdd = res.data.get(key)
-                toAdd_ = res.data.get(f"_{key}")
-                if key == 'extension':
-                    childPath = 'Extension'
+            if key == "length":
+                toAdd = len(res.data)
+
+        childPath = (
+            model["path2Type"].get(childPath, childPath)
+            if isinstance(model, dict) and "path2Type" in model
+            else childPath
+        )
 
         if util.is_some(toAdd):
             if isinstance(toAdd, list):
@@ -219,7 +227,7 @@ def create_reduce_member_invocation(model, key):
 
 
 def member_invocation(ctx, parentData, node):
-    key = engine.do_eval(ctx, parentData, node["children"][0])[0]
+    key = engine.do_eval(ctx, parentData, node["children"][0])[0].replace("`", "")
     model = ctx["model"]
 
     if isinstance(parentData, list):
@@ -307,6 +315,8 @@ evaluators = {
     "ThisInvocation": this_invocation,
     "MemberInvocation": member_invocation,
     "FunctionInvocation": function_invocation,
+    "IndexInvocation": index_invocation,
+    "TotalInvocation": total_invocation,
     # expressions
     "PolarityExpression": polarity_expression,
     "IndexerExpression": indexer_expression,
@@ -317,6 +327,7 @@ evaluators = {
     "InequalityExpression": op_expression,
     "AdditiveExpression": op_expression,
     "MultiplicativeExpression": op_expression,
+    "TypeExpression": alias_op_expression({"is": "isOp", "as": "asOp"}),
     "EqualityExpression": op_expression,
     "OrExpression": op_expression,
     "ImpliesExpression": op_expression,

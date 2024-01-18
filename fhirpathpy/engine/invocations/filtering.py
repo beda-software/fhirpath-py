@@ -1,3 +1,4 @@
+from decimal import Decimal
 import numbers
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
@@ -22,14 +23,27 @@ def where_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
-    return util.flatten([x for x in data if check_macro_expr(expr, x)])
+    result = []
+
+    for i, x in enumerate(data):
+        ctx["$index"] = i
+        if check_macro_expr(expr, x):
+            result.append(x)
+
+    return util.flatten(result)
 
 
 def select_macro(ctx, data, expr):
     if not isinstance(data, list):
         return []
 
-    return util.flatten([expr(x) for x in data])
+    result = []
+
+    for i, x in enumerate(data):
+        ctx["$index"] = i
+        result.append(expr(x))
+
+    return util.flatten(result)
 
 
 def repeat_macro(ctx, data, expr):
@@ -42,11 +56,15 @@ def repeat_macro(ctx, data, expr):
     next = None
     lres = None
 
+    uniq = set()
+
     while len(items) != 0:
         next = items[0]
         items = items[1:]
-        lres = expr(next)
-        if lres:
+        lres = [l for l in expr(next) if l not in uniq]
+        if len(lres) > 0:
+            for l in lres:
+                uniq.add(l)
             res = res + lres
             items = items + lres
 
@@ -95,27 +113,8 @@ def skip_fn(ctx, x, n):
     return x[int(n) :]
 
 
-def check_fhir_type(ctx, x, tp):
-    if tp == "string" and type(x) == str:
-        return True
-
-    if tp == "boolean" and type(x) == bool:
-        return True
-
-    if tp == "object":
-        return isinstance(x, dict)
-
-    if tp == "integer" and type(x) == int:
-        return True
-
-    if tp == "decimal" and (type(x) == int or type(x) == float):
-        return True
-
-    return False
-
-
 def of_type_fn(ctx, coll, tp):
-    return list(filter(lambda x: check_fhir_type(ctx, util.get_data(x), tp), coll))
+    return [value for value in coll if nodes.TypeInfo.from_value(value).is_(tp)]
 
 
 def extension(ctx, data, url):

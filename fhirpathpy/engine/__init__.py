@@ -1,6 +1,7 @@
 import json
 import numbers
 import fhirpathpy.engine.util as util
+from fhirpathpy.engine.nodes import TypeInfo
 from fhirpathpy.engine.evaluators import evaluators
 from fhirpathpy.engine.invocations import invocations
 
@@ -62,6 +63,9 @@ def doInvoke(ctx, fn_name, data, raw_params):
 
         raise Exception(fn_name + " expects no params")
 
+    if invocation["fn"].__name__ == "trace_fn" and raw_params is not None:
+        raw_params = raw_params[:1]
+
     paramsNumber = 0
     if isinstance(raw_params, list):
         paramsNumber = len(raw_params)
@@ -89,6 +93,21 @@ def doInvoke(ctx, fn_name, data, raw_params):
     return util.arraify(res)
 
 
+def type_specifier(ctx, parent_data, node):
+    identifiers = node["text"].replace("`", "").split(".")
+    namespace = None
+    name = None
+
+    if len(identifiers) == 2:
+        namespace, name = identifiers
+    elif len(identifiers) == 1:
+        (name,) = identifiers
+    else:
+        raise Exception(f"Expected TypeSpecifier node, got {node}")
+
+    return TypeInfo(name=name, namespace=namespace)
+
+
 param_check_table = {
     "Integer": check_integer_param,
     "Number": check_number_param,
@@ -98,7 +117,6 @@ param_check_table = {
 
 
 def make_param(ctx, parentData, node_type, param):
-
     if node_type == "Expr":
 
         def func(data):
@@ -108,14 +126,17 @@ def make_param(ctx, parentData, node_type, param):
         return func
 
     if node_type == "AnyAtRoot":
-        ctx["$this"] = ctx["$this"] if "$this" in ctx else ctx['dataRoot']
-        return do_eval(ctx, ctx["dataRoot"], param)
+        ctx["$this"] = ctx["$this"] if "$this" in ctx else ctx["dataRoot"]
+        return do_eval(ctx, ctx["$this"], param)
 
     if node_type == "Identifier":
         if param["type"] == "TermExpression":
             return param["text"]
 
         raise Exception("Expected identifier node, got " + json.dumps(param))
+
+    if node_type == "TypeSpecifier":
+        return type_specifier(ctx, parentData, param)
 
     ctx["$this"] = parentData
     res = do_eval(ctx, parentData, param)
@@ -131,10 +152,7 @@ def make_param(ctx, parentData, node_type, param):
 
     if len(res) > 1:
         raise Exception(
-            "Unexpected collection"
-            + json.dumps(res)
-            + "; expected singleton of type "
-            + node_type
+            "Unexpected collection" + json.dumps(res) + "; expected singleton of type " + node_type
         )
 
     if len(res) == 0:

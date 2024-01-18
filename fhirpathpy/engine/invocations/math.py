@@ -1,4 +1,5 @@
-import math
+from decimal import Decimal
+from fhirpathpy.engine.invocations.equality import remove_duplicate_extension
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
 
@@ -15,11 +16,17 @@ def is_empty(x):
 
 def ensure_number_singleton(x):
     data = util.get_data(x)
+    if isinstance(data, float):
+        data = Decimal(data)
+
     if not util.is_number(data):
         if not isinstance(data, list) or len(data) != 1:
             raise Exception("Expected list with number, but got " + str(data))
 
         value = util.get_data(data[0])
+
+        if isinstance(value, float):
+            value = Decimal(value)
 
         if not util.is_number(value):
             raise Exception("Expected number, but got " + str(x))
@@ -29,19 +36,33 @@ def ensure_number_singleton(x):
 
 
 def amp(ctx, x="", y=""):
+    if isinstance(x, list) and not x:
+        x = ""
+    if isinstance(y, list) and not y:
+        y = ""
     return x + y
 
 
-def minus(ctx, xs, ys):
-    if len(xs) == 1 and len(ys) == 1:
-        x = util.get_data(xs[0])
-        y = util.get_data(ys[0])
+def minus(ctx, xs_, ys_):
+    xs = remove_duplicate_extension(xs_)
+    ys = remove_duplicate_extension(ys_)
 
-        if util.is_number(x) and util.is_number(y):
-            return x - y
+    if len(xs) != 1 or len(ys) != 1:
+        raise Exception("Cannot " + str(xs) + " - " + str(ys))
 
-        if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
-            return x.plus(nodes.FP_Quantity(-y.value, y.unit))
+    x = util.get_data(util.val_data_converted(xs[0]))
+    y = util.get_data(util.val_data_converted(ys[0]))
+
+    if util.is_number(x) and util.is_number(y):
+        return x - y
+
+    if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
+        return x.plus(nodes.FP_Quantity(-y.value, y.unit))
+
+    if isinstance(x, str) and isinstance(y, nodes.FP_Quantity):
+        x_ = nodes.FP_TimeBase.get_match_data(x)
+        if x_ is not None:
+            return x_.plus(nodes.FP_Quantity(-y.value, y.unit))
 
     raise Exception("Cannot " + str(xs) + " - " + str(ys))
 
@@ -51,25 +72,35 @@ def mul(ctx, x, y):
 
 
 def div(ctx, x, y):
+    if y == 0:
+        return []
     return x / y
 
 
 def intdiv(ctx, x, y):
+    if y == 0:
+        return []
     return int(x / y)
 
 
 def mod(ctx, x, y):
+    if y == 0:
+        return []
+
     return x % y
 
 
 # HACK: for only polymorphic function
 # Actually, "minus" is now also polymorphic
-def plus(ctx, xs, ys):
+def plus(ctx, xs_, ys_):
+    xs = remove_duplicate_extension(xs_)
+    ys = remove_duplicate_extension(ys_)
+
     if len(xs) != 1 or len(ys) != 1:
         raise Exception("Cannot " + str(xs) + " + " + str(ys))
 
-    x = util.get_data(xs[0])
-    y = util.get_data(ys[0])
+    x = util.get_data(util.val_data_converted(xs[0]))
+    y = util.get_data(util.val_data_converted(ys[0]))
 
     """
     In the future, this and other functions might need to return ResourceNode
@@ -77,7 +108,7 @@ def plus(ctx, xs, ys):
     vs string if decimals are represented as strings), in order to support
     "as" and "is", but that support is deferred for now.
     """
-    if type(x) == str and type(y) == str:
+    if isinstance(x, str) and isinstance(y, str):
         return x + y
 
     if util.is_number(x) and util.is_number(y):
@@ -86,33 +117,40 @@ def plus(ctx, xs, ys):
     if isinstance(x, nodes.FP_TimeBase) and isinstance(y, nodes.FP_Quantity):
         return x.plus(y)
 
+    if isinstance(x, str) and isinstance(y, nodes.FP_Quantity):
+        x_ = nodes.FP_TimeBase.get_match_data(x)
+        if x_ is not None:
+            return x_.plus(y)
+
+    raise Exception("Cannot " + str(xs) + " + " + str(ys))
+
 
 def abs(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return math.fabs(num)
+    return Decimal(num).copy_abs()
 
 
 def ceiling(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return math.ceil(num)
+    return Decimal(num).to_integral_value(rounding="ROUND_CEILING")
 
 
 def exp(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return math.exp(num)
+    return Decimal(num).exp()
 
 
 def floor(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return math.floor(num)
+    return Decimal(num).to_integral_value(rounding="ROUND_FLOOR")
 
 
 def ln(ctx, x):
@@ -120,42 +158,42 @@ def ln(ctx, x):
         return []
 
     num = ensure_number_singleton(x)
-    return math.log(num)
+    return Decimal(num).ln()
 
 
 def log(ctx, x, base):
     if is_empty(x) or is_empty(base):
         return []
 
-    num = ensure_number_singleton(x)
-    num2 = ensure_number_singleton(base)
+    num = Decimal(ensure_number_singleton(x))
+    num2 = Decimal(ensure_number_singleton(base))
 
-    return math.log(num, num2)
+    return (num.ln() / num2.ln()).quantize(Decimal("1.000000000000000"))
 
 
 def power(ctx, x, degree):
     if is_empty(x) or is_empty(degree):
         return []
 
-    num = ensure_number_singleton(x)
-    num2 = ensure_number_singleton(degree)
+    num = Decimal(ensure_number_singleton(x))
+    num2 = Decimal(ensure_number_singleton(degree))
 
-    if num < 0 or math.floor(num2) != num2:
+    if num < 0 or num2.to_integral_value(rounding="ROUND_FLOOR") != num2:
         return []
 
-    return math.pow(num, num2)
+    return pow(num, num2)
 
 
 def rround(ctx, x, acc):
     if is_empty(x):
         return []
 
-    num = ensure_number_singleton(x)
+    num = Decimal(ensure_number_singleton(x))
     if is_empty(acc):
         return round(num)
 
     num2 = ensure_number_singleton(acc)
-    degree = math.pow(10, num2)
+    degree = 10 ** Decimal(num2)
 
     return round(num * degree) / degree
 
@@ -168,11 +206,11 @@ def sqrt(ctx, x):
     if num < 0:
         return []
 
-    return math.sqrt(num)
+    return Decimal(num).sqrt()
 
 
 def truncate(ctx, x):
     if is_empty(x):
         return []
     num = ensure_number_singleton(x)
-    return math.trunc(num)
+    return Decimal(num).to_integral_value(rounding="ROUND_DOWN")

@@ -1,8 +1,9 @@
 import json
 import yaml
 import pytest
+from fhirpathpy.engine.nodes import FP_Quantity
 
-from tests.context import models
+from fhirpathpy.models import models
 from tests.resources import resources
 from fhirpathpy import evaluate
 
@@ -27,31 +28,40 @@ class YamlFile(pytest.File):
 
         return any(key.startswith("group") for key in test.keys())
 
-    def collect_tests(self, suites, subject):
+    def collect_tests(self, suites, subject, is_group_disabled=False):
         for suite in suites:
+            current_group_disabled = is_group_disabled or suite.get("disable", False)
             if self.is_group(suite):
                 name = next(iter(suite))
                 tests = suite[name]
-                for test in self.collect_tests(tests, subject):
+                for test in self.collect_tests(tests, subject, current_group_disabled):
                     yield test
             else:
-                for test in self.collect_test(suite, subject):
+                for test in self.collect_test(suite, subject, current_group_disabled):
                     yield test
 
-    def collect_test(self, test, subject):
+    def collect_test(self, test, subject, is_group_disabled):
         name = test["desc"] if "desc" in test else ""
-        is_disabled = "disable" in test and test["disable"]
+        is_disabled = (
+            is_group_disabled if is_group_disabled else "disable" in test and test["disable"]
+        )
 
         if "expression" in test and not is_disabled:
             if isinstance(test["expression"], list):
                 for expression in test["expression"]:
                     test["expression"] = expression
                     yield YamlItem.from_parent(
-                        self, name=name, test=test, resource=subject,
+                        self,
+                        name=name,
+                        test=test,
+                        resource=subject,
                     )
             else:
                 yield YamlItem.from_parent(
-                    self, name=name, test=test, resource=subject,
+                    self,
+                    name=name,
+                    test=test,
+                    resource=subject,
                 )
 
 
@@ -63,7 +73,6 @@ class YamlItem(pytest.Item):
         self.resource = resource
 
     def runtest(self):
-
         expression = self.test["expression"]
         resource = self.resource
 
@@ -81,10 +90,24 @@ class YamlItem(pytest.Item):
         if "variables" in self.test:
             variables.update(self.test["variables"])
 
-        if "error" in self.test and self.test["error"]:
+        if "error" in self.test and self.test["error"] is True:
             with pytest.raises(Exception):
-                evaluate(resource, expression, variables, model)
+                raise Exception(self.test["desc"])
         else:
-            assert (
-                evaluate(resource, expression, variables, model) == self.test["result"]
-            )
+            result = evaluate(resource, expression, variables, model)
+            compare(result, self.test["result"])
+
+
+def compare(l1, l2):
+    # TODO REFACTOR
+    if l1 == l2:
+        assert True
+    elif len(l1) == len(l2) == 1:
+        e1 = l1[0]
+        e2 = evaluate({}, l2[0])[0] if isinstance(l2[0], str) else l2[0]
+        if isinstance(e1, FP_Quantity) and isinstance(e2, FP_Quantity):
+            assert e1 == e2
+        else:
+            assert str(e1) == str(e2)
+    else:
+        assert False, f"{l1} != {l2}"

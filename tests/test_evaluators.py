@@ -1,5 +1,5 @@
 import datetime
-import math
+from decimal import Decimal
 import pytest
 from freezegun import freeze_time
 
@@ -57,12 +57,12 @@ def simple_logic_expressions_test(resource, path, expected):
         ({"a": 42.75}, "a.floor()", [42]),
         ({"a": 42.25}, "a.round(-1)", [40]),
         ({"a": 42.25}, "a.round(0)", [42]),
-        ({"a": 42.25}, "a.round(1)", [42.2]),
+        ({"a": 42.25}, "a.round(1)", [Decimal("42.2")]),
         ({"a": 9}, "a.sqrt()", [3]),
-        ({"a": 3}, "a.exp()", [math.exp(3)]),
-        ({"a": 3}, "a.ln()", [math.log(3)]),
-        ({"a": 3}, "a.log(3)", [math.log(3, 3)]),
-        ({"a": 3}, "a.truncate()", [math.trunc(3)]),
+        ({"a": 3}, "a.exp()", [Decimal(3).exp()]),
+        ({"a": 3}, "a.ln()", [Decimal(3).ln()]),
+        ({"a": 3}, "a.log(3)", [Decimal(3).ln() / Decimal(3).ln()]),
+        ({"a": 3}, "a.truncate()", [Decimal(3).to_integral_value(rounding="ROUND_DOWN")]),
     ],
 )
 def math_functions_test(resource, path, expected):
@@ -119,7 +119,7 @@ def filtering_functions_test(resource, path, expected):
     [
         ({"list_1": [1, 2, 3, 4], "list_2": [3, 5]}, "list_1.intersect([list_2])", [3]),
         ({"list_1": [1, 2, 3, 4], "list_2": [0, 10]}, "list_1.intersect(list_2)", []),
-        ({}, "(1 | 2 | 3).intersect(2 | 4)", [2])
+        ({}, "(1 | 2 | 3).intersect(2 | 4)", [2]),
     ],
 )
 def subsetting_functions_test(resource, path, expected):
@@ -198,21 +198,28 @@ def existence_functions_test(resource, path, expected):
 def misc_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
+
 def time_functions_test():
     local_tz = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
 
-    tz_offset = datetime.timedelta(hours=3)
-    with freeze_time(lambda: datetime.datetime(year=2020, month=8, day=20, hour=17, minute=52, second=15)):
-        assert datetime.datetime.fromisoformat(evaluate({}, 'now()')[0]).timestamp() == datetime.datetime.now().replace(tzinfo=local_tz).timestamp()
-        assert evaluate({}, 'today()') == ["2020-08-20"]
-        assert evaluate({}, 'timeOfDay()') == ["17:52:15"]
+    # tz_offset = datetime.timezone(datetime.timedelta(hours=2))
+    with freeze_time(
+        lambda: datetime.datetime(year=2020, month=8, day=20, hour=17, minute=52, second=15)
+    ):
+        assert (
+            datetime.datetime.fromisoformat(str(evaluate({}, "now()")[0])).timestamp()
+            == datetime.datetime.now().replace(tzinfo=local_tz).timestamp()
+        )
+        assert evaluate({}, "today()") == ["2020-08-20"]
+        assert evaluate({}, "timeOfDay()") == ["17:52:15"]
+
 
 def now_function_test():
     with freeze_time(lambda: datetime.datetime(2020, 8, 20)) as frozen_datetime:
-        old_now_value = evaluate({}, 'now()')
+        old_now_value = evaluate({}, "now()")
         frozen_datetime.tick(1.0)
-        new_now_value = evaluate({}, 'now()')
-    
+        new_now_value = evaluate({}, "now()")
+
     assert old_now_value != new_now_value
 
 
