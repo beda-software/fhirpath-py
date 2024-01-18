@@ -3,7 +3,7 @@ import yaml
 import pytest
 from fhirpathpy.engine.nodes import FP_Quantity
 
-from tests.context import models
+from fhirpathpy.models import models
 from tests.resources import resources
 from fhirpathpy import evaluate
 
