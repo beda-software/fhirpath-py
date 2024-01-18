@@ -37,7 +37,7 @@ license = { file = "LICENSE.md" }
 keywords = ["fhir", "fhirpath"]
 dynamic = ["version"]
 authors = [{ name = "beda.software", email = "fhirpath@beda.software" }]
-dependencies = ["antlr4-python3-runtime==4.13.1"]
+dependencies = ["antlr4-python3-runtime~=4.10"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
