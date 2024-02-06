@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
-from dateutil import parser
+from dateutil import parser, tz
 from decimal import ROUND_HALF_UP, ROUND_UP, Decimal
 import math
 import json
@@ -313,8 +313,7 @@ class FP_TimeBase(FP_Type):
         return result
 
     def _calculatePrecision(self, dt_list):
-        return sum(all(x not in i for x in ['+', '-']) for i in dt_list if i is not None)
-
+        return sum(all(x not in i for x in ["+", "-"]) for i in dt_list if i is not None)
 
     def _getMatchAsList(self):
         raise NotImplementedError()
@@ -636,7 +635,7 @@ class FP_Time(FP_TimeBase):
         return self.asStr
 
     def __eq__(self, other):
-        if (isinstance(other, str)):
+        if isinstance(other, str):
             return self.getTimeMatchStr()
 
     def getTimeMatchStr(self):
@@ -724,7 +723,7 @@ class FP_DateTime(FP_TimeBase):
         return self.asStr
 
     def __eq__(self, other):
-        if (isinstance(other, str)):
+        if isinstance(other, str):
             return self.getDateTimeMatchStr()
 
     def getDateTimeMatchStr(self):
@@ -761,7 +760,10 @@ class FP_DateTime(FP_TimeBase):
 
         return integer_result
 
-    def _extractDateByPrecision(self, date_obj, precision):
+    def _extractDateByPrecision(self, date_obj: datetime, precision):
+        if date_obj.tzinfo is None or date_obj.tzinfo.utcoffset(date_obj) is None:
+            date_obj = date_obj.replace(tzinfo=tz.tzutc())
+
         format = {
             1: "%Y",
             2: "%Y-%m",
@@ -769,9 +771,20 @@ class FP_DateTime(FP_TimeBase):
             4: "%Y-%m-%dT%H",
             5: "%Y-%m-%dT%H:%M",
             6: "%Y-%m-%dT%H:%M:%S",
-            7: "%Y-%m-%dT%H:%M:%S.%f",
+            7: "%Y-%m-%dT%H:%M:%S",
         }
-        return date_obj.strftime(format.get(precision)) if precision in format else None
+
+        formatted_date = date_obj.strftime(format.get(precision, ""))
+
+        if precision == 7:
+            milliseconds = date_obj.strftime("%f")[:3]
+
+            tz_offset = date_obj.strftime("%z")
+            tz_formatted = tz_offset[:3] + ":" + tz_offset[3:]
+
+            formatted_date = f"{formatted_date}.{milliseconds}{tz_formatted}"
+
+        return formatted_date
 
     def _convertDatetime(self, date_list):
         n_date_list = self._normalize_datetime(date_list)
@@ -854,8 +867,8 @@ class ResourceNode:
             data = FP_TimeBase.check_string(cls, data) or data
         if isinstance(data, dict) and data["system"] == "http://unitsofmeasure.org":
             data = FP_Quantity(
-                data['value'],
-                FP_Quantity.timeUnitsToUCUM.get(data['code'], "'" + data['code'] + "'")
+                data["value"],
+                FP_Quantity.timeUnitsToUCUM.get(data["code"], "'" + data["code"] + "'"),
             )
         return data
 
