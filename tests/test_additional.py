@@ -1,3 +1,4 @@
+import copy
 import datetime
 from freezegun import freeze_time
 import pytest
@@ -38,3 +39,15 @@ def path_functions_test(resource, path):
     with pytest.raises(Exception) as e:
         evaluate(resource, path)
     assert str(e.value) == "to_date called for a collection of length 2"
+
+
+def copy_deepcopy_test():
+    copy_1 = copy.copy(evaluate({}, "@2018"))
+    copy_2 = evaluate({}, "@2018").copy()
+
+    result = evaluate({}, "@2018")
+    deepcopy_1 = copy.deepcopy(result)
+
+    assert copy_1[0] == "2018"
+    assert copy_2[0] == "2018"
+    assert deepcopy_1[0] == "2018"

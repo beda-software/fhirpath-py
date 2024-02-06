@@ -1,3 +1,4 @@
+import copy
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
 from dateutil import parser, tz
@@ -725,6 +726,9 @@ class FP_DateTime(FP_TimeBase):
     def __eq__(self, other):
         if isinstance(other, str):
             return self.getDateTimeMatchStr()
+
+    def __deepcopy__(self, memo):
+        return type(self)(copy.deepcopy(self.asStr, memo))
 
     def getDateTimeMatchStr(self):
         return self._dateTimeMatchStr
