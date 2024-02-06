@@ -1,5 +1,6 @@
 import datetime
 from freezegun import freeze_time
+import pytest
 from fhirpathpy import evaluate
 
 
@@ -19,3 +20,21 @@ def datetime_tostring_tzinfo_test():
         )
     ):
         assert evaluate({}, "(now() + 1 month).toString()")[0] == "2020-09-20T17:52:15.123+00:00"
+
+
+@pytest.mark.parametrize(
+    ("resource", "path"),
+    [
+        (
+            {
+                "resourceType": "Patient",
+                "name": [{"given": ["First", "Middle"], "family": "Last"}],
+            },
+            "Patient.name.given.toDate()",
+        ),
+    ],
+)
+def path_functions_test(resource, path):
+    with pytest.raises(Exception) as e:
+        evaluate(resource, path)
+    assert str(e.value) == "to_date called for a collection of length 2"

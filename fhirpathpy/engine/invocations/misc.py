@@ -127,7 +127,7 @@ def to_date_time(ctx, coll):
     ln = len(coll)
     rtn = []
     if ln > 1:
-        raise Exception("to_date_time called for a collection of length " + ln)
+        raise Exception("to_date_time called for a collection of length " + str(ln))
 
     if ln == 1:
         value = util.get_data(coll[0])
@@ -144,7 +144,7 @@ def to_time(ctx, coll):
     ln = len(coll)
     rtn = []
     if ln > 1:
-        raise Exception("to_time called for a collection of length " + ln)
+        raise Exception("to_time called for a collection of length " + str(ln))
 
     if ln == 1:
         value = util.get_data(coll[0])
@@ -162,7 +162,7 @@ def to_date(ctx, coll):
     rtn = []
 
     if ln > 1:
-        raise Exception("to_date called for a collection of length " + ln)
+        raise Exception("to_date called for a collection of length " + str(ln))
 
     if ln == 1:
         value = util.get_data(coll[0])
