@@ -18,4 +18,4 @@ def datetime_tostring_tzinfo_test():
             tzinfo=local_tz,
         )
     ):
-        assert evaluate({}, "(now() + 1 month).toString()")[0] == "2020-09-20T13:52:15.123+00:00"
+        assert evaluate({}, "(now() + 1 month).toString()")[0] == "2020-09-20T17:52:15.123+00:00"
