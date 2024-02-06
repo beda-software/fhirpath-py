@@ -763,7 +763,6 @@ class FP_DateTime(FP_TimeBase):
     def _extractDateByPrecision(self, date_obj: datetime, precision):
         if date_obj.tzinfo is None or date_obj.tzinfo.utcoffset(date_obj) is None:
             date_obj = date_obj.replace(tzinfo=tz.tzutc())
-
         format = {
             1: "%Y",
             2: "%Y-%m",
@@ -773,17 +772,12 @@ class FP_DateTime(FP_TimeBase):
             6: "%Y-%m-%dT%H:%M:%S",
             7: "%Y-%m-%dT%H:%M:%S",
         }
-
         formatted_date = date_obj.strftime(format.get(precision, ""))
-
         if precision == 7:
             milliseconds = date_obj.strftime("%f")[:3]
-
             tz_offset = date_obj.strftime("%z")
             tz_formatted = tz_offset[:3] + ":" + tz_offset[3:]
-
             formatted_date = f"{formatted_date}.{milliseconds}{tz_formatted}"
-
         return formatted_date
 
     def _convertDatetime(self, date_list):
