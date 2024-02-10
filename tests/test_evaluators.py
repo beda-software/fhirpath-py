@@ -220,7 +220,9 @@ def misc_functions_test(resource, path, expected):
     ],
 )
 def datetime_json_serialization_test(expression: str, expected_json: str):
-    with mock.patch("fhirpathpy.engine.invocations.datetime.datetime") as datetime_mock:
+    with mock.patch(
+        "fhirpathpy.engine.invocations.datetime.systemtime"
+    ) as datetime_mock:
         datetime_mock.now.return_value = datetime(
             2020, 8, 20, 17, 52, 15, 123000, tzinfo=timezone.utc
         )
@@ -228,7 +230,9 @@ def datetime_json_serialization_test(expression: str, expected_json: str):
 
 
 def now_function_test():
-    with mock.patch("fhirpathpy.engine.invocations.datetime.datetime") as datetime_mock:
+    with mock.patch(
+        "fhirpathpy.engine.invocations.datetime.systemtime"
+    ) as datetime_mock:
         datetime_mock.now.side_effect = [
             datetime(2020, 8, 20, 17, 52, 15, 123000, tzinfo=timezone.utc),
             datetime(2020, 8, 20, 17, 52, 16, 123000, tzinfo=timezone.utc),
