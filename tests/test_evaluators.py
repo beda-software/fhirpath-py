@@ -203,7 +203,6 @@ def misc_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
 
-@mock.patch("fhirpathpy.engine.invocations.datetime.datetime")
 @pytest.mark.parametrize(
     ("expression", "expected_json"),
     [
@@ -220,27 +219,26 @@ def misc_functions_test(resource, path, expected):
         ("today() + 1 day", '["2020-08-21"]'),
     ],
 )
-def datetime_json_serialization_test(
-    datetime_mock: mock.MagicMock, expression: str, expected_json: str
-):
-    datetime_mock.now.return_value = datetime(
-        2020, 8, 20, 17, 52, 15, 123000, tzinfo=UTC
-    )
-    assert json.dumps(evaluate({}, expression)) == expected_json
+def datetime_json_serialization_test(expression: str, expected_json: str):
+    with mock.patch("fhirpathpy.engine.invocations.datetime.datetime") as datetime_mock:
+        datetime_mock.now.return_value = datetime(
+            2020, 8, 20, 17, 52, 15, 123000, tzinfo=UTC
+        )
+        assert json.dumps(evaluate({}, expression)) == expected_json
 
 
-@mock.patch("fhirpathpy.engine.invocations.datetime.datetime")
-def now_function_test(datetime_mock: mock.MagicMock):
-    datetime_mock.now.side_effect = [
-        datetime(2020, 8, 20, 17, 52, 15, 123000, tzinfo=UTC),
-        datetime(2020, 8, 20, 17, 52, 16, 123000, tzinfo=UTC),
-    ]
-    old_now_value = evaluate({}, "now()")
-    new_now_value = evaluate({}, "now()")
+def now_function_test():
+    with mock.patch("fhirpathpy.engine.invocations.datetime.datetime") as datetime_mock:
+        datetime_mock.now.side_effect = [
+            datetime(2020, 8, 20, 17, 52, 15, 123000, tzinfo=UTC),
+            datetime(2020, 8, 20, 17, 52, 16, 123000, tzinfo=UTC),
+        ]
+        old_now_value = evaluate({}, "now()")
+        new_now_value = evaluate({}, "now()")
 
-    assert old_now_value != new_now_value
-    assert old_now_value == ["2020-08-20T17:52:15.123+00:00"]
-    assert new_now_value == ["2020-08-20T17:52:16.123+00:00"]
+        assert old_now_value != new_now_value
+        assert old_now_value == ["2020-08-20T17:52:15.123+00:00"]
+        assert new_now_value == ["2020-08-20T17:52:16.123+00:00"]
 
 
 @pytest.mark.parametrize(
