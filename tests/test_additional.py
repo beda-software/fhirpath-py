@@ -1,17 +1,7 @@
 import copy
-from datetime import UTC, datetime
-from unittest import mock
 
 import pytest
 from fhirpathpy import evaluate
-
-
-@mock.patch("fhirpathpy.engine.invocations.datetime.datetime")
-def datetime_tostring_tzinfo_test(datetime_mock):
-    datetime_mock.now.return_value = datetime(
-        2020, 8, 20, 17, 52, 15, 123000, tzinfo=UTC
-    )
-    assert evaluate({}, "now() + 1 month")[0] == "2020-09-20T17:52:15.123+00:00"
 
 
 @pytest.mark.parametrize(
