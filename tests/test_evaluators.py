@@ -1,10 +1,10 @@
-import datetime
+import json
+from datetime import datetime, UTC
+from unittest import mock
 from decimal import Decimal
 import pytest
-from freezegun import freeze_time
 
 from fhirpathpy import evaluate
-from fhirpathpy.engine.invocations.constants import constants
 
 
 @pytest.mark.parametrize(
@@ -62,7 +62,11 @@ def simple_logic_expressions_test(resource, path, expected):
         ({"a": 3}, "a.exp()", [Decimal(3).exp()]),
         ({"a": 3}, "a.ln()", [Decimal(3).ln()]),
         ({"a": 3}, "a.log(3)", [Decimal(3).ln() / Decimal(3).ln()]),
-        ({"a": 3}, "a.truncate()", [Decimal(3).to_integral_value(rounding="ROUND_DOWN")]),
+        (
+            {"a": 3},
+            "a.truncate()",
+            [Decimal(3).to_integral_value(rounding="ROUND_DOWN")],
+        ),
     ],
 )
 def math_functions_test(resource, path, expected):
@@ -199,28 +203,44 @@ def misc_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
 
-def time_functions_test():
-    local_tz = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+@mock.patch("fhirpathpy.engine.invocations.datetime.datetime")
+@pytest.mark.parametrize(
+    ("expression", "expected_json"),
+    [
+        ("now()", '["2020-08-20T17:52:15.123+00:00"]'),
+        ("now() + 1 year", '["2021-08-20T17:52:15.123+00:00"]'),
+        ("now() + 1 month", '["2020-09-20T17:52:15.123+00:00"]'),
+        ("now() + 1 day", '["2020-08-21T17:52:15.123+00:00"]'),
+        ("now() + 1 hour", '["2020-08-20T18:52:15.123+00:00"]'),
+        ("now() + 1 minute", '["2020-08-20T17:53:15.123+00:00"]'),
+        ("now() + 1 second", '["2020-08-20T17:52:16.123+00:00"]'),
+        ("now().toString()", '["2020-08-20T17:52:15.123+00:00"]'),
+        ("timeOfDay()", '["17:52:15.123"]'),
+        ("today()", '["2020-08-20"]'),
+        ("today() + 1 day", '["2020-08-21"]'),
+    ],
+)
+def datetime_json_serialization_test(
+    datetime_mock: mock.MagicMock, expression: str, expected_json: str
+):
+    datetime_mock.now.return_value = datetime(
+        2020, 8, 20, 17, 52, 15, 123000, tzinfo=UTC
+    )
+    assert json.dumps(evaluate({}, expression)) == expected_json
 
-    # tz_offset = datetime.timezone(datetime.timedelta(hours=2))
-    with freeze_time(
-        lambda: datetime.datetime(year=2020, month=8, day=20, hour=17, minute=52, second=15)
-    ):
-        assert (
-            datetime.datetime.fromisoformat(str(evaluate({}, "now()")[0])).timestamp()
-            == datetime.datetime.now().replace(tzinfo=local_tz).timestamp()
-        )
-        assert evaluate({}, "today()") == ["2020-08-20"]
-        assert evaluate({}, "timeOfDay()") == ["17:52:15"]
 
-
-def now_function_test():
-    with freeze_time(lambda: datetime.datetime(2020, 8, 20)) as frozen_datetime:
-        old_now_value = evaluate({}, "now()")
-        frozen_datetime.tick(1.0)
-        new_now_value = evaluate({}, "now()")
+@mock.patch("fhirpathpy.engine.invocations.datetime.datetime")
+def now_function_test(datetime_mock: mock.MagicMock):
+    datetime_mock.now.side_effect = [
+        datetime(2020, 8, 20, 17, 52, 15, 123000, tzinfo=UTC),
+        datetime(2020, 8, 20, 17, 52, 16, 123000, tzinfo=UTC),
+    ]
+    old_now_value = evaluate({}, "now()")
+    new_now_value = evaluate({}, "now()")
 
     assert old_now_value != new_now_value
+    assert old_now_value == ["2020-08-20T17:52:15.123+00:00"]
+    assert new_now_value == ["2020-08-20T17:52:16.123+00:00"]
 
 
 @pytest.mark.parametrize(
