@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 from unittest import mock
 from decimal import Decimal
 import pytest
@@ -222,7 +222,7 @@ def misc_functions_test(resource, path, expected):
 def datetime_json_serialization_test(expression: str, expected_json: str):
     with mock.patch("fhirpathpy.engine.invocations.datetime.datetime") as datetime_mock:
         datetime_mock.now.return_value = datetime(
-            2020, 8, 20, 17, 52, 15, 123000, tzinfo=UTC
+            2020, 8, 20, 17, 52, 15, 123000, tzinfo=timezone.utc
         )
         assert json.dumps(evaluate({}, expression)) == expected_json
 
@@ -230,8 +230,8 @@ def datetime_json_serialization_test(expression: str, expected_json: str):
 def now_function_test():
     with mock.patch("fhirpathpy.engine.invocations.datetime.datetime") as datetime_mock:
         datetime_mock.now.side_effect = [
-            datetime(2020, 8, 20, 17, 52, 15, 123000, tzinfo=UTC),
-            datetime(2020, 8, 20, 17, 52, 16, 123000, tzinfo=UTC),
+            datetime(2020, 8, 20, 17, 52, 15, 123000, tzinfo=timezone.utc),
+            datetime(2020, 8, 20, 17, 52, 16, 123000, tzinfo=timezone.utc),
         ]
         old_now_value = evaluate({}, "now()")
         new_now_value = evaluate({}, "now()")
