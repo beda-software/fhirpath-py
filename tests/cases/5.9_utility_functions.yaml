@@ -29,10 +29,15 @@ tests:
             result:
               - true
 
-          - desc: '** should return type System.Time'
-            expression: timeOfDay().is(System.Time)
-            result:
-              - true
+          # TODO: While we don't have a standard method for json serializing Date/Time/DateTime
+          #       objects those utility functions return string representation instead.
+          #       Otherwise we would have to use .toString() each time we access 'now()'.
+          #       Return typechecks back once we decide on how to deal with json serialization.
+          #
+          # - desc: '** should return type System.Time'
+          #   expression: timeOfDay().is(System.Time)
+          #   result:
+          #     - true
 
 subject:
   coll:
