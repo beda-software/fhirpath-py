@@ -1,3 +1,18 @@
+from datetime import datetime
+
+
+class SystemTime:
+    """
+    System date/time should not change during an evaluation of a FHIRPath
+    expression. It remains the same for the entire expression evaluation.
+    """
+
+    expressionExecutionDateTime = datetime.now()
+
+    def now(self):
+        return self.expressionExecutionDateTime
+
+
 class Constants:
     """
     These are values that should not change during an evaluation of a FHIRPath
@@ -18,3 +33,4 @@ class Constants:
 
 
 constants = Constants()
+systemtime = SystemTime()

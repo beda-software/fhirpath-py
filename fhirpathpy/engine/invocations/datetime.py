@@ -1,6 +1,4 @@
-from datetime import datetime as systemtime
-
-from fhirpathpy.engine.invocations.constants import constants
+from fhirpathpy.engine.invocations.constants import constants, systemtime
 from fhirpathpy.engine.nodes import FP_DateTime, FP_Time
 
 
