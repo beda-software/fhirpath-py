@@ -3,7 +3,7 @@ import numbers
 import fhirpathpy.engine.util as util
 from fhirpathpy.engine.nodes import TypeInfo
 from fhirpathpy.engine.evaluators import evaluators
-from fhirpathpy.engine.invocations import invocations
+from fhirpathpy.engine.invocations import invocation_registry
 
 
 def check_integer_param(val):
@@ -48,10 +48,10 @@ def doInvoke(ctx, fn_name, data, raw_params):
     if isinstance(fn_name, list) and len(fn_name) == 1:
         fn_name = fn_name[0]
 
-    if type(fn_name) != str or not fn_name in invocations:
+    if type(fn_name) != str or not fn_name in invocation_registry:
         raise Exception("Not implemented: " + str(fn_name))
 
-    invocation = invocations[fn_name]
+    invocation = invocation_registry[fn_name]
 
     if "nullable_input" in invocation and util.is_nullable(data):
         return []
@@ -167,10 +167,10 @@ def make_param(ctx, parentData, node_type, param):
 
 
 def infix_invoke(ctx, fn_name, data, raw_params):
-    if not fn_name in invocations or not "fn" in invocations[fn_name]:
+    if not fn_name in invocation_registry or not "fn" in invocation_registry[fn_name]:
         raise Exception("Not implemented " + fn_name)
 
-    invocation = invocations[fn_name]
+    invocation = invocation_registry[fn_name]
     paramsNumber = len(raw_params)
 
     if paramsNumber != 2:

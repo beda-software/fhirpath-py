@@ -16,7 +16,7 @@ import fhirpathpy.engine.invocations.types as types
 import fhirpathpy.engine.invocations.aggregate as aggregate
 from fhirpathpy.engine.nodes import FP_DateTime, FP_Quantity, FP_Time
 
-invocations = {
+invocation_registry = {
     "empty": {"fn": existence.empty_fn},
     "not": {"fn": existence.not_fn},
     "exists": {"fn": existence.exists_macro, "arity": {0: [], 1: ["Expr"]}},
