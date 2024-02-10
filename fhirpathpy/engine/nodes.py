@@ -488,6 +488,8 @@ class FP_TimeBase(FP_Type):
                 if precision == 3:
                     days = math.floor(value / 24) if value >= 0 else math.ceil(value / 24)
                     result = date_obj + relativedelta(days=days)
+                if precision == 7:
+                    result = date_obj + timedelta(hours=value)
             if time_unit in ["minute", "second", "millisecond"]:
                 if precision == 4:
                     if time_unit == "minute":
@@ -521,6 +523,13 @@ class FP_TimeBase(FP_Type):
                             else math.ceil(value / (60 * 1000))
                         )
                         result = date_obj + relativedelta(minutes=minutes)
+                if precision == 7:
+                    if time_unit == "minute":
+                        result = date_obj + timedelta(minutes=value)
+                    if time_unit == "second":
+                        result = date_obj + timedelta(seconds=value)
+                    if time_unit == "millisecond":
+                        result = date_obj + timedelta(milliseconds=value)
             return self._extractDateByPrecision(result, precision)
         if isinstance(self, FP_Time):
             precision = self._calculateTimePrecision(dt_list)
