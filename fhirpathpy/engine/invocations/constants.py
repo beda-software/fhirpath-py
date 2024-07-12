@@ -7,10 +7,14 @@ class SystemTime:
     expression. It remains the same for the entire expression evaluation.
     """
 
-    expressionExecutionDateTime = datetime.now()
+    def __init__(self) -> None:
+        self.expressionExecutionDateTime = datetime.now()
 
     def now(self):
         return self.expressionExecutionDateTime
+
+    def reset(self):
+        self.expressionExecutionDateTime = datetime.now()
 
 
 class Constants:
@@ -30,6 +34,7 @@ class Constants:
         self.now = None
         self.timeOfDay = None
         self.localTimezoneOffset = None
+        systemtime.reset()
 
 
 constants = Constants()
