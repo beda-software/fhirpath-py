@@ -68,10 +68,6 @@ context (dict): a hash of variable name/value pairs.
 
 model (dict): The "model" data object specific to a domain, e.g. R4.
 
-**Returns**
-
-int: Description of return value
-
 ## compile
 Returns a function that takes a resource and an optional context hash (see "evaluate"), and returns the result of evaluating the given FHIRPath expression on that resource.  The advantage of this function over "evaluate" is that if you have multiple resources, the given FHIRPath expression will only be parsed once
 
