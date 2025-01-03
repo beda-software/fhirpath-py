@@ -1,3 +1,4 @@
+from collections import abc
 from decimal import Decimal
 import numbers
 import fhirpathpy.engine.util as util
@@ -121,7 +122,7 @@ def extension(ctx, data, url):
     res = []
     for d in data:
         element = util.get_data(d)
-        if isinstance(element, dict):
+        if isinstance(element, abc.Mapping):
             exts = [e for e in element.get("extension", []) if e["url"] == url]
             if len(exts) > 0:
                 res.append(nodes.ResourceNode.create_node(exts[0], "Extension"))

@@ -1,3 +1,4 @@
+from collections import abc
 from functools import reduce
 import fhirpathpy.engine.util as util
 import fhirpathpy.engine.nodes as nodes
@@ -15,7 +16,7 @@ def create_reduce_children(ctx):
         if isinstance(data, list):
             data = dict((i, data[i]) for i in range(0, len(data)))
 
-        if isinstance(data, dict):
+        if isinstance(data, abc.Mapping):
             for prop in data.keys():
                 value = data[prop]
                 childPath = ""
