@@ -1,3 +1,4 @@
+from collections import abc
 import copy
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
@@ -824,7 +825,7 @@ class ResourceNode:
         If data is a resource (maybe a contained resource) reset the path
         information to the resource type.
         """
-        if isinstance(data, dict) and "resourceType" in data:
+        if isinstance(data, abc.Mapping) and "resourceType" in data:
             path = data["resourceType"]
 
         self.path = path
@@ -872,7 +873,7 @@ class ResourceNode:
         cls = TypeInfo.type_to_class_with_check_string.get(self.path)
         if cls:
             data = FP_TimeBase.check_string(cls, data) or data
-        if isinstance(data, dict) and data["system"] == "http://unitsofmeasure.org":
+        if isinstance(data, abc.Mapping) and data["system"] == "http://unitsofmeasure.org":
             data = FP_Quantity(
                 data["value"],
                 FP_Quantity.timeUnitsToUCUM.get(data["code"], "'" + data["code"] + "'"),
@@ -934,7 +935,7 @@ class TypeInfo:
             name = "Quantity"
         elif isinstance(value, str):
             name = "string"
-        elif isinstance(value, dict):
+        elif isinstance(value, abc.Mapping):
             name = "object"
 
         if name == "bool":

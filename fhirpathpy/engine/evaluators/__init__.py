@@ -1,3 +1,4 @@
+from collections import abc
 from decimal import Decimal
 from functools import reduce
 
@@ -185,7 +186,7 @@ def create_reduce_member_invocation(model, key):
         if isinstance(res.data, nodes.FP_Quantity):
             toAdd = res.data.value
 
-        if actualTypes and isinstance(res.data, dict):
+        if actualTypes and isinstance(res.data, abc.Mapping):
             # Use actualTypes to find the field's value
             for actualType in actualTypes:
                 field = f"{key}{actualType}"
@@ -194,7 +195,7 @@ def create_reduce_member_invocation(model, key):
                 if toAdd is not None or toAdd_ is not None:
                     childPath += actualType
                     break
-        elif isinstance(res.data, dict):
+        elif isinstance(res.data, abc.Mapping):
             toAdd = res.data.get(key)
             toAdd_ = res.data.get(f"_{key}")
             if key == "extension":
