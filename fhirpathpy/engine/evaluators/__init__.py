@@ -1,12 +1,12 @@
-import json
-import re
 from collections import abc
 from decimal import Decimal
 from functools import reduce
 
+import re
+import json
 import fhirpathpy.engine as engine
-import fhirpathpy.engine.nodes as nodes
 import fhirpathpy.engine.util as util
+import fhirpathpy.engine.nodes as nodes
 
 
 def boolean_literal(ctx, parentData, node):
@@ -71,10 +71,8 @@ def alias_op_expression(mapFn):
     def func(ctx, parentData, node):
         op = node["terminalNodeText"][0]
 
-        if op not in mapFn:
-            raise Exception(
-                "Do not know how to alias " + op + " by " + json.dumps(mapFn)
-            )
+        if not op in mapFn:
+            raise Exception("Do not know how to alias " + op + " by " + json.dumps(mapFn))
 
         alias = mapFn[op]
         return engine.infix_invoke(ctx, alias, parentData, node["children"])
@@ -108,7 +106,7 @@ def external_constant_term(ctx, parent_data, node):
     ext_identifier = ext_constant["children"][0]
     varName = identifier(ctx, parent_data, ext_identifier)[0].replace("`", "")
 
-    if varName not in ctx["vars"]:
+    if not varName in ctx["vars"]:
         return []
 
     value = ctx["vars"][varName]
@@ -181,7 +179,7 @@ def create_reduce_member_invocation(model, key):
         toAdd = None
         toAdd_ = None
 
-        if isinstance(model, abc.Mapping):
+        if isinstance(model, dict):
             childPath = model["pathsDefinedElsewhere"].get(childPath, childPath)
             actualTypes = model["choiceTypePaths"].get(childPath)
 
@@ -287,9 +285,7 @@ def polarity_expression(ctx, parentData, node):
     rtn = engine.do_eval(ctx, parentData, node["children"][0])
 
     if len(rtn) != 1:  # not yet in spec, but per Bryn Rhodes
-        raise Exception(
-            "Unary " + sign + " can only be applied to an individual number."
-        )
+        raise Exception("Unary " + sign + " can only be applied to an individual number.")
 
     if not util.is_number(rtn[0]):
         raise Exception("Unary " + sign + " can only be applied to a number.")
@@ -325,9 +321,7 @@ evaluators = {
     # expressions
     "PolarityExpression": polarity_expression,
     "IndexerExpression": indexer_expression,
-    "MembershipExpression": alias_op_expression(
-        {"contains": "containsOp", "in": "inOp"}
-    ),
+    "MembershipExpression": alias_op_expression({"contains": "containsOp", "in": "inOp"}),
     "TermExpression": term_expression,
     "UnionExpression": union_expression,
     "InvocationExpression": invocation_expression,
