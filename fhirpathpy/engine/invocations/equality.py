@@ -1,3 +1,4 @@
+from collections import abc
 from decimal import Decimal
 import json
 import fhirpathpy.engine.util as util
@@ -80,9 +81,9 @@ def equivalence(ctx, x, y):
     if isinstance(x_val, nodes.FP_Quantity) and isinstance(y_val, nodes.FP_Quantity):
         return x_val.deep_equal(y_val)
 
-    if isinstance(a, (dict, list)) and isinstance(b, (dict, list)):
+    if isinstance(a, (abc.Mapping, list)) and isinstance(b, (abc.Mapping, list)):
         def deep_equal(a, b):
-            if isinstance(a, dict) and isinstance(b, dict):
+            if isinstance(a, abc.Mapping) and isinstance(b, abc.Mapping):
                 if a.keys() != b.keys():
                     return False
                 return all(deep_equal(a[key], b[key]) for key in a)
