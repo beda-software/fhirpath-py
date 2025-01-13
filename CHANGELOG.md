@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Support collection.abc.Mapping as resource instead of only dict #44 @axelv
+
 ## 1.0.0
 
 - Implement all fhirpath specification, pass all tests from fhirpath-js @atuonufure
