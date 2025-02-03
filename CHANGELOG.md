@@ -1,3 +1,7 @@
+## 1.2.1
+
+- Upgrade paython-dateutil #46 @kpcurai
+
 ## 1.2.0
 
 - Support collection.abc.Mapping as resource instead of only dict #44 @axelv
