@@ -106,8 +106,8 @@ def external_constant_term(ctx, parent_data, node):
     ext_identifier = ext_constant["children"][0]
     varName = identifier(ctx, parent_data, ext_identifier)[0].replace("`", "")
 
-    if not varName in ctx["vars"]:
-        return []
+    if varName not in ctx["vars"]:
+        raise ValueError(f'Attempting to access an undefined environment variable: {varName}')
 
     value = ctx["vars"][varName]
 

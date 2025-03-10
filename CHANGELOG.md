@@ -1,3 +1,7 @@
+## latest
+
+- Raise an error in case of accessing undefined env variable #50 @ruscoder
+
 ## 1.2.1
 
 - Upgrade paython-dateutil #46 @kpcurai

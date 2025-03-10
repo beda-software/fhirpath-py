@@ -280,7 +280,6 @@ def path_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
 
-
 @dataclass(eq=True)
 class NestedMapping(Mapping):
     d: int
@@ -388,8 +387,17 @@ class CustomMapping(Mapping):
             ),
             "e.where(d=5)",
             [NestedMapping(d=5, e="w")],
-        )
+        ),
     ],
 )
 def mappings_test(resource, path, expected):
     assert evaluate(resource, path) == expected
+
+
+def text_external_constant():
+    evaluate({}, "%var", {"var": "value"}) == "value"
+
+
+def text_external_constant_fails_on_undefined_var():
+    with pytest.raises(ValueError):
+        evaluate({}, "%var")
