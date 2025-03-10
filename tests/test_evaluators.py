@@ -401,3 +401,26 @@ def external_constant_test():
 def external_constant_fails_on_undefined_var_test():
     with pytest.raises(ValueError):
         evaluate({}, "%var")
+
+
+def user_invocation_table_test():
+    user_invocation_table = {
+        "pow": {
+            "fn": lambda inputs, exp=2: [i ** exp for i in inputs],
+            "arity": {0: [], 1: ["Integer"]},
+        }
+    }
+
+    result = evaluate(
+        {"a": [5, 6, 7]},
+        "a.pow()",
+        options={"userInvocationTable": user_invocation_table},
+    )
+    assert result == [5 * 5, 6 * 6, 7 * 7]
+
+    result = evaluate(
+        {"a": [5, 6, 7]},
+        "a.pow(3)",
+        options={"userInvocationTable": user_invocation_table},
+    )
+    assert result == [5 * 5 * 5, 6 * 6 * 6, 7 * 7 * 7]

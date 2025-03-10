@@ -1,11 +1,11 @@
 from fhirpathpy.engine.invocations.constants import constants
 from fhirpathpy.parser import parse
 from fhirpathpy.engine import do_eval
-from fhirpathpy.engine.util import arraify, get_data, set_paths
+from fhirpathpy.engine.util import arraify, get_data, set_paths, process_user_invocation_table
 from fhirpathpy.engine.nodes import FP_Type, ResourceNode
 
 __title__ = "fhirpathpy"
-__version__ = "1.2.1"
+__version__ = "2.0.0"
 __author__ = "beda.software"
 __license__ = "MIT"
 __copyright__ = "Copyright 2025 beda.software"
@@ -14,7 +14,7 @@ __copyright__ = "Copyright 2025 beda.software"
 VERSION = __version__
 
 
-def apply_parsed_path(resource, parsedPath, context=None, model=None):
+def apply_parsed_path(resource, parsedPath, context=None, model=None, options=None):
     constants.reset()
     dataRoot = arraify(resource)
 
@@ -27,7 +27,14 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None):
     vars = {"context": resource, "ucum": "http://unitsofmeasure.org"}
     vars.update(context or {})
 
-    ctx = {"dataRoot": dataRoot, "vars": vars, "model": model}
+    ctx = {
+        "dataRoot": dataRoot,
+        "vars": vars,
+        "model": model,
+        "userInvocationTable": process_user_invocation_table(
+            (options or {}).get("userInvocationTable", {})
+        ),
+    }
     node = do_eval(ctx, dataRoot, parsedPath["children"][0])
 
     # Resolve any internal "ResourceNode" instances.  Continue to let FP_Type
@@ -57,7 +64,7 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None):
     return visit(node)
 
 
-def evaluate(resource, path, context=None, model=None):
+def evaluate(resource, path, context=None, model=None, options=None):
     """
     Evaluates the "path" FHIRPath expression on the given resource, using data
     from "context" for variables mentioned in the "path" expression.
@@ -75,14 +82,14 @@ def evaluate(resource, path, context=None, model=None):
     if isinstance(path, dict):
         node = parse(path["expression"])
         if "base" in path:
-            resource = ResourceNode.create_node(resource, path['base'])
+            resource = ResourceNode.create_node(resource, path["base"])
     else:
         node = parse(path)
 
-    return apply_parsed_path(resource, node, context or {}, model)
+    return apply_parsed_path(resource, node, context or {}, model, options)
 
 
-def compile(path, model=None):
+def compile(path, model=None, options=None):
     """
     Returns a function that takes a resource and an optional context hash (see
     "evaluate"), and returns the result of evaluating the given FHIRPath
@@ -96,4 +103,6 @@ def compile(path, model=None):
 
     For example, you could pass in the result of require("fhirpath/fhir-context/r4")
     """
-    return set_paths(apply_parsed_path, parsedPath=parse(path), model=model)
+    return set_paths(
+        apply_parsed_path, parsedPath=parse(path), model=model, options=options
+    )

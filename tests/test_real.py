@@ -174,3 +174,18 @@ def reference_filter_test():
         "Encounter.participant.individual.reference.where($this.matches('Practitioner/'))",
     )
     assert result == ["Practitioner/dr-johns"]
+
+
+def compile_with_user_defined_table_test():
+    user_invocation_table = {
+        "pow": {
+            "fn": lambda inputs, exp=2: [i ** exp for i in inputs],
+            "arity": {0: [], 1: ["Integer"]},
+        }
+    }
+
+    expr = compile(
+        "a.pow()",
+        options={"userInvocationTable": user_invocation_table},
+    )
+    assert expr({"a": [5, 6, 7]}) == [5 * 5, 6 * 6, 7 * 7]
