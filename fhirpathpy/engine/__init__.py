@@ -22,7 +22,7 @@ def check_number_param(val):
 
 def check_boolean_param(val):
     data = util.get_data(val)
-    if data == True or data == False:
+    if data is True or data is False:
         return data
     raise Exception("Expected boolean, got: " + json.dumps(data))
 
@@ -48,7 +48,7 @@ def doInvoke(ctx, fn_name, data, raw_params):
     if isinstance(fn_name, list) and len(fn_name) == 1:
         fn_name = fn_name[0]
 
-    if type(fn_name) != str or not fn_name in invocation_registry:
+    if not isinstance(fn_name, str) or fn_name not in invocation_registry:
         raise Exception("Not implemented: " + str(fn_name))
 
     invocation = invocation_registry[fn_name]
@@ -56,7 +56,7 @@ def doInvoke(ctx, fn_name, data, raw_params):
     if "nullable_input" in invocation and util.is_nullable(data):
         return []
 
-    if not "arity" in invocation:
+    if "arity" not in invocation:
         if raw_params is None or util.is_empty(raw_params):
             res = invocation["fn"](ctx, util.arraify(data))
             return util.arraify(res)
@@ -70,7 +70,7 @@ def doInvoke(ctx, fn_name, data, raw_params):
     if isinstance(raw_params, list):
         paramsNumber = len(raw_params)
 
-    if not paramsNumber in invocation["arity"]:
+    if paramsNumber not in invocation["arity"]:
         raise Exception(fn_name + " wrong arity: got " + str(paramsNumber))
 
     params = []
@@ -152,7 +152,10 @@ def make_param(ctx, parentData, node_type, param):
 
     if len(res) > 1:
         raise Exception(
-            "Unexpected collection" + json.dumps(res) + "; expected singleton of type " + node_type
+            "Unexpected collection"
+            + json.dumps(res)
+            + "; expected singleton of type "
+            + node_type
         )
 
     if len(res) == 0:
