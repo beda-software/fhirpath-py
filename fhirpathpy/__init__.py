@@ -8,13 +8,13 @@ __title__ = "fhirpathpy"
 __version__ = "1.2.1"
 __author__ = "beda.software"
 __license__ = "MIT"
-__copyright__ = "Copyright 2023 beda.software"
+__copyright__ = "Copyright 2025 beda.software"
 
 # Version synonym
 VERSION = __version__
 
 
-def apply_parsed_path(resource, parsedPath, context={}, model=None):
+def apply_parsed_path(resource, parsedPath, context=None, model=None):
     constants.reset()
     dataRoot = arraify(resource)
 
@@ -25,7 +25,7 @@ def apply_parsed_path(resource, parsedPath, context={}, model=None):
     However, we'll keep our own copy of dataRoot for internal processing.
     """
     vars = {"context": resource, "ucum": "http://unitsofmeasure.org"}
-    vars.update(context)
+    vars.update(context or {})
 
     ctx = {"dataRoot": dataRoot, "vars": vars, "model": model}
     node = do_eval(ctx, dataRoot, parsedPath["children"][0])
@@ -57,7 +57,7 @@ def apply_parsed_path(resource, parsedPath, context={}, model=None):
     return visit(node)
 
 
-def evaluate(resource, path, context={}, model=None):
+def evaluate(resource, path, context=None, model=None):
     """
     Evaluates the "path" FHIRPath expression on the given resource, using data
     from "context" for variables mentioned in the "path" expression.
@@ -79,7 +79,7 @@ def evaluate(resource, path, context={}, model=None):
     else:
         node = parse(path)
 
-    return apply_parsed_path(resource, node, context, model)
+    return apply_parsed_path(resource, node, context or {}, model)
 
 
 def compile(path, model=None):

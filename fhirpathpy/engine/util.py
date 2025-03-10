@@ -11,8 +11,8 @@ class set_paths:
         self.parsedPath = parsedPath
         self.model = model
 
-    def __call__(self, resource, context={}):
-        return self.func(resource, self.parsedPath, context, self.model)
+    def __call__(self, resource, context=None):
+        return self.func(resource, self.parsedPath, context or {}, self.model)
 
 
 def get_data(value):
