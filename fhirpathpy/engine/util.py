@@ -6,13 +6,16 @@ from fhirpathpy.engine.nodes import ResourceNode, FP_Quantity
 
 
 class set_paths:
-    def __init__(self, func, parsedPath, model=None):
+    def __init__(self, func, parsedPath, model=None, options=None):
         self.func = func
         self.parsedPath = parsedPath
         self.model = model
+        self.options = options
 
     def __call__(self, resource, context=None):
-        return self.func(resource, self.parsedPath, context or {}, self.model)
+        return self.func(
+            resource, self.parsedPath, context or {}, self.model, self.options
+        )
 
 
 def get_data(value):
@@ -92,8 +95,21 @@ def uniq(arr):
         ordered_dict[key] = x
     return list(ordered_dict.values())
 
+
 def val_data_converted(val):
     if isinstance(val, ResourceNode):
         val = val.convert_data()
 
     return val
+
+
+def process_user_invocation_table(table):
+    return {
+        name: {
+            **entity,
+            "fn": lambda ctx, inputs, *args: entity["fn"](
+                [get_data(i) for i in inputs], *args
+            ),
+        }
+        for name, entity in table.items()
+    }

@@ -3,7 +3,9 @@ import numbers
 import fhirpathpy.engine.util as util
 from fhirpathpy.engine.nodes import TypeInfo
 from fhirpathpy.engine.evaluators import evaluators
-from fhirpathpy.engine.invocations import invocation_registry
+from fhirpathpy.engine.invocations import (
+    invocation_registry as base_invocation_registry,
+)
 
 
 def check_integer_param(val):
@@ -45,6 +47,11 @@ def do_eval(ctx, parentData, node):
 
 
 def doInvoke(ctx, fn_name, data, raw_params):
+    invocation_registry = {
+        **base_invocation_registry,
+        **(ctx["userInvocationTable"] or {}),
+    }
+
     if isinstance(fn_name, list) and len(fn_name) == 1:
         fn_name = fn_name[0]
 
@@ -170,7 +177,11 @@ def make_param(ctx, parentData, node_type, param):
 
 
 def infix_invoke(ctx, fn_name, data, raw_params):
-    if not fn_name in invocation_registry or not "fn" in invocation_registry[fn_name]:
+    invocation_registry = {
+        **base_invocation_registry,
+        **(ctx["userInvocationTable"] or {}),
+    }
+    if fn_name not in invocation_registry or "fn" not in invocation_registry[fn_name]:
         raise Exception("Not implemented " + fn_name)
 
     invocation = invocation_registry[fn_name]

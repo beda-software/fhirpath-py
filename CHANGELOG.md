@@ -1,6 +1,7 @@
-## latest
+## 2.0.0
 
 - Raise an error in case of accessing undefined env variable #50 @ruscoder
+- Add support for user defined functions #49 @ruscoder
 
 ## 1.2.1
 
