@@ -394,10 +394,10 @@ def mappings_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
 
-def text_external_constant():
+def external_constant_test():
     evaluate({}, "%var", {"var": "value"}) == "value"
 
 
-def text_external_constant_fails_on_undefined_var():
+def external_constant_fails_on_undefined_var_test():
     with pytest.raises(ValueError):
         evaluate({}, "%var")
