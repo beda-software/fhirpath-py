@@ -51,7 +51,7 @@ patient = {
 }
 
 # Evaluating FHIRPath
-result = evaluate(patient, "Patient.name.where(use='usual').given.first()", [])
+result = evaluate(patient, "Patient.name.where(use='usual').given.first()", {})
 # result: `['Jim']`
 ```
 
@@ -66,11 +66,11 @@ path (string): fhirpath expression, sample 'Patient.name.given'
 
 context (dict): a hash of variable name/value pairs.
 
-model (dict): The "model" data object specific to a domain, e.g. R4.
+model (dict): The "model" data object specific to a domain, e.g. R4. See Using data models documentation below.
 
-options (dict) - Custom options (see the documentation below)
+options (dict) - Custom options.
 
-options.userInvocationTable - a user invocation table used to replace any existing functions or define new ones (see User-defined functions documentation below)
+options.userInvocationTable - a user invocation table used to replace any existing functions or define new ones. See User-defined functions documentation below.
 
 ## compile
 Returns a function that takes a resource and an optional context hash (see "evaluate"), and returns the result of evaluating the given FHIRPath expression on that resource.  The advantage of this function over "evaluate" is that if you have multiple resources, the given FHIRPath expression will only be parsed once
@@ -79,14 +79,38 @@ Returns a function that takes a resource and an optional context hash (see "eval
 
 path (string) - the FHIRPath expression to be parsed.
 
-model (dict) - The "model" data object specific to a domain, e.g. R4.
+model (dict) - The "model" data object specific to a domain, e.g. R4. See Using data models documentation below.
 
 options (dict) - Custom options
 
-options.userInvocationTable - a user invocation table used to replace any existing functions or define new ones (see User-defined functions documentation below)
+options.userInvocationTable - a user invocation table used to replace any existing functions or define new ones. See User-defined functions documentation below.
+
+## Using data models
+
+The fhirpathpy library comes with pre-defined data models for FHIR versions DSTU2, STU3, R4, and R5. These models can be used within your project.
+
+Example:
+```python
+from fhirpathpy.models import models
+
+
+r4_model = models["r4"]
+
+patient = {
+  "resourceType": "Patient",
+  "deceasedBoolean": false,
+}
+
+result = evaluate(patient, "Patient.deceased", {}, r4_model)
+
+# result: `[False]`
+```
 
 ## User-defined functions
 
+The FHIRPath specification includes a set of built-in functions. However, if you need to extend the functionality by adding custom logic, you can define your own functions by providing a table of user-defined functions.
+
+Example:
 ```python
 user_invocation_table = {
     "pow": {
@@ -101,7 +125,7 @@ result = evaluate(
     options={"userInvocationTable": user_invocation_table},
 )
 
-# result: [25, 36, 49]
+# result: `[25, 36, 49]`
 ```
 
 It works similarly to [fhirpath.js](https://github.com/HL7/fhirpath.js/tree/master?tab=readme-ov-file#user-defined-functions)
