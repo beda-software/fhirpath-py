@@ -107,7 +107,7 @@ def process_user_invocation_table(table):
     return {
         name: {
             **entity,
-            "fn": lambda ctx, inputs, *args: entity["fn"](
+            "fn": lambda ctx, inputs, *args, __fn__=entity["fn"]: __fn__(
                 [get_data(i) for i in inputs], *args
             ),
         }
