@@ -408,7 +408,12 @@ def user_invocation_table_test():
         "pow": {
             "fn": lambda inputs, exp=2: [i ** exp for i in inputs],
             "arity": {0: [], 1: ["Integer"]},
-        }
+        },
+
+        "pow3":{
+            "fn": lambda inputs: [i ** 3 for i in inputs],
+            "arity": {0: [], 1: ["Integer"]},
+        },
     }
 
     result = evaluate(
@@ -420,7 +425,14 @@ def user_invocation_table_test():
 
     result = evaluate(
         {"a": [5, 6, 7]},
-        "a.pow(3)",
+        "a.pow(2)",
+        options={"userInvocationTable": user_invocation_table},
+    )
+    assert result == [5 * 5, 6 * 6, 7 * 7]
+
+    result = evaluate(
+        {"a": [5, 6, 7]},
+        "a.pow3()",
         options={"userInvocationTable": user_invocation_table},
     )
     assert result == [5 * 5 * 5, 6 * 6 * 6, 7 * 7 * 7]
