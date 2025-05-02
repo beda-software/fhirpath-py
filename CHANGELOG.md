@@ -1,3 +1,7 @@
+## 2.0.1
+
+- Fix of the bug with multiple user-defined functions @kpcurai @ruscoder
+
 ## 2.0.0
 
 - Raise an error in case of accessing undefined env variable #50 @ruscoder
