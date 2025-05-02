@@ -281,7 +281,8 @@ class FP_Quantity(FP_Type):
             return FP_Quantity(result, toUnit)
         return None
 
-    def _compare_years_and_months(self, other, year_units=["year", "years"]):
+    def _compare_years_and_months(self, other, year_units=None):
+        year_units = year_units or ["year", "years"]
         self_value_in_months = self.value
         other_value_in_months = other.value
 

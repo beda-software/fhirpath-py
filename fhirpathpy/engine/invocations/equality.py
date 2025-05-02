@@ -82,6 +82,7 @@ def equivalence(ctx, x, y):
         return x_val.deep_equal(y_val)
 
     if isinstance(a, (abc.Mapping, list)) and isinstance(b, (abc.Mapping, list)):
+
         def deep_equal(a, b):
             if isinstance(a, abc.Mapping) and isinstance(b, abc.Mapping):
                 if a.keys() != b.keys():
@@ -89,7 +90,7 @@ def equivalence(ctx, x, y):
                 return all(deep_equal(a[key], b[key]) for key in a)
             elif isinstance(a, list) and isinstance(b, list):
                 return len(a) == len(b) and all(
-                    deep_equal(x, y) for x, y in zip(sorted(a), sorted(b))
+                    deep_equal(x, y) for x, y in zip(sorted(a), sorted(b), strict=True)
                 )
             elif isinstance(a, str) and isinstance(b, str):
                 return normalize_string(a) == normalize_string(b)

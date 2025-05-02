@@ -28,7 +28,7 @@ class ASTPathListener(FHIRPathListener):
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)
 
-        if name in FHIRPathListener.__dict__ and hasattr(attr, "__call__"):
+        if name in FHIRPathListener.__dict__ and callable(attr):
 
             def newfunc(*args, **kwargs):
                 if name.startswith("enter"):

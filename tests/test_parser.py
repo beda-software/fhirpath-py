@@ -1,8 +1,10 @@
 import json
-import pytest
 from pathlib import Path
-from fhirpathpy.parser import parse
+
+import pytest
 from antlr4.error.Errors import LexerNoViableAltException
+
+from fhirpathpy.parser import parse
 
 ast_fixtures_path = Path(__file__).resolve().parent.joinpath("fixtures").joinpath("ast")
 

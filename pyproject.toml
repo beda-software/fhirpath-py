@@ -12,11 +12,6 @@ exclude = '''
 )
 '''
 
-[tool.isort]
-profile = "black"
-line_length = 100
-skip = [".gitignore"]
-
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q --color=yes --cov=fhirpathpy --cov-report=xml"
@@ -62,3 +57,19 @@ Homepage = "https://github.com/beda-software/fhirpath-py"
 Documentation = "https://github.com/beda-software/fhirpath-py#readme"
 Source = "https://github.com/beda-software/fhirpath-py.git"
 Changelog = "https://github.com/beda-software/fhirpath-py/blob/master/CHANGELOG.md"
+
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+include = ["app/**/*.py", "tests/**/*.py"]
+
+[tool.ruff.lint]
+select = ["B", "F", "I", "E", "UP", "N", "PL", "PERF"]
+# Black is responsible for E501
+ignore = ["E501"]
+unfixable = ["F401"]
+
+[tool.autohooks]
+mode = "pipenv"
+pre-commit = ["autohooks.plugins.black", "autohooks.plugins.ruff"]

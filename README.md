@@ -129,3 +129,10 @@ result = evaluate(
 ```
 
 It works similarly to [fhirpath.js](https://github.com/HL7/fhirpath.js/tree/master?tab=readme-ov-file#user-defined-functions)
+
+
+## Development
+
+To activate git pre-commit hook: `autohooks activate`
+
+To run tests: `pytest`

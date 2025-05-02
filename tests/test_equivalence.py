@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 import pytest
 
 from fhirpathpy.engine.invocations.equality import (

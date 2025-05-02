@@ -1,5 +1,6 @@
-from fhirpathpy import evaluate, compile
 import pickle
+
+from fhirpathpy import compile, evaluate
 
 
 def find_concept_test():
@@ -179,7 +180,7 @@ def reference_filter_test():
 def compile_with_user_defined_table_test():
     user_invocation_table = {
         "pow": {
-            "fn": lambda inputs, exp=2: [i ** exp for i in inputs],
+            "fn": lambda inputs, exp=2: [i**exp for i in inputs],
             "arity": {0: [], 1: ["Integer"]},
         }
     }

@@ -1,11 +1,10 @@
-import json
-import yaml
 import pytest
-from fhirpathpy.engine.nodes import FP_Quantity
+import yaml
 
+from fhirpathpy import evaluate
+from fhirpathpy.engine.nodes import FP_Quantity
 from fhirpathpy.models import models
 from tests.resources import resources
-from fhirpathpy import evaluate
 
 
 def pytest_collect_file(parent, path):
@@ -91,8 +90,8 @@ class YamlItem(pytest.Item):
             variables.update(self.test["variables"])
 
         if "error" in self.test and self.test["error"] is True:
-            with pytest.raises(Exception):
-                raise Exception(self.test["desc"])
+            with pytest.raises(Exception) as exc:
+                raise Exception(self.test["desc"]) from exc
         else:
             result = evaluate(resource, expression, variables, model)
             compare(result, self.test["result"])
@@ -110,4 +109,4 @@ def compare(l1, l2):
         else:
             assert str(e1) == str(e2)
     else:
-        assert False, f"{l1} != {l2}"
+        raise AssertionError(f"{l1} != {l2}")

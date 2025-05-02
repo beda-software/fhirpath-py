@@ -223,9 +223,7 @@ def misc_functions_test(resource, path, expected):
     ],
 )
 def datetime_json_serialization_test(expression: str, expected_json: str):
-    with mock.patch(
-        "fhirpathpy.engine.invocations.datetime.systemtime"
-    ) as datetime_mock:
+    with mock.patch("fhirpathpy.engine.invocations.datetime.systemtime") as datetime_mock:
         datetime_mock.now.return_value = datetime(
             2020, 8, 20, 17, 52, 15, 123000, tzinfo=timezone.utc
         )
@@ -233,9 +231,7 @@ def datetime_json_serialization_test(expression: str, expected_json: str):
 
 
 def now_function_test():
-    with mock.patch(
-        "fhirpathpy.engine.invocations.datetime.systemtime"
-    ) as datetime_mock:
+    with mock.patch("fhirpathpy.engine.invocations.datetime.systemtime") as datetime_mock:
         datetime_mock.now.side_effect = [
             datetime(2020, 8, 20, 17, 52, 15, 123000, tzinfo=timezone.utc),
             datetime(2020, 8, 20, 17, 52, 16, 123000, tzinfo=timezone.utc),
@@ -291,8 +287,8 @@ class NestedMapping(Mapping):
     def __getitem__(self, key: str):
         try:
             return getattr(self, key)
-        except AttributeError:
-            raise KeyError(key)
+        except AttributeError as exc:
+            raise KeyError(key) from exc
 
     def __len__(self):
         return len(fields(self))
@@ -312,8 +308,8 @@ class CustomMapping(Mapping):
     def __getitem__(self, key: str):
         try:
             return getattr(self, key)
-        except AttributeError:
-            raise KeyError(key)
+        except AttributeError as exc:
+            raise KeyError(key) from exc
 
     def __len__(self):
         return len(fields(self))
@@ -395,7 +391,7 @@ def mappings_test(resource, path, expected):
 
 
 def external_constant_test():
-    evaluate({}, "%var", {"var": "value"}) == "value"
+    assert evaluate({}, "%var", {"var": "value"}) == ["value"]
 
 
 def external_constant_fails_on_undefined_var_test():
@@ -406,12 +402,11 @@ def external_constant_fails_on_undefined_var_test():
 def user_invocation_table_test():
     user_invocation_table = {
         "pow": {
-            "fn": lambda inputs, exp=2: [i ** exp for i in inputs],
+            "fn": lambda inputs, exp=2: [i**exp for i in inputs],
             "arity": {0: [], 1: ["Integer"]},
         },
-
-        "pow3":{
-            "fn": lambda inputs: [i ** 3 for i in inputs],
+        "pow3": {
+            "fn": lambda inputs: [i**3 for i in inputs],
             "arity": {0: [], 1: ["Integer"]},
         },
     }
