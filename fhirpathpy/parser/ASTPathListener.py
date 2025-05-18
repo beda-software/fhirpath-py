@@ -2,19 +2,32 @@ from antlr4.tree.Tree import TerminalNodeImpl
 from fhirpathpy.parser.generated.FHIRPathListener import FHIRPathListener
 
 
+def has_node_type_text(node_type):
+    # In general we need mostly terminal nodes (e.g. Identifier and any Literal)
+    # But the code also uses TypeSpecifier, InvocationExpression and TermExpression
+    return node_type.endswith("Literal") or node_type in [
+        "LiteralTerm",
+        "Identifier",
+        "TypeSpecifier",
+        "InvocationExpression",
+        "TermExpression",
+    ]
+
+
 class ASTPathListener(FHIRPathListener):
     def __init__(self):
         self.parentStack = [{}]
 
     def pushNode(self, nodeType, ctx):
         parentNode = self.parentStack[-1]
-        node = {"type": nodeType, "text": ctx.getText(), "terminalNodeText": []}
-
+        node = {"type": nodeType, "terminalNodeText": []}
+        if has_node_type_text(nodeType):
+            node["text"] = ctx.getText()
         for child in ctx.children:
             if isinstance(child, TerminalNodeImpl):
                 node["terminalNodeText"].append(child.getText())
 
-        if not "children" in parentNode:
+        if "children" not in parentNode:
             parentNode["children"] = []
 
         parentNode["children"].append(node)

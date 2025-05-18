@@ -1,7 +1,6 @@
 {
   "children": [{
     "type": "AdditiveExpression",
-    "text": "%v+2",
     "terminalNodeText": ["+"],
     "children": [{
       "type": "TermExpression",
@@ -9,11 +8,9 @@
       "terminalNodeText": [],
       "children": [{
         "type": "ExternalConstantTerm",
-        "text": "%v",
         "terminalNodeText": [],
         "children": [{
           "type": "ExternalConstant",
-          "text": "%v",
           "terminalNodeText": ["%"],
           "children": [{
             "type": "Identifier",
