@@ -13,11 +13,9 @@
         "terminalNodeText": [],
         "children": [{
           "type": "InvocationTerm",
-          "text": "Patient",
           "terminalNodeText": [],
           "children": [{
             "type": "MemberInvocation",
-            "text": "Patient",
             "terminalNodeText": [],
             "children": [{
               "type": "Identifier",
@@ -28,7 +26,6 @@
         }]
       }, {
         "type": "MemberInvocation",
-        "text": "name",
         "terminalNodeText": [],
         "children": [{
           "type": "Identifier",
@@ -38,7 +35,6 @@
       }]
     }, {
       "type": "MemberInvocation",
-      "text": "given",
       "terminalNodeText": [],
       "children": [{
         "type": "Identifier",

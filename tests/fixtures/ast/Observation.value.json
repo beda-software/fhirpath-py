@@ -9,11 +9,9 @@
       "terminalNodeText": [],
       "children": [{
         "type": "InvocationTerm",
-        "text": "Observation",
         "terminalNodeText": [],
         "children": [{
           "type": "MemberInvocation",
-          "text": "Observation",
           "terminalNodeText": [],
           "children": [{
             "type": "Identifier",
@@ -24,7 +22,6 @@
       }]
     }, {
       "type": "MemberInvocation",
-      "text": "value",
       "terminalNodeText": [],
       "children": [{
         "type": "Identifier",

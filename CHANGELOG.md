@@ -1,3 +1,7 @@
+## 2.0.2
+
+- Increase performance of parsing #54 @ruscoder
+
 ## 2.0.1
 
 - Fix of the bug with multiple user-defined functions @kpcurai @ruscoder
