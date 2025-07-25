@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from dateutil import parser, tz
 from decimal import ROUND_HALF_UP, ROUND_UP, Decimal
 import math
-import json
+import simplejson as json
 import re
 import time
 
