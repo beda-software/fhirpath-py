@@ -839,7 +839,7 @@ class ResourceNode:
         return self.data == value
 
     def __hash__(self):
-        data_hash = hash(json.dumps(self.data, sort_keys=True))
+        data_hash = hash(json.dumps(self.data, sort_keys=True, default=str))
         path_hash = hash(self.path)
         return hash((data_hash, path_hash))
 
