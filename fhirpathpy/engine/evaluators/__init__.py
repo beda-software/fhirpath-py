@@ -175,6 +175,7 @@ def create_reduce_member_invocation(model, key):
         res = nodes.ResourceNode.create_node(res)
         childPath = f"{res.path}.{key}" if res.path else f"_.{key}"
         fullPath = f"{res.propName}.{key}" if res.propName else childPath # The full path to the node (weill evenutally be) e.g. Patient.name[0].given
+        fullPath = fullPath.replace("_", "")
 
         actualTypes = None
         toAdd = None

@@ -25,6 +25,10 @@ def create_reduce_children(ctx):
                     childPath = res.path + "." + prop
 
                 fullPath = f"{res.propName}.{prop}" if res.propName else childPath # The full path to the node (weill evenutally be) e.g. Patient.name[0].given
+                fullPath = fullPath.replace("_", "")
+
+                if prop == "extension":
+                    childPath = "Extension"
 
                 if (
                     isinstance(model, dict)
@@ -33,6 +37,12 @@ def create_reduce_children(ctx):
                 ):
                     childPath = model["pathsDefinedElsewhere"][childPath]
 
+                childPath = (
+                    model["path2Type"].get(childPath, childPath)
+                    if isinstance(model, dict) and "path2Type" in model
+                    else childPath
+                )
+                
                 if isinstance(value, list):
                     mapped = [create_node(n, childPath, propName=f"{fullPath}[{i}]") for i, n in enumerate(value)]
                     acc = acc + mapped
