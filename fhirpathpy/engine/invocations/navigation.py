@@ -6,7 +6,7 @@ import fhirpathpy.engine.nodes as nodes
 create_node = nodes.ResourceNode.create_node
 
 
-def create_reduce_children(ctx):
+def create_reduce_children(ctx, exclude_primitive_extensions):
     model = ctx["model"]
 
     def func(acc, res):
@@ -20,6 +20,12 @@ def create_reduce_children(ctx):
             for prop in data.keys():
                 value = data[prop]
                 childPath = ""
+
+                # extensions shouldn't filter through here, yet they should for descendants?
+                # unless this item is the node that is being processed (primitive extension)
+                # though if you filter it, descendants will not work too
+                if prop.startswith("_") and exclude_primitive_extensions:
+                    continue
 
                 if res.path is not None:
                     childPath = res.path + "." + prop
@@ -54,14 +60,13 @@ def create_reduce_children(ctx):
 
 
 def children(ctx, coll):
-    return reduce(create_reduce_children(ctx), coll, [])
+    return reduce(create_reduce_children(ctx, True), coll, [])
 
 
 def descendants(ctx, coll):
     res = []
-    ch = children(ctx, coll)
+    ch = reduce(create_reduce_children(ctx, False), coll, [])
     while len(ch) > 0:
         res = res + ch
-        ch = children(ctx, ch)
-
+        ch = reduce(create_reduce_children(ctx, False), ch, [])
     return res
