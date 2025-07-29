@@ -8,6 +8,7 @@ import math
 import json
 import re
 import time
+from typing import Optional
 
 
 timeRE = (
@@ -821,7 +822,7 @@ class ResourceNode:
     * @param _data additional data stored in a property named with "_" prepended.
     """
 
-    def __init__(self, data, path, _data=None):
+    def __init__(self, data, path, _data=None, propName=None, index=None):
         """
         If data is a resource (maybe a contained resource) reset the path
         information to the resource type.
@@ -832,6 +833,8 @@ class ResourceNode:
         self.path = path
         self.data = data
         self._data = _data
+        self.propName: Optional[str] = propName
+        self.index: Optional[int] = index
 
     def __eq__(self, value):
         if isinstance(value, ResourceNode):
@@ -864,10 +867,10 @@ class ResourceNode:
         return json.dumps(self.data)
 
     @staticmethod
-    def create_node(data, path=None, _data=None):
+    def create_node(data, path=None, _data=None, propName=None, index=None):
         if isinstance(data, ResourceNode):
             return data
-        return ResourceNode(data, path, _data)
+        return ResourceNode(data, path, _data, propName, index)
 
     def convert_data(self):
         data = self.data

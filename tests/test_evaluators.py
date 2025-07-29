@@ -193,7 +193,7 @@ def existence_functions_test(resource, path, expected):
     ("resource", "path", "expected"),
     [
         ({}, "iif(true, 'a', 'b')", ["a"]),
-        ({"a": {"b": [1, 2, 3]}}, "a.b.trace()", [1, 2, 3]),
+        ({"a": {"b": [1, 2, 3]}}, "a.b.trace('t')", [1, 2, 3]),
         ({"a": True}, "a.toInteger()", [1]),
         ({"a": False}, "a.toInteger()", [0]),
         ({"a": True}, "a.toDecimal()", [1.0]),
