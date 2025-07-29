@@ -26,7 +26,7 @@ def trace_fn(ctx, x, label=""):
         ctx["trace_callback"](label, x)
     else:
         # Fall back to console output if no callback is provided
-    print("TRACE:[" + label + "]", str(x))
+        print("TRACE:[" + label + "]", str(x))
     return x
 
 
