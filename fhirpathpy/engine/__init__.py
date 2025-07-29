@@ -83,10 +83,11 @@ def doInvoke(ctx, fn_name, data, raw_params):
     params = []
     argTypes = invocation["arity"][paramsNumber]
 
+    thisValue = ctx["$this"] if "$this" in ctx else ctx["dataRoot"]
     for i in range(0, paramsNumber):
         tp = argTypes[i]
         pr = raw_params[i]
-        params.append(make_param(ctx, data, tp, pr))
+        params.append(make_param(ctx, thisValue, tp, pr))
 
     params.insert(0, data)
     params.insert(0, ctx)
