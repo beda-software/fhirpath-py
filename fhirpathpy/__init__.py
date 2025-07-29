@@ -35,6 +35,11 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None, options=No
             (options or {}).get("userInvocationTable", {})
         ),
     }
+    
+    # Add trace callback if provided in options
+    if options and "trace_callback" in options:
+        ctx["trace_callback"] = options["trace_callback"]
+    
     node = do_eval(ctx, dataRoot, parsedPath["children"][0])
 
     # Resolve any internal "ResourceNode" instances.  Continue to let FP_Type
