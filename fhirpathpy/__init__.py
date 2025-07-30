@@ -37,8 +37,8 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None, options=No
     }
     
     # Add trace callback if provided in options
-    if options and "trace_callback" in options:
-        ctx["trace_callback"] = options["trace_callback"]
+    if options and "traceFn " in options:
+        ctx["traceFn "] = options["traceFn "]
     
     node = do_eval(ctx, dataRoot, parsedPath["children"][0])
 
