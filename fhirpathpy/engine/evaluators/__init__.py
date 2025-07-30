@@ -220,7 +220,7 @@ def create_reduce_member_invocation(model, key):
                 acc.append(nodes.ResourceNode.create_node(toAdd, childPath, propName=fullPath))
         if util.is_some(toAdd_):
             if isinstance(toAdd_, list):
-                mapped = [nodes.ResourceNode.create_node(x, childPath, propName=fullPath) for x in toAdd_]
+                mapped = [nodes.ResourceNode.create_node(x, childPath, propName=f"{fullPath}[{i}]", index=i) for i, x in enumerate(toAdd_)]
                 acc = acc + mapped
             else:
                 acc.append(nodes.ResourceNode.create_node(toAdd_, childPath, propName=fullPath))
