@@ -45,7 +45,7 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None, options=No
     # Resolve any internal "ResourceNode" instances.  Continue to let FP_Type
     # subclasses through.
 
-    if options and options.get("return_raw_data", False):
+    if options and options.get("returnRawData", False):
         if isinstance(node, list):
             res = []
             # Filter out intenal representation of primitive extensions
