@@ -5,7 +5,7 @@ from fhirpathpy.engine.util import arraify, get_data, set_paths, process_user_in
 from fhirpathpy.engine.nodes import FP_Type, ResourceNode
 
 __title__ = "fhirpathpy"
-__version__ = "2.0.3"
+__version__ = "2.1.0"
 __author__ = "beda.software"
 __license__ = "MIT"
 __copyright__ = "Copyright 2025 beda.software"
@@ -35,11 +35,11 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None, options=No
             (options or {}).get("userInvocationTable", {})
         ),
     }
-    
+
     # Add trace callback if provided in options
     if options and "traceFn" in options:
         ctx["traceFn"] = options["traceFn"]
-    
+
     node = do_eval(ctx, dataRoot, parsedPath["children"][0])
 
     # Resolve any internal "ResourceNode" instances.  Continue to let FP_Type
@@ -59,7 +59,7 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None, options=No
                 res.append(item)
             return res
         return node
-    
+
     def visit(node):
         data = get_data(node)
 

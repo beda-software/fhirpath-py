@@ -1,5 +1,6 @@
-from fhirpathpy import evaluate as fhirpath
 from decimal import Decimal
+
+from fhirpathpy import evaluate as fhirpath
 
 
 def use_decimal_in_context_test():

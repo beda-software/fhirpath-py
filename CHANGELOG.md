@@ -1,3 +1,14 @@
+## 2.1.0
+
+- Fix bug with $this evaluation context in function invocations #60 @brianpos
+- Add traceFn option for trace function callback #57 @brianpos
+- Add returnRawData option for getting output in raw format #59 @brianpos
+- Add propName/index props to ResourceNode #58 @brianpos
+
+## 2.0.3
+
+- Fix runtime error when there is a decimal in context @ir4y
+
 ## 2.0.2
 
 - Increase performance of parsing #54 @ruscoder

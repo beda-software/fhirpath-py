@@ -67,7 +67,8 @@ include = ["app/**/*.py", "tests/**/*.py"]
 [tool.ruff.lint]
 select = ["B", "F", "I", "E", "UP", "N", "PL", "PERF"]
 # Black is responsible for E501
-ignore = ["E501"]
+# N803/N806 is not relevant for us because we use camelCase for historical reasons
+ignore = ["E501", "N803", "N806"]
 unfixable = ["F401"]
 
 [tool.autohooks]
