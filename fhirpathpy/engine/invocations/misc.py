@@ -21,7 +21,12 @@ def iif_macro(ctx, data, cond, ok, fail=None):
 
 
 def trace_fn(ctx, x, label=""):
-    print("TRACE:[" + label + "]", str(x))
+    # Check if a custom trace callback is provided in the context
+    if "traceFn" in ctx and callable(ctx["traceFn"]):
+        ctx["traceFn"](label, x)
+    else:
+        # Fall back to console output if no callback is provided
+        print("TRACE:[" + label + "]", str(x))
     return x
 
 

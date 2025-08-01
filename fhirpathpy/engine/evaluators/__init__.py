@@ -174,6 +174,8 @@ def create_reduce_member_invocation(model, key):
     def func(acc, res):
         res = nodes.ResourceNode.create_node(res)
         childPath = f"{res.path}.{key}" if res.path else f"_.{key}"
+        fullPath = f"{res.propName}.{key}" if res.propName else childPath # The full path to the node (weill evenutally be) e.g. Patient.name[0].given
+        fullPath = fullPath.replace("_", "")
 
         actualTypes = None
         toAdd = None
@@ -212,16 +214,16 @@ def create_reduce_member_invocation(model, key):
 
         if util.is_some(toAdd):
             if isinstance(toAdd, list):
-                mapped = [nodes.ResourceNode.create_node(x, childPath) for x in toAdd]
+                mapped = [nodes.ResourceNode.create_node(x, childPath, propName=f"{fullPath}[{i}]", index=i) for i, x in enumerate(toAdd)]
                 acc = acc + mapped
             else:
-                acc.append(nodes.ResourceNode.create_node(toAdd, childPath))
+                acc.append(nodes.ResourceNode.create_node(toAdd, childPath, propName=fullPath))
         if util.is_some(toAdd_):
             if isinstance(toAdd_, list):
-                mapped = [nodes.ResourceNode.create_node(x, childPath) for x in toAdd_]
+                mapped = [nodes.ResourceNode.create_node(x, childPath, propName=f"{fullPath}[{i}]", index=i) for i, x in enumerate(toAdd_)]
                 acc = acc + mapped
             else:
-                acc.append(nodes.ResourceNode.create_node(toAdd_, childPath))
+                acc.append(nodes.ResourceNode.create_node(toAdd_, childPath, propName=fullPath))
         return acc
 
     return func
