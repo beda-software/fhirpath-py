@@ -124,3 +124,26 @@ def compile(path, model=None, options=None):
     For example, you could pass in the result of require("fhirpath/fhir-context/r4")
     """
     return set_paths(apply_parsed_path, parsedPath=parse(path), model=model, options=options)
+
+
+def compile_as_array(expression: str):
+    path_fn = compile(expression)
+
+    def fn(resource, context=None):
+        result = path_fn(resource, context)
+        return result if isinstance(result, list) else ([] if result is None else [result])
+
+    return fn
+
+
+def compile_as_first(expression: str):
+    path_fn = compile(expression)
+
+    def fn(resource, context = None):
+        result = path_fn(resource, context)
+        if isinstance(result, list):
+            return result[0] if result else None
+
+        return result
+
+    return fn
