@@ -1,3 +1,6 @@
+from typing import Callable, Optional, Any, List
+import fhirpy_types_r4b as r4b
+
 from fhirpathpy.engine.invocations.constants import constants
 from fhirpathpy.parser import parse
 from fhirpathpy.engine import do_eval
@@ -125,21 +128,35 @@ def compile(path, model=None, options=None):
     """
     return set_paths(apply_parsed_path, parsedPath=parse(path), model=model, options=options)
 
+type ResourceType = dict | r4b.Resource
+type ContextType = Optional[dict]
 
-def compile_as_array(expression: str):
+def compile_as_array(expression: str, r_model: r4b.Resource = None) -> Callable[[ResourceType, ContextType], List[Any]]:
     path_fn = compile(expression)
 
-    def fn(resource, context=None):
+    def fn(resource: ResourceType, context: ContextType = None) -> List[Any]:
+        if r_model is not None:
+            if isinstance(resource, r_model):
+                resource = resource.model_dump()
+            else:
+                raise Exception("Resource is not of type {}".format(r_model))
+
         result = path_fn(resource, context)
         return result if isinstance(result, list) else ([] if result is None else [result])
 
     return fn
 
 
-def compile_as_first(expression: str):
+def compile_as_first(expression: str, r_model: r4b.Resource = None) -> Callable[[ResourceType, ContextType], Optional[Any]]:
     path_fn = compile(expression)
 
-    def fn(resource, context = None):
+    def fn(resource: ResourceType, context: ContextType = None) -> Optional[Any]:
+        if r_model is not None:
+            if isinstance(resource, r_model):
+                resource = resource.model_dump()
+            else:
+                raise Exception("Resource is not of type {}".format(r_model))
+
         result = path_fn(resource, context)
         if isinstance(result, list):
             return result[0] if result else None
