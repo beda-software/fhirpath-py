@@ -1,6 +1,4 @@
-from typing import Any, Callable, Optional
-
-import fhirpy_types_r4b as r4b
+from typing import Any, Callable, Optional, Type
 
 from fhirpathpy.engine import do_eval
 from fhirpathpy.engine.invocations.constants import constants
@@ -130,53 +128,58 @@ def compile(path, model=None, options=None):
     return set_paths(apply_parsed_path, parsedPath=parse(path), model=model, options=options)
 
 
-type ResourceType = dict | r4b.Resource
+type ResourceType = Any
 type ContextType = Optional[dict]
 
 
 def compile_as_array(
-    expression: str, r_model: r4b.Resource = None
-) -> Callable[[ResourceType, ContextType], list[Any]]:
+    expression: str, input_type: Type, output_type: Type
+) -> Callable[[Any], Any]:
     path_fn = compile(expression)
 
-    def fn(resource: ResourceType, context: ContextType = None) -> list[Any]:
+    def fn(resource: input_type, context: ContextType = None) -> list[output_type]:
         return _format_result(
-            path_fn(_validate_and_convert_resource(resource, r_model), context), False
+            path_fn(_validate_and_convert_resource(resource, input_type), context), output_type, False
         )
 
     return fn
 
 
 def compile_as_first(
-    expression: str, r_model: r4b.Resource = None
-) -> Callable[[ResourceType, ContextType], Optional[Any]]:
+    expression: str, input_type: Type, output_type: Type
+) -> Callable[[Any], Any]:
     path_fn = compile(expression)
 
-    def fn(resource: ResourceType, context: ContextType = None) -> Optional[Any]:
+    def fn(resource: input_type, context: ContextType = None) -> output_type:
         return _format_result(
-            path_fn(_validate_and_convert_resource(resource, r_model), context), True
+            path_fn(_validate_and_convert_resource(resource, input_type), context), output_type, True
         )
 
     return fn
 
 
-def _validate_and_convert_resource(resource: ResourceType, r_model: r4b.Resource = None) -> dict:
-    if r_model is not None:
-        if isinstance(resource, r_model):
-            resource = resource.model_dump()
+def _validate_and_convert_resource(resource: ResourceType, input_type: Type) -> dict:
+    if isinstance(resource, input_type):
+        if isinstance(resource, dict):
+            return resource
+        elif hasattr(resource, "model_dump"):
+            return resource.model_dump()
         else:
-            raise Exception(f"Resource is not of type {r_model}")
+            raise Exception(f"Don't know how to work with type {type(resource)}")
+    else:
+        raise Exception(f"Resource type is {type(resource)}, expected {input_type}")
 
-    return resource
 
-
-def _format_result(result: list, is_first=False) -> list | dict | str | int | float | bool:
+def _format_result(result: list, output_type: Type, is_first=False) -> Any:
     if isinstance(result, list):
         if is_first:
             if len(result) > 0:
-                return result[0]
+                if isinstance(result[0], output_type):
+                    return result[0]
+                else:
+                    raise Exception(f"Unexpected result type {type(result)}, expected {output_type}")
             else:
-                return []
+                return None
         else:
             return result
     else:
