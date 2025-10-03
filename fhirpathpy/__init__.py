@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional, Type
+from typing import Any, Callable, Optional, TypeVar
 
 from fhirpathpy.engine import do_eval
 from fhirpathpy.engine.invocations.constants import constants
@@ -128,13 +128,13 @@ def compile(path, model=None, options=None):
     return set_paths(apply_parsed_path, parsedPath=parse(path), model=model, options=options)
 
 
-type ResourceType = Any
 type ContextType = Optional[dict]
-
+InputType = TypeVar('InputType')
+OutputType = TypeVar('OutputType')
 
 def compile_as_array(
-    expression: str, input_type: Type, output_type: Type
-) -> Callable[[Any], Any]:
+    expression: str, input_type: type[InputType], output_type: type[OutputType]
+) -> Callable[[InputType, ContextType], OutputType]:
     path_fn = compile(expression)
 
     def fn(resource: input_type, context: ContextType = None) -> list[output_type]:
@@ -146,8 +146,8 @@ def compile_as_array(
 
 
 def compile_as_first(
-    expression: str, input_type: Type, output_type: Type
-) -> Callable[[Any], Any]:
+    expression: str, input_type: type[InputType], output_type: type[OutputType]
+) -> Callable[[InputType, ContextType], OutputType]:
     path_fn = compile(expression)
 
     def fn(resource: input_type, context: ContextType = None) -> output_type:
@@ -158,7 +158,7 @@ def compile_as_first(
     return fn
 
 
-def _validate_and_convert_resource(resource: ResourceType, input_type: Type) -> dict:
+def _validate_and_convert_resource(resource: Any, input_type: type[InputType]) -> dict:
     if isinstance(resource, input_type):
         if isinstance(resource, dict):
             return resource
@@ -170,7 +170,7 @@ def _validate_and_convert_resource(resource: ResourceType, input_type: Type) -> 
         raise Exception(f"Resource type is {type(resource)}, expected {input_type}")
 
 
-def _format_result(result: list, output_type: Type, is_first=False) -> Any:
+def _format_result(result: list, output_type: type[OutputType], is_first=False) -> Any:
     if isinstance(result, list):
         if is_first:
             if len(result) > 0:
