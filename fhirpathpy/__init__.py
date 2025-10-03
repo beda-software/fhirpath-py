@@ -1,11 +1,12 @@
-from typing import Callable, Optional, Any, List
+from typing import Any, Callable, Optional
+
 import fhirpy_types_r4b as r4b
 
-from fhirpathpy.engine.invocations.constants import constants
-from fhirpathpy.parser import parse
 from fhirpathpy.engine import do_eval
-from fhirpathpy.engine.util import arraify, get_data, set_paths, process_user_invocation_table
+from fhirpathpy.engine.invocations.constants import constants
 from fhirpathpy.engine.nodes import FP_Type, ResourceNode
+from fhirpathpy.engine.util import arraify, get_data, process_user_invocation_table, set_paths
+from fhirpathpy.parser import parse
 
 __title__ = "fhirpathpy"
 __version__ = "2.1.0"
@@ -128,23 +129,33 @@ def compile(path, model=None, options=None):
     """
     return set_paths(apply_parsed_path, parsedPath=parse(path), model=model, options=options)
 
+
 type ResourceType = dict | r4b.Resource
 type ContextType = Optional[dict]
 
-def compile_as_array(expression: str, r_model: r4b.Resource = None) -> Callable[[ResourceType, ContextType], List[Any]]:
+
+def compile_as_array(
+    expression: str, r_model: r4b.Resource = None
+) -> Callable[[ResourceType, ContextType], list[Any]]:
     path_fn = compile(expression)
 
-    def fn(resource: ResourceType, context: ContextType = None) -> List[Any]:
-        return _format_result(path_fn(_validate_and_convert_resource(resource, r_model), context), False)
+    def fn(resource: ResourceType, context: ContextType = None) -> list[Any]:
+        return _format_result(
+            path_fn(_validate_and_convert_resource(resource, r_model), context), False
+        )
 
     return fn
 
 
-def compile_as_first(expression: str, r_model: r4b.Resource = None) -> Callable[[ResourceType, ContextType], Optional[Any]]:
+def compile_as_first(
+    expression: str, r_model: r4b.Resource = None
+) -> Callable[[ResourceType, ContextType], Optional[Any]]:
     path_fn = compile(expression)
 
     def fn(resource: ResourceType, context: ContextType = None) -> Optional[Any]:
-        return _format_result(path_fn(_validate_and_convert_resource(resource, r_model), context), True)
+        return _format_result(
+            path_fn(_validate_and_convert_resource(resource, r_model), context), True
+        )
 
     return fn
 
@@ -154,12 +165,12 @@ def _validate_and_convert_resource(resource: ResourceType, r_model: r4b.Resource
         if isinstance(resource, r_model):
             resource = resource.model_dump()
         else:
-            raise Exception("Resource is not of type {}".format(r_model))
+            raise Exception(f"Resource is not of type {r_model}")
 
     return resource
 
 
-def _format_result(result: list, is_first = False) -> list | dict | str | int | float | bool:
+def _format_result(result: list, is_first=False) -> list | dict | str | int | float | bool:
     if isinstance(result, list):
         if is_first:
             if len(result) > 0:
@@ -169,4 +180,4 @@ def _format_result(result: list, is_first = False) -> list | dict | str | int | 
         else:
             return result
     else:
-        raise Exception("Unexpected result type {}".format(type(result)))
+        raise Exception(f"Unexpected result type {type(result)}")
