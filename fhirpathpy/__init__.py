@@ -135,14 +135,7 @@ def compile_as_array(expression: str, r_model: r4b.Resource = None) -> Callable[
     path_fn = compile(expression)
 
     def fn(resource: ResourceType, context: ContextType = None) -> List[Any]:
-        if r_model is not None:
-            if isinstance(resource, r_model):
-                resource = resource.model_dump()
-            else:
-                raise Exception("Resource is not of type {}".format(r_model))
-
-        result = path_fn(resource, context)
-        return result if isinstance(result, list) else ([] if result is None else [result])
+        return _format_result(path_fn(_validate_and_convert_resource(resource, r_model), context), False)
 
     return fn
 
@@ -151,16 +144,29 @@ def compile_as_first(expression: str, r_model: r4b.Resource = None) -> Callable[
     path_fn = compile(expression)
 
     def fn(resource: ResourceType, context: ContextType = None) -> Optional[Any]:
-        if r_model is not None:
-            if isinstance(resource, r_model):
-                resource = resource.model_dump()
-            else:
-                raise Exception("Resource is not of type {}".format(r_model))
-
-        result = path_fn(resource, context)
-        if isinstance(result, list):
-            return result[0] if result else None
-
-        return result
+        return _format_result(path_fn(_validate_and_convert_resource(resource, r_model), context), True)
 
     return fn
+
+
+def _validate_and_convert_resource(resource: ResourceType, r_model: r4b.Resource = None) -> dict:
+    if r_model is not None:
+        if isinstance(resource, r_model):
+            resource = resource.model_dump()
+        else:
+            raise Exception("Resource is not of type {}".format(r_model))
+
+    return resource
+
+
+def _format_result(result: list, is_first = False) -> list | dict | str | int | float | bool:
+    if isinstance(result, list):
+        if is_first:
+            if len(result) > 0:
+                return result[0]
+            else:
+                return []
+        else:
+            return result
+    else:
+        raise Exception("Unexpected result type {}".format(type(result)))
