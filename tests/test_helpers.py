@@ -2,11 +2,13 @@ from fhirpathpy import compile_as_first, compile_as_array
 import fhirpy_types_r4b as r4b
 import pytest
 
+class CustomModel:
+    pass
+CUSTOM_MODEL = CustomModel()
 PATIENT_DATA = {
     "resourceType": "Patient",
     "name": [{"given": ["First", "Middle"], "family": "Last"}],
 }
-
 PATIENT_RESOURCE = r4b.Patient(**PATIENT_DATA)
 
 EXPRESSION = "Patient.name.given"
@@ -30,6 +32,7 @@ def compile_as_test(fn, resource, path, input_type, output_type, expected):
     [
         (compile_as_first, PATIENT_RESOURCE, EXPRESSION, r4b.Observation, str, "Resource type is <class 'fhirpy_types_r4b.Patient'>, expected <class 'fhirpy_types_r4b.Observation'>"),
         (compile_as_array, PATIENT_RESOURCE, EXPRESSION, r4b.Observation, list[str], "Resource type is <class 'fhirpy_types_r4b.Patient'>, expected <class 'fhirpy_types_r4b.Observation'>"),
+        (compile_as_first, CUSTOM_MODEL, "Patient.name", type(CUSTOM_MODEL), str, "Don't know how to work with type <class 'tests.test_helpers.CustomModel'>"),
     ],
 )
 def exception_compile_as_test(fn, resource, path, input_type, output_type, expected):
