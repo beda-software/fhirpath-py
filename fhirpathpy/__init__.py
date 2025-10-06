@@ -137,7 +137,7 @@ def compile_as_array(
 ) -> Callable[[InputType, ContextType], OutputType]:
     path_fn = compile(expression)
 
-    def fn(resource: input_type, context: ContextType = None) -> list[output_type]:
+    def fn(resource: InputType, context: ContextType = None) -> OutputType:
         return _format_result(
             path_fn(_validate_and_convert_resource(resource, input_type), context), output_type, False
         )
@@ -150,7 +150,7 @@ def compile_as_first(
 ) -> Callable[[InputType, ContextType], OutputType]:
     path_fn = compile(expression)
 
-    def fn(resource: input_type, context: ContextType = None) -> output_type:
+    def fn(resource: InputType, context: ContextType = None) -> OutputType:
         return _format_result(
             path_fn(_validate_and_convert_resource(resource, input_type), context), output_type, True
         )
