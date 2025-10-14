@@ -165,22 +165,26 @@ def _validate_and_convert_resource(resource: Any, input_type: type[InputType]) -
         elif hasattr(resource, "model_dump"):
             return resource.model_dump()
         else:
-            raise Exception(f"Don't know how to work with type {type(resource)}")
+            raise Exception(f"Don't know how to work with type {type(resource).__name__}")
     else:
-        raise Exception(f"Resource type is {type(resource)}, expected {input_type}")
+        raise Exception(f"Resource type is {type(resource).__name__}, expected {input_type.__name__}")
 
 
 def _format_result(result: list, output_type: type[OutputType], is_first=False) -> Any:
-    if isinstance(result, list):
-        if is_first:
-            if len(result) > 0:
-                if isinstance(result[0], output_type):
-                    return result[0]
-                else:
-                    raise Exception(f"Unexpected result type {type(result)}, expected {output_type}")
-            else:
-                return None
-        else:
-            return result
-    else:
-        raise Exception(f"Unexpected result type {type(result)}")
+    if not isinstance(result, list):
+        raise Exception(f"Unexpected result type {type(result).__name__}")
+
+    if not is_first:
+        return result
+
+    if len(result) == 0:
+        return None
+
+    first_item = result[0]
+    if not isinstance(first_item, output_type):
+        raise Exception(
+            f"Expected first result to be {output_type.__name__}, "
+            f"but got {type(first_item).__name__}"
+        )
+
+    return first_item

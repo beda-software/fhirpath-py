@@ -45,10 +45,10 @@ def compile_as_test(fn, resource, path, input_type, output_type, expected):
 @pytest.mark.parametrize(
     ("fn", "resource", "path", "input_type", "output_type", "expected"),
     [
-        (compile_as_first, PATIENT_RESOURCE, EXPRESSION, r4b.Observation, str, "Resource type is <class 'fhirpy_types_r4b.Patient'>, expected <class 'fhirpy_types_r4b.Observation'>"),
-        (compile_as_array, PATIENT_RESOURCE, EXPRESSION, r4b.Observation, list[str], "Resource type is <class 'fhirpy_types_r4b.Patient'>, expected <class 'fhirpy_types_r4b.Observation'>"),
-        (compile_as_first, CUSTOM_MODEL, "Patient.name", type(CUSTOM_MODEL), str, "Don't know how to work with type <class 'tests.test_helpers.CustomModel'>"),
-        (compile_as_first, PATIENT_DATA, "Patient.telecom.value", dict, int, "Unexpected result type <class 'list'>, expected <class 'int'>")
+        (compile_as_first, PATIENT_RESOURCE, EXPRESSION, r4b.Observation, str, "Resource type is Patient, expected Observation"),
+        (compile_as_array, PATIENT_RESOURCE, EXPRESSION, r4b.Observation, list[str], "Resource type is Patient, expected Observation"),
+        (compile_as_first, CUSTOM_MODEL, "Patient.name", type(CUSTOM_MODEL), str, "Don't know how to work with type CustomModel"),
+        (compile_as_first, PATIENT_DATA, "Patient.telecom.value", dict, int, "Expected first result to be int, but got str")
     ],
 )
 def exception_compile_as_test(fn, resource, path, input_type, output_type, expected):
@@ -65,4 +65,4 @@ def format_result_exception_test():
         _format_result("resource", list)
         assert False, "Expected exception not raised"
     except Exception as e:
-        assert str(e) == "Unexpected result type <class 'str'>"
+        assert str(e) == "Unexpected result type str"
