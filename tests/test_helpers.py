@@ -1,4 +1,4 @@
-from fhirpathpy import compile_as_first, compile_as_array
+from fhirpathpy import compile_as_first, compile_as_array, _format_result
 import fhirpy_types_r4b as r4b
 import pytest
 
@@ -58,3 +58,11 @@ def exception_compile_as_test(fn, resource, path, input_type, output_type, expec
         assert False, "Expected exception not raised"
     except Exception as e:
         assert str(e) == expected
+
+
+def test_format_result_exception():
+    try:
+        _format_result("resource", list)
+        assert False, "Expected exception not raised"
+    except Exception as e:
+        assert str(e) == "Unexpected result type <class 'str'>}"
