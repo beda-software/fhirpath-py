@@ -132,30 +132,28 @@ type ContextType = Optional[dict]
 InputType = TypeVar('InputType')
 OutputType = TypeVar('OutputType')
 
-def compile_as_array(
-    expression: str, input_type: type[InputType], output_type: type[OutputType]
+def prepare_fhirpath_fn(
+    expression: str, input_type: type[InputType], output_type: type[OutputType], is_first: bool = False
 ) -> Callable[[InputType, ContextType], OutputType]:
     path_fn = compile(expression)
 
     def fn(resource: InputType, context: ContextType = None) -> OutputType:
         return _format_result(
-            path_fn(_validate_and_convert_resource(resource, input_type), context), output_type, False
+            path_fn(_validate_and_convert_resource(resource, input_type), context), output_type, is_first
         )
 
     return fn
+
+def compile_as_array(
+    expression: str, input_type: type[InputType], output_type: type[OutputType]
+) -> Callable[[InputType, ContextType], OutputType]:
+    return prepare_fhirpath_fn(expression, input_type, output_type)
 
 
 def compile_as_first(
     expression: str, input_type: type[InputType], output_type: type[OutputType]
 ) -> Callable[[InputType, ContextType], OutputType]:
-    path_fn = compile(expression)
-
-    def fn(resource: InputType, context: ContextType = None) -> OutputType:
-        return _format_result(
-            path_fn(_validate_and_convert_resource(resource, input_type), context), output_type, True
-        )
-
-    return fn
+    return prepare_fhirpath_fn(expression, input_type, output_type, True)
 
 
 def _validate_and_convert_resource(resource: Any, input_type: type[InputType]) -> dict:
