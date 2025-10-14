@@ -159,15 +159,16 @@ def compile_as_first(
 
 
 def _validate_and_convert_resource(resource: Any, input_type: type[InputType]) -> dict:
-    if isinstance(resource, input_type):
-        if isinstance(resource, dict):
-            return resource
-        elif hasattr(resource, "model_dump"):
-            return resource.model_dump()
-        else:
-            raise Exception(f"Don't know how to work with type {type(resource).__name__}")
-    else:
+    if not isinstance(resource, input_type):
         raise Exception(f"Resource type is {type(resource).__name__}, expected {input_type.__name__}")
+
+    if isinstance(resource, dict):
+        return resource
+
+    if hasattr(resource, "model_dump"):
+        return resource.model_dump()
+
+    raise Exception(f"Don't know how to work with type {type(resource).__name__}")
 
 
 def _format_result(result: list, output_type: type[OutputType], is_first=False) -> Any:
