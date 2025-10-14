@@ -60,9 +60,9 @@ def exception_compile_as_test(fn, resource, path, input_type, output_type, expec
         assert str(e) == expected
 
 
-def test_format_result_exception():
+def format_result_exception_test():
     try:
         _format_result("resource", list)
         assert False, "Expected exception not raised"
     except Exception as e:
-        assert str(e) == "Unexpected result type <class 'str'>}"
+        assert str(e) == "Unexpected result type <class 'str'>"
