@@ -1,4 +1,7 @@
-from typing import Any, Callable, Optional, TypeVar
+from __future__ import annotations
+
+from collections.abc import Callable, Mapping
+from typing import Any, TypeAlias, TypeVar, cast
 
 from fhirpathpy.engine import do_eval
 from fhirpathpy.engine.invocations.constants import constants
@@ -14,6 +17,9 @@ __copyright__ = "Copyright 2025 beda.software"
 
 # Version synonym
 VERSION = __version__
+
+ResourceType: TypeAlias = Mapping[str, Any]
+ContextType: TypeAlias = Mapping[str, Any] | None
 
 
 def apply_parsed_path(resource, parsedPath, context=None, model=None, options=None):
@@ -86,7 +92,13 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None, options=No
     return visit(node)
 
 
-def evaluate(resource, path, context=None, model=None, options=None):
+def evaluate(
+    resource: ResourceType | list,
+    path: str | dict,
+    context: dict | None = None,
+    model: dict | None = None,
+    options: dict | None = None,
+) -> list:
     """
     Evaluates the "path" FHIRPath expression on the given resource, using data
     from "context" for variables mentioned in the "path" expression.
@@ -111,7 +123,9 @@ def evaluate(resource, path, context=None, model=None, options=None):
     return apply_parsed_path(resource, node, context or {}, model, options)
 
 
-def compile(path, model=None, options=None):
+def compile(
+    path: str, model: dict | None = None, options: dict | None = None
+) -> Callable[[ResourceType, ContextType], list]:
     """
     Returns a function that takes a resource and an optional context hash (see
     "evaluate"), and returns the result of evaluating the given FHIRPath
@@ -128,37 +142,45 @@ def compile(path, model=None, options=None):
     return set_paths(apply_parsed_path, parsedPath=parse(path), model=model, options=options)
 
 
-type ContextType = Optional[dict]
-InputType = TypeVar('InputType')
-OutputType = TypeVar('OutputType')
+InputType = TypeVar("InputType")
+OutputType = TypeVar("OutputType")
 
-def prepare_fhirpath_fn(
-    expression: str, input_type: type[InputType], output_type: type[OutputType], is_first: bool = False
-) -> Callable[[InputType, ContextType], OutputType]:
-    path_fn = compile(expression)
-
-    def fn(resource: InputType, context: ContextType = None) -> OutputType:
-        return _format_result(
-            path_fn(_validate_and_convert_resource(resource, input_type), context), output_type, is_first
-        )
-
-    return fn
 
 def compile_as_array(
     expression: str, input_type: type[InputType], output_type: type[OutputType]
-) -> Callable[[InputType, ContextType], OutputType]:
-    return prepare_fhirpath_fn(expression, input_type, output_type)
+) -> Callable[[InputType, ContextType], list[OutputType]]:
+    path_fn = compile(expression)
+
+    def fn(resource: Any, context: ContextType = None) -> Any:
+        return _format_result(
+            path_fn(_prepare_data(resource, input_type), context),
+            output_type,
+            is_array=True,
+        )
+
+    return cast(Callable[[InputType, ContextType], list[OutputType]], fn)
 
 
 def compile_as_first(
     expression: str, input_type: type[InputType], output_type: type[OutputType]
-) -> Callable[[InputType, ContextType], OutputType]:
-    return prepare_fhirpath_fn(expression, input_type, output_type, True)
+) -> Callable[[InputType, ContextType], OutputType | None]:
+    path_fn = compile(expression)
+
+    def fn(resource: Any, context: ContextType = None) -> Any:
+        return _format_result(
+            path_fn(_prepare_data(resource, input_type), context),
+            output_type,
+            is_array=False,
+        )
+
+    return cast(Callable[[InputType, ContextType], OutputType | None], fn)
 
 
-def _validate_and_convert_resource(resource: Any, input_type: type[InputType]) -> dict:
+def _prepare_data(resource: Any, input_type: type[InputType]) -> ResourceType:
     if not isinstance(resource, input_type):
-        raise Exception(f"Resource type is {type(resource).__name__}, expected {input_type.__name__}")
+        raise Exception(
+            f"Resource type is {type(resource).__name__}, expected {input_type.__name__}"
+        )
 
     if isinstance(resource, dict):
         return resource
@@ -169,21 +191,25 @@ def _validate_and_convert_resource(resource: Any, input_type: type[InputType]) -
     raise Exception(f"Don't know how to work with type {type(resource).__name__}")
 
 
-def _format_result(result: list, output_type: type[OutputType], is_first=False) -> Any:
-    if not isinstance(result, list):
-        raise Exception(f"Unexpected result type {type(result).__name__}")
+def _format_result(result: list, output_type: type[OutputType], is_array=False) -> Any:
+    result = [_format_item(item, output_type) for item in result]
 
-    if not is_first:
+    if is_array:
         return result
 
     if len(result) == 0:
         return None
 
-    first_item = result[0]
-    if not isinstance(first_item, output_type):
+    return result[0]
+
+
+def _format_item(item: Any, output_type: type[OutputType]) -> OutputType:
+    if hasattr(output_type, "model_validate"):
+        return cast(Any, output_type).model_validate(item)
+
+    if not isinstance(item, output_type):
         raise Exception(
-            f"Expected first result to be {output_type.__name__}, "
-            f"but got {type(first_item).__name__}"
+            f"Expected result to be {output_type.__name__}, but got {type(item).__name__}"
         )
 
-    return first_item
+    return item
