@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 100
-target-version = ['py311']
+target-version = ['py310', 'py311', 'py312', 'py313']
 exclude = '''
 (
   /(
@@ -40,14 +40,15 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 
 [project.optional-dependencies]
 test = ["pytest==7.1.1", "pyyaml==5.4"]
@@ -60,7 +61,7 @@ Changelog = "https://github.com/beda-software/fhirpath-py/blob/master/CHANGELOG.
 
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py310"
 line-length = 100
 include = ["app/**/*.py", "tests/**/*.py"]
 
@@ -70,6 +71,12 @@ select = ["B", "F", "I", "E", "UP", "N", "PL", "PERF"]
 # N803/N806 is not relevant for us because we use camelCase for historical reasons
 ignore = ["E501", "N803", "N806"]
 unfixable = ["F401"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
 
 [tool.autohooks]
 mode = "pipenv"
