@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from collections.abc import Callable, Mapping, Sequence
-from typing import Any, Protocol, TypeAlias, TypeVar, cast
+from typing import Any, Protocol, TypeVar, cast
 
 from fhirpathpy.engine import do_eval
 from fhirpathpy.engine.invocations.constants import constants
@@ -16,8 +18,8 @@ __copyright__ = "Copyright 2026 beda.software"
 # Version synonym
 VERSION = __version__
 
-ResourceType: TypeAlias = Mapping[str, Any]
-ContextType: TypeAlias = Mapping[str, Any] | None
+ResourceType = Mapping[str, Any]
+ContextType = Mapping[str, Any] | None
 
 
 def apply_parsed_path(resource, parsedPath, context=None, model=None, options=None):

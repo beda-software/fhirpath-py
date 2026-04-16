@@ -1,4 +1,6 @@
-import fhirpy_types_r4b as r4b
+from typing import Literal
+
+import pydantic
 import pytest
 
 from fhirpathpy import compile_as_array, compile_as_first
@@ -6,6 +8,37 @@ from fhirpathpy import compile_as_array, compile_as_first
 
 class CustomModel:
     pass
+
+
+class HumanName(pydantic.BaseModel):
+    given: list[str]
+    family: str
+
+
+class ContactPoint(pydantic.BaseModel):
+    system: Literal["phone", "email", "fax", "pager", "url", "sms", "other"]
+    value: str
+    use: Literal["home", "work", "temp", "old", "mobile"]
+
+
+class Patient(pydantic.BaseModel):
+    resourceType: Literal["Patient"] = "Patient"  # noqa: N815
+    name: list[HumanName]
+    telecom: list[ContactPoint]
+
+
+class Observation(pydantic.BaseModel):
+    resourceType: Literal["Observation"] = "Observation"  # noqa: N815
+
+
+class BundleEntry(pydantic.BaseModel):
+    resource: Patient | Observation
+
+
+class Bundle(pydantic.BaseModel):
+    resourceType: Literal["Bundle"] = "Bundle"  # noqa: N815
+    type: Literal["searchset"]
+    entry: list[BundleEntry]
 
 
 CUSTOM_MODEL = CustomModel()
@@ -19,8 +52,8 @@ PATIENT_DATA = {
         {"system": "phone", "value": "555-555-2001", "use": "home"},
     ],
 }
-PATIENT_RESOURCE = r4b.Patient(**PATIENT_DATA)
-BUNDLE_RESOURCE = r4b.Bundle(type="searchset", entry=[r4b.BundleEntry(resource=PATIENT_RESOURCE)])
+PATIENT_RESOURCE = Patient(**PATIENT_DATA)
+BUNDLE_RESOURCE = Bundle(type="searchset", entry=[BundleEntry(resource=PATIENT_RESOURCE)])
 
 EXPRESSION = "Patient.name.given"
 
@@ -29,13 +62,13 @@ EXPRESSION = "Patient.name.given"
     ("resource", "path", "input_type", "output_type", "expected"),
     [
         (PATIENT_DATA, EXPRESSION, dict, str, "First"),
-        (PATIENT_RESOURCE, EXPRESSION, r4b.Patient, str, "First"),
+        (PATIENT_RESOURCE, EXPRESSION, Patient, str, "First"),
         (PATIENT_DATA, "Patient.gender", dict, str, None),
         (
             BUNDLE_RESOURCE,
             "Bundle.entry.resource.where(resourceType='Patient')",
-            r4b.Bundle,
-            r4b.Patient,
+            Bundle,
+            Patient,
             PATIENT_RESOURCE,
         ),
     ],
@@ -51,12 +84,12 @@ def compile_as_first_test(resource, path, input_type, output_type, expected):
     ("resource", "path", "input_type", "output_type", "expected"),
     [
         (PATIENT_DATA, EXPRESSION, dict, str, ["First", "Middle"]),
-        (PATIENT_RESOURCE, EXPRESSION, r4b.Patient, str, ["First", "Middle"]),
+        (PATIENT_RESOURCE, EXPRESSION, Patient, str, ["First", "Middle"]),
         (
             BUNDLE_RESOURCE,
             "Bundle.entry.resource.where(resourceType='Patient')",
-            r4b.Bundle,
-            r4b.Patient,
+            Bundle,
+            Patient,
             [PATIENT_RESOURCE],
         ),
     ],
@@ -76,7 +109,7 @@ def compile_as_array_test(resource, path, input_type, output_type, expected):
         (
             PATIENT_RESOURCE,
             EXPRESSION,
-            r4b.Observation,
+            Observation,
             str,
             "Resource type is Patient, expected Observation",
         ),
@@ -109,7 +142,7 @@ def exception_compile_as_first_test(resource, path, input_type, output_type, exp
         (
             PATIENT_RESOURCE,
             EXPRESSION,
-            r4b.Observation,
+            Observation,
             str,
             "Resource type is Patient, expected Observation",
         ),
