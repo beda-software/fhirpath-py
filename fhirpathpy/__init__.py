@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any, Protocol, TypeAlias, TypeVar, cast
 
@@ -10,10 +8,10 @@ from fhirpathpy.engine.util import arraify, get_data, process_user_invocation_ta
 from fhirpathpy.parser import parse
 
 __title__ = "fhirpathpy"
-__version__ = "2.1.0"
+__version__ = "2.2.0"
 __author__ = "beda.software"
 __license__ = "MIT"
-__copyright__ = "Copyright 2025 beda.software"
+__copyright__ = "Copyright 2026 beda.software"
 
 # Version synonym
 VERSION = __version__
