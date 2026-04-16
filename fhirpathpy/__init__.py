@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
-from typing import Any, TypeAlias, TypeVar, cast
+from collections.abc import Callable, Mapping, Sequence
+from typing import Any, Protocol, TypeAlias, TypeVar, cast
 
 from fhirpathpy.engine import do_eval
 from fhirpathpy.engine.invocations.constants import constants
@@ -144,11 +144,24 @@ def compile(
 
 InputType = TypeVar("InputType")
 OutputType = TypeVar("OutputType")
+# Contravariant: a callable accepting a wider input type is a valid subtype.
+_I_contra = TypeVar("_I_contra", contravariant=True)
+# Covariant: a callable returning a narrower output type is a valid subtype.
+# Sequence (read-only) is required here because list is invariant and rejects covariant TypeVars.
+_O_co = TypeVar("_O_co", covariant=True)
+
+
+class CompiledFirst(Protocol[_I_contra, _O_co]):
+    def __call__(self, resource: _I_contra, context: ContextType = ...) -> _O_co | None: ...
+
+
+class CompiledArray(Protocol[_I_contra, _O_co]):
+    def __call__(self, resource: _I_contra, context: ContextType = ...) -> Sequence[_O_co]: ...
 
 
 def compile_as_array(
     expression: str, input_type: type[InputType], output_type: type[OutputType]
-) -> Callable[[InputType, ContextType], list[OutputType]]:
+) -> CompiledArray[InputType, OutputType]:
     path_fn = compile(expression)
 
     def fn(resource: Any, context: ContextType = None) -> Any:
@@ -158,12 +171,12 @@ def compile_as_array(
             is_array=True,
         )
 
-    return cast(Callable[[InputType, ContextType], list[OutputType]], fn)
+    return cast(CompiledArray[InputType, OutputType], fn)
 
 
 def compile_as_first(
     expression: str, input_type: type[InputType], output_type: type[OutputType]
-) -> Callable[[InputType, ContextType], OutputType | None]:
+) -> CompiledFirst[InputType, OutputType]:
     path_fn = compile(expression)
 
     def fn(resource: Any, context: ContextType = None) -> Any:
@@ -173,7 +186,7 @@ def compile_as_first(
             is_array=False,
         )
 
-    return cast(Callable[[InputType, ContextType], OutputType | None], fn)
+    return cast(CompiledFirst[InputType, OutputType], fn)
 
 
 def _prepare_data(resource: Any, input_type: type[InputType]) -> ResourceType:
