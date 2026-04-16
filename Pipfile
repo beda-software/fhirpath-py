@@ -8,15 +8,14 @@ antlr4-python3-runtime = "~=4.10"
 python-dateutil = "~=2.8"
 
 [dev-packages]
+exceptiongroup = {version = "*", markers = "python_version < '3.11'"}
 fhirpy-types-r4b = "==0.1.1"
 pytest = "==7.1.1"
 pytest-cov = "==3.0.0"
 pyyaml = "==6.0.1"
 pre-commit = "~=2.21.0"
 ipython = "*"
-black = "*"
 types-python-dateutil = "*"
 ruff = "==0.6.3"
 autohooks = "*"
-autohooks-plugin-black = "*"
 autohooks-plugin-ruff = "*"
