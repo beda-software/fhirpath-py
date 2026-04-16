@@ -26,7 +26,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -34,7 +33,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 [project.optional-dependencies]
 test = ["pytest==7.1.1", "pyyaml==5.4", "fhirpy-types-r4b==0.1.1"]
@@ -47,7 +46,7 @@ Changelog = "https://github.com/beda-software/fhirpath-py/blob/master/CHANGELOG.
 
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 line-length = 100
 include = ["fhirpathpy/**/*.py", "tests/**/*.py"]
 
@@ -58,7 +57,7 @@ ignore = ["E501", "N803", "N806"]
 unfixable = ["F401"]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 ignore_missing_imports = true
 plugins = ["pydantic.mypy"]
 

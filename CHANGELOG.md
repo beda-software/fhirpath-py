@@ -2,7 +2,7 @@
 
 - Add helpers for compile_as_first and compile_as_array #63 @projkov @ruscoder
 - Add py.typed marker, specify types for compile, evaluate
-- Drop support for python 3.9
+- Drop support for python 3.9 and 3.10
 
 ## 2.1.0
 
