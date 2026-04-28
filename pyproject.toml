@@ -50,6 +50,7 @@ Changelog = "https://github.com/beda-software/fhirpath-py/blob/master/CHANGELOG.
 target-version = "py310"
 line-length = 100
 include = ["fhirpathpy/**/*.py", "tests/**/*.py"]
+exclude = ["fhirpathpy/parser/**/*.py"]
 
 [tool.ruff.lint]
 select = ["B", "F", "I", "E", "UP", "N", "PL", "PERF"]

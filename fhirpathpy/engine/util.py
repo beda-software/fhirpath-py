@@ -13,9 +13,7 @@ class set_paths:
         self.options = options
 
     def __call__(self, resource, context=None):
-        return self.func(
-            resource, self.parsedPath, context or {}, self.model, self.options
-        )
+        return self.func(resource, self.parsedPath, context or {}, self.model, self.options)
 
 
 def get_data(value):

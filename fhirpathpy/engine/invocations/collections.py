@@ -1,4 +1,4 @@
-""" 
+"""
 This file holds code to hande the FHIRPath Math functions.
 """
 

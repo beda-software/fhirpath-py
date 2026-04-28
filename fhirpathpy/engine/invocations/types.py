@@ -1,5 +1,6 @@
 from fhirpathpy.engine.nodes import TypeInfo
 
+
 def type_fn(ctx, coll):
     return [TypeInfo.from_value(value).__dict__ for value in coll]
 

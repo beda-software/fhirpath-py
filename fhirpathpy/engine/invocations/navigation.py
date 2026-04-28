@@ -30,7 +30,9 @@ def create_reduce_children(ctx, exclude_primitive_extensions):
                 if res.path is not None:
                     childPath = res.path + "." + prop
 
-                fullPath = f"{res.propName}.{prop}" if res.propName else childPath # The full path to the node (weill evenutally be) e.g. Patient.name[0].given
+                fullPath = (
+                    f"{res.propName}.{prop}" if res.propName else childPath
+                )  # The full path to the node (weill evenutally be) e.g. Patient.name[0].given
                 fullPath = fullPath.replace("_", "")
 
                 if prop == "extension":
@@ -52,14 +54,17 @@ def create_reduce_children(ctx, exclude_primitive_extensions):
                 # If the prop tolower ends with the type tolower
                 if prop.lower().endswith(childPath.lower()) and len(prop) > len(childPath):
                     # Check if the path is actually in the choice types
-                    altPropName = res.path + "." + prop[:-len(childPath)]
+                    altPropName = res.path + "." + prop[: -len(childPath)]
                     actualTypes = model["choiceTypePaths"].get(altPropName, [])
                     if len(actualTypes) > 0:
                         # If it is, we can use it
                         fullPath = f"{res.propName}.{prop[:-len(childPath)]}"
 
                 if isinstance(value, list):
-                    mapped = [create_node(n, childPath, propName=f"{fullPath}[{i}]", index=i) for i, n in enumerate(value)]
+                    mapped = [
+                        create_node(n, childPath, propName=f"{fullPath}[{i}]", index=i)
+                        for i, n in enumerate(value)
+                    ]
                     acc = acc + mapped
                 else:
                     acc.append(create_node(value, childPath, propName=fullPath))

@@ -258,8 +258,9 @@ class FP_Quantity(FP_Type):
                 fromUnit in FP_Quantity._m_cm_mm_conversion_factor
                 or toUnit in FP_Quantity._m_cm_mm_conversion_factor
             ):
-                from_magnitude, to_magnitude = Decimal(from_m_cm_mm_magnitude), Decimal(
-                    to_m_cm_mm_magnitude
+                from_magnitude, to_magnitude = (
+                    Decimal(from_m_cm_mm_magnitude),
+                    Decimal(to_m_cm_mm_magnitude),
                 )
             return FP_Quantity(from_magnitude * value / to_magnitude, toUnit)
 
