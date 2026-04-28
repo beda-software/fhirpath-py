@@ -1,8 +1,8 @@
+import json
 from collections import abc
 from decimal import Decimal
-import json
-import fhirpathpy.engine.util as util
-import fhirpathpy.engine.nodes as nodes
+
+from fhirpathpy.engine import nodes, util
 
 """
 This file holds code to hande the FHIRPath Math functions.
@@ -81,7 +81,7 @@ def equivalence(ctx, x, y):
     if isinstance(x_val, nodes.FP_Quantity) and isinstance(y_val, nodes.FP_Quantity):
         return x_val.deep_equal(y_val)
 
-    if isinstance(a, (abc.Mapping, list)) and isinstance(b, (abc.Mapping, list)):
+    if isinstance(a, abc.Mapping | list) and isinstance(b, abc.Mapping | list):
 
         def deep_equal(a, b):
             if isinstance(a, abc.Mapping) and isinstance(b, abc.Mapping):
@@ -94,7 +94,7 @@ def equivalence(ctx, x, y):
                 )
             elif isinstance(a, str) and isinstance(b, str):
                 return normalize_string(a) == normalize_string(b)
-            elif isinstance(a, (int, float)) and isinstance(b, (int, float)):
+            elif isinstance(a, int | float) and isinstance(b, int | float):
                 return abs(a - b) < 0.5
             else:
                 return a == b
@@ -190,12 +190,11 @@ def typecheck(a, b):
     if lClass != rClass and not areNumbers:
         d = None
 
-        # TODO refactor
-        if lClass == str and (rClass == nodes.FP_DateTime or rClass == nodes.FP_Time):
+        if lClass is str and (rClass in (nodes.FP_DateTime, nodes.FP_Time)):
             d = nodes.FP_DateTime(a) or nodes.FP_Time(a)
             if d is not None:
                 rtn = [d, b]
-        elif rClass == str and (lClass == nodes.FP_DateTime or lClass == nodes.FP_Time):
+        elif rClass is str and (lClass in (nodes.FP_DateTime, nodes.FP_Time)):
             d = nodes.FP_DateTime(b) or nodes.FP_Time(b)
             if d is not None:
                 rtn = [a, d]

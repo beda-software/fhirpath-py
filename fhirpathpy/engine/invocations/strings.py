@@ -1,12 +1,13 @@
 import base64
 import re
-import fhirpathpy.engine.util as util
+
+from fhirpathpy.engine import util
 
 
 def ensure_string_singleton(x):
     if len(x) == 1:
         d = util.get_data(x[0])
-        if type(d) == str:
+        if isinstance(d, str):
             return d
         raise Exception("Expected string, but got " + str(d))
 

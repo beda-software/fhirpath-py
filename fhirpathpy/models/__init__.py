@@ -1,8 +1,7 @@
-import os
-from collections import defaultdict
 import json
-
+import os
 import pathlib
+from collections import defaultdict
 
 current_dir = pathlib.Path(__file__).parent.resolve()
 

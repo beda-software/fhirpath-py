@@ -1,13 +1,13 @@
 def or_op(ctx, a, b):
     if isinstance(b, list):
-        if a == True:
+        if a is True:
             return True
-        if a == False:
+        if a is False:
             return []
         if isinstance(a, list):
             return []
     if isinstance(a, list):
-        if b == True:
+        if b is True:
             return True
         return []
 
@@ -16,15 +16,15 @@ def or_op(ctx, a, b):
 
 def and_op(ctx, a, b):
     if isinstance(b, list):
-        if a == True:
+        if a is True:
             return []
-        if a == False:
+        if a is False:
             return False
         if isinstance(a, list):
             return []
 
     if isinstance(a, list):
-        if b == True:
+        if b is True:
             return []
         return False
 
@@ -42,19 +42,19 @@ def xor_op(ctx, a, b):
 
 def implies_op(ctx, a, b):
     if isinstance(b, list):
-        if a == True:
+        if a is True:
             return []
-        if a == False:
+        if a is False:
             return True
         if isinstance(a, list):
             return []
 
     if isinstance(a, list):
-        if b == True:
+        if b is True:
             return True
         return []
 
-    if a == False:
+    if a is False:
         return True
 
     return a and b

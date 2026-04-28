@@ -1,4 +1,4 @@
-import fhirpathpy.engine.invocations.existence as existence
+from fhirpathpy.engine.invocations import existence
 
 """
 This file holds code to hande the FHIRPath Combining functions

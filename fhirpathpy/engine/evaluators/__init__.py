@@ -1,12 +1,11 @@
+import json
+import re
 from collections import abc
 from decimal import Decimal
 from functools import reduce
 
-import re
-import json
-import fhirpathpy.engine as engine
-import fhirpathpy.engine.util as util
-import fhirpathpy.engine.nodes as nodes
+from fhirpathpy import engine
+from fhirpathpy.engine import nodes, util
 
 
 def boolean_literal(ctx, parentData, node):
@@ -71,7 +70,7 @@ def alias_op_expression(mapFn):
     def func(ctx, parentData, node):
         op = node["terminalNodeText"][0]
 
-        if not op in mapFn:
+        if op not in mapFn:
             raise Exception("Do not know how to alias " + op + " by " + json.dumps(mapFn))
 
         alias = mapFn[op]
@@ -204,9 +203,8 @@ def create_reduce_member_invocation(model, key):
             toAdd_ = res.data.get(f"_{key}")
             if key == "extension":
                 childPath = "Extension"
-        else:
-            if key == "length":
-                toAdd = len(res.data)
+        elif key == "length":
+            toAdd = len(res.data)
 
         childPath = (
             model["path2Type"].get(childPath, childPath)

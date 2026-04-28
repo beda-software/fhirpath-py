@@ -1,15 +1,13 @@
-from collections import abc
 import copy
-from datetime import datetime, timedelta, timezone
-from dateutil.relativedelta import relativedelta
-from dateutil import parser, tz
-from decimal import ROUND_HALF_UP, ROUND_UP, Decimal
-import math
 import json
+import math
 import re
-import time
-from typing import Optional
+from collections import abc
+from datetime import datetime, timedelta, timezone
+from decimal import ROUND_HALF_UP, ROUND_UP, Decimal
 
+from dateutil import parser, tz
+from dateutil.relativedelta import relativedelta
 
 timeRE = (
     r"^T?([0-9]{2})(?::([0-9]{2}))?(?::([0-9]{2}))?(?:\.([0-9]+))?(Z|(\+|-)[0-9]{2}(:[0-9]{2})?)?$"
@@ -344,7 +342,7 @@ class FP_TimeBase(FP_Type):
             2012-01 = 2011 returns false
             2012-01 ~ 2012 returns false
         """
-        if type(otherDateTime) != type(self):
+        if type(otherDateTime) is not type(self):
             return False
 
         thisdt_list = self._getMatchAsList()
@@ -356,7 +354,7 @@ class FP_TimeBase(FP_Type):
         indices_to_remove = [
             i
             for i in range(len(normalized_thisdt_list))
-            if normalized_thisdt_list[i] == normalized_otherdt_list[i] == None
+            if normalized_thisdt_list[i] is None and normalized_otherdt_list[i] is None
         ]
 
         for i in reversed(indices_to_remove):
@@ -414,7 +412,7 @@ class FP_TimeBase(FP_Type):
         ]
 
     def compare(self, otherDateTime):
-        if type(otherDateTime) != type(self):
+        if type(otherDateTime) is not type(self):
             raise TypeError
 
         thisDateTimeList = self._getMatchAsList()
@@ -425,7 +423,7 @@ class FP_TimeBase(FP_Type):
         indices_to_remove = [
             i
             for i in range(len(normalized_thisdt_list))
-            if normalized_thisdt_list[i] == normalized_otherdt_list[i] == None
+            if normalized_thisdt_list[i] is None and normalized_otherdt_list[i] is None
         ]
         for i in reversed(indices_to_remove):
             del normalized_thisdt_list[i]
@@ -599,7 +597,7 @@ class FP_Time(FP_TimeBase):
         if not re.match(timeRE, dateStr):
             return None
 
-        return super(FP_Time, cls).__new__(cls)
+        return super().__new__(cls)
 
     def __init__(self, timeStr):
         self.asStr = timeStr if isinstance(timeStr, str) else None
@@ -706,7 +704,7 @@ class FP_DateTime(FP_TimeBase):
         if not re.match(dateTimeRE, dateStr):
             return None
 
-        return super(FP_DateTime, cls).__new__(cls)
+        return super().__new__(cls)
 
     def __init__(self, dateStr):
         self.asStr = dateStr if isinstance(dateStr, str) else None
@@ -834,8 +832,8 @@ class ResourceNode:
         self.path = path
         self.data = data
         self._data = _data
-        self.propName: Optional[str] = propName
-        self.index: Optional[int] = index
+        self.propName: str | None = propName
+        self.index: int | None = index
 
     def __eq__(self, value):
         if isinstance(value, ResourceNode):

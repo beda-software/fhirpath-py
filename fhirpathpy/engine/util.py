@@ -1,8 +1,9 @@
-from decimal import Decimal
 import json
 from collections import OrderedDict
+from decimal import Decimal
 from functools import reduce
-from fhirpathpy.engine.nodes import ResourceNode, FP_Quantity
+
+from fhirpathpy.engine.nodes import FP_Quantity, ResourceNode
 
 
 class set_paths:
@@ -39,7 +40,7 @@ def parse_value(value):
 
 
 def is_number(value):
-    return isinstance(value, (int, Decimal, complex)) and not isinstance(value, bool)
+    return isinstance(value, int | Decimal | complex) and not isinstance(value, bool)
 
 
 def is_capitalized(x):
@@ -59,7 +60,7 @@ def is_nullable(x):
 
 
 def is_true(x):
-    return x == True or isinstance(x, list) and len(x) == 1 and x[0] == True
+    return x is True or isinstance(x, list) and len(x) == 1 and x[0] is True
 
 
 def arraify(x, instead_none=None):

@@ -54,8 +54,8 @@ exclude = ["fhirpathpy/parser/**/*.py"]
 
 [tool.ruff.lint]
 select = ["B", "F", "I", "E", "UP", "N", "PL", "PERF"]
-# N803/N806 is not relevant for us because we use camelCase for historical reasons
-ignore = ["E501", "N803", "N806"]
+# N8* is not relevant for us because of legacy code
+ignore = ["E501", "N801", "N802", "N805", "N815", "N816", "N803", "N806", "PLR0911", "PLR0912", "PLR0915", "PLR2004", "PLW0211"]
 unfixable = ["F401"]
 
 [tool.mypy]

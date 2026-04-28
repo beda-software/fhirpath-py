@@ -1,7 +1,7 @@
 from collections import abc
 from functools import reduce
-import fhirpathpy.engine.util as util
-import fhirpathpy.engine.nodes as nodes
+
+from fhirpathpy.engine import nodes, util
 
 create_node = nodes.ResourceNode.create_node
 

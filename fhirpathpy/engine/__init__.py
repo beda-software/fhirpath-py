@@ -1,11 +1,12 @@
 import json
 import numbers
-import fhirpathpy.engine.util as util
-from fhirpathpy.engine.nodes import TypeInfo
+
+from fhirpathpy.engine import util
 from fhirpathpy.engine.evaluators import evaluators
 from fhirpathpy.engine.invocations import (
     invocation_registry as base_invocation_registry,
 )
+from fhirpathpy.engine.nodes import TypeInfo
 
 
 def check_integer_param(val):
