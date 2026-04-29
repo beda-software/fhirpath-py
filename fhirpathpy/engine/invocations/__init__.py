@@ -50,6 +50,7 @@ invocation_registry = {
     "skip": {"fn": filtering.skip_fn, "arity": {1: ["Integer"]}},
     "intersect": {"fn": subsetting.intersect_fn, "arity": {1: ["AnyAtRoot"]}},
     "combine": {"fn": combining.combine_fn, "arity": {1: ["AnyAtRoot"]}},
+    "coalesce": {"fn": combining.coalesce_fn, "variadic": "Expr"},
     "iif": {"fn": misc.iif_macro, "arity": {2: ["Expr", "Expr"], 3: ["Expr", "Expr", "Expr"]}},
     "trace": {"fn": misc.trace_fn, "arity": {0: [], 1: ["String"]}},
     "toInteger": {"fn": misc.to_integer},
