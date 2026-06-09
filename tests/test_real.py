@@ -1,7 +1,7 @@
 import pickle
+import pytest
 
 from fhirpathpy import compile, evaluate
-
 
 def find_concept_test():
     env = {}
@@ -190,3 +190,30 @@ def compile_with_user_defined_table_test():
         options={"userInvocationTable": user_invocation_table},
     )
     assert expr({"a": [5, 6, 7]}) == [5 * 5, 6 * 6, 7 * 7]
+
+
+def age_comparation_test():
+    assert evaluate(
+        {"resourceType": "Patient", "birthDate": "2024-08-01"},
+        "Patient.birthDate + 12 month <= now()",
+    ) == [True]
+
+@pytest.mark.parametrize(
+    ("effective", "result"),
+    [
+        (None, []),
+        ({}, []),
+        ("2020", ["2020"]),
+        ("2020-01-01", ["2020-01-01"])
+    ],
+)
+def emty_substring_test(effective, result):
+    if(isinstance(effective, str)):
+        effective = {"effective": effective}
+    r = evaluate(effective, "effective.toString().substring(0,10).toDate()")
+    if len(r) > 0:
+        assert len(r) == len(result)
+        for index,item in enumerate(r):
+            assert str(item) == result[index]
+    else:
+        assert r == result

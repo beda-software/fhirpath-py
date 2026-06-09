@@ -129,54 +129,53 @@ def to_string(ctx, coll):
 
 def to_date_time(ctx, coll):
     ln = len(coll)
-    rtn = []
     if ln > 1:
         raise Exception("to_date_time called for a collection of length " + str(ln))
 
-    if ln == 1:
-        value = util.get_data(coll[0])
+    if ln != 1:
+        return []
 
-        dateTimeObject = nodes.FP_DateTime(value)
+    value = util.get_data(coll[0])
+    dateTimeObject = nodes.FP_DateTime(value)
 
-        if dateTimeObject:
-            rtn.append(dateTimeObject)
+    if not dateTimeObject:
+        return []
 
-    return util.get_data(rtn[0])
+    return util.get_data(dateTimeObject)
 
 
 def to_time(ctx, coll):
     ln = len(coll)
-    rtn = []
     if ln > 1:
         raise Exception("to_time called for a collection of length " + str(ln))
 
-    if ln == 1:
-        value = util.get_data(coll[0])
+    if ln != 1:
+        return []
 
-        timeObject = nodes.FP_Time(value)
+    value = util.get_data(coll[0])
+    timeObject = nodes.FP_Time(value)
 
-        if timeObject:
-            rtn.append(timeObject)
+    if not timeObject:
+        return []
 
-    return util.get_data(rtn[0])
+    return util.get_data(timeObject)
 
 
 def to_date(ctx, coll):
     ln = len(coll)
-    rtn = []
-
     if ln > 1:
         raise Exception("to_date called for a collection of length " + str(ln))
 
-    if ln == 1:
-        value = util.get_data(coll[0])
+    if ln != 1:
+        return []
 
-        dateObject = nodes.FP_DateTime(value)
+    value = util.get_data(coll[0])
+    dateObject = nodes.FP_DateTime(value)
 
-        if dateObject:
-            rtn.append(dateObject)
+    if not dateObject:
+        return []
 
-    return util.get_data(rtn[0])
+    return util.get_data(dateObject)
 
 
 def create_converts_to_fn(to_function, _type):
