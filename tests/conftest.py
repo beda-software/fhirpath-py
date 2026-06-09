@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import yaml
 
@@ -7,14 +9,14 @@ from fhirpathpy.models import models
 from tests.resources import resources
 
 
-def pytest_collect_file(parent, path):
-    if path.ext == ".yaml":
-        return YamlFile.from_parent(parent, fspath=path)
+def pytest_collect_file(file_path: Path, parent):
+    if file_path.suffix == ".yaml":
+        return YamlFile.from_parent(parent, path=file_path)
 
 
 class YamlFile(pytest.File):
     def collect(self):
-        raw = yaml.safe_load(self.fspath.open())
+        raw = yaml.safe_load(self.path.read_text())
 
         suites = raw["tests"]
         subject = raw["subject"] if "subject" in raw else None
