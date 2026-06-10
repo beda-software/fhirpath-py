@@ -58,7 +58,7 @@ def create_reduce_children(ctx, exclude_primitive_extensions):
                     actualTypes = model["choiceTypePaths"].get(altPropName, [])
                     if len(actualTypes) > 0:
                         # If it is, we can use it
-                        fullPath = f"{res.propName}.{prop[:-len(childPath)]}"
+                        fullPath = f"{res.propName}.{prop[: -len(childPath)]}"
 
                 if isinstance(value, list):
                     mapped = [

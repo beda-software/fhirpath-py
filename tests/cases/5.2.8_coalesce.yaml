@@ -1,0 +1,33 @@
+tests:
+  - desc: '5.2.8 coalesce'
+
+  - desc: '** returns first non-empty value from identifier'
+    expression: "coalesce(Patient.identifier.where(system='required-system').value.first(), 'unknown')"
+    result:
+      - required-value
+
+  - desc: '** returns fallback when first is empty'
+    expression: "coalesce(Patient.identifier.where(system='other-system').value.first(), 'unknown')"
+    result:
+      - unknown
+
+  - desc: '** returns first non-empty collection among multiple args'
+    expression: "coalesce({}, (1 | 2), (3 | 4))"
+    result:
+      - 1
+      - 2
+
+  - desc: '** returns single value when first arg is empty'
+    expression: "coalesce({}, 1)"
+    result:
+      - 1
+
+  - desc: '** returns empty when only arg is empty'
+    expression: "coalesce({})"
+    result: []
+
+subject:
+  resourceType: Patient
+  identifier:
+    - system: required-system
+      value: required-value

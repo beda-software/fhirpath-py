@@ -646,6 +646,8 @@ class FP_Time(FP_TimeBase):
             return time_str
         return self.asStr
 
+    __hash__ = None
+
     def __eq__(self, other):
         if isinstance(other, str):
             return self.getTimeMatchStr()
@@ -733,6 +735,8 @@ class FP_DateTime(FP_TimeBase):
                 iso_str = iso_str[: iso_str.index(".") + 4] + iso_str[iso_str.index(".") + 7 :]
             return iso_str
         return self.asStr
+
+    __hash__ = None
 
     def __eq__(self, other):
         if isinstance(other, str):
