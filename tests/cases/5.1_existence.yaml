@@ -117,6 +117,14 @@ tests:
     expression: (0|1|2|3).all($this = $index)
     result: [true]
 
+  - desc: '** all with boolean field criterium (all true)'
+    expression: Functions.coll1.colltrue.attr.all($this)
+    result: [true]
+
+  - desc: '** all with boolean field criterium (contains false)'
+    expression: Functions.coll1.collwithfalse.attr.all($this)
+    result: [false]
+
 
   - desc: '5.1.5. allTrue() : boolean'
 # Takes a collection of boolean values and returns
