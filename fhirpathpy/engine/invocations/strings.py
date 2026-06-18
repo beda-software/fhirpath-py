@@ -125,6 +125,9 @@ def decode(ctx, coll, format):
 
 
 def join(ctx, coll, separator=""):
+    if not coll:
+        return []
+
     stringValues = []
     for n in coll:
         d = util.get_data(n)

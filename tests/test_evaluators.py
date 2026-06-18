@@ -95,6 +95,22 @@ def string_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
 
+@pytest.mark.parametrize(
+    ("resource", "path", "expected"),
+    [
+        # join on empty collection should return empty per FHIRPath spec
+        ({"a": []}, "a.join(',')", []),
+        ({"a": []}, "a.join()", []),
+        # join on non-empty collection still works
+        ({"a": ["hello", "world"]}, "a.join(',')", ["hello,world"]),
+        ({"a": ["hello", "world"]}, "a.join()", ["helloworld"]),
+        ({"a": ["a", "b", "c"]}, "a.join('-')", ["a-b-c"]),
+    ],
+)
+def join_function_test(resource, path, expected):
+    assert evaluate(resource, path) == expected
+
+
 """
 'select'
 'ofType'
