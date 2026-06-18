@@ -60,7 +60,9 @@ def is_nullable(x):
 
 
 def is_true(x):
-    return x is True or isinstance(x, list) and len(x) == 1 and x[0] is True
+    # Use == not is: mid-pipeline values are often ResourceNode wrappers; __eq__
+    # compares .data, while `is True` does not (see fhirpathpy 2.2.1 regression).
+    return x == True or isinstance(x, list) and len(x) == 1 and x[0] == True  # noqa: E712
 
 
 def arraify(x, instead_none=None):

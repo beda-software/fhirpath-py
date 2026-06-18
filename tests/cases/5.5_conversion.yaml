@@ -38,6 +38,14 @@ tests:
     expression: Functions.iif(false, 'a')
     result: []
 
+  - desc: '** iif with boolean field as criterium (true)'
+    expression: Functions.iif(attrtrue, 'a', 'b')
+    result: ['a']
+
+  - desc: '** iif with boolean field as criterium (false)'
+    expression: Functions.iif(attrfalse, 'a', 'b')
+    result: ['b']
+
   - desc: '5.5.2. toInteger() : integer'
     # If the input collection contains a single item, this functio# n will return a single integer if:
     # the item in the input collection is an integer
