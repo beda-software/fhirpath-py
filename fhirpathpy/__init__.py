@@ -84,8 +84,7 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None, options=No
             return res
 
         if isinstance(data, dict) and not isinstance(data, FP_Type):
-            for key, value in data.items():
-                data[key] = visit(value)
+            return {key: visit(value) for key, value in data.items()}
 
         return data
 
