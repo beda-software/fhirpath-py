@@ -10,7 +10,7 @@ from fhirpathpy.engine.util import arraify, get_data, process_user_invocation_ta
 from fhirpathpy.parser import parse
 
 __title__ = "fhirpathpy"
-__version__ = "2.2.3"
+__version__ = "2.2.4"
 __author__ = "beda.software"
 __license__ = "MIT"
 __copyright__ = "Copyright 2026 beda.software"
