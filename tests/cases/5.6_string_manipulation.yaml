@@ -275,6 +275,10 @@ tests:
     expression: "('a'|'b'|'c').join()"
     result: ['abc']
 
+  - desc: '** join on empty input collection'
+    expression: Functions.str.empty.join(',')
+    result: []
+
   - desc: '** join string with date throws error'
     expression: "('a'|'2023-05-28'.toDate()|'c').join(',')"
     error: true
