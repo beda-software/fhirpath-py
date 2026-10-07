@@ -51,3 +51,54 @@ tests:
       - desc: 'avg() function returns an empty value for the undefined input collection'
         expression: UndefinedInput.avg()
         result: []
+    - 'group: Extension functions on resource values':
+      - desc: 'sum() of decimal values from a resource with a model'
+        inputfile: questionnaireresponse-example.json
+        model: 'r4'
+        expression: "%resource.repeat(item).where(linkId='decimal').answer.value.sum()"
+        result:
+          - 7.5
+      - desc: 'min() of decimal values from a resource with a model'
+        inputfile: questionnaireresponse-example.json
+        model: 'r4'
+        expression: "%resource.repeat(item).where(linkId='decimal').answer.value.min()"
+        result:
+          - 2
+      - desc: 'max() of decimal values from a resource with a model'
+        inputfile: questionnaireresponse-example.json
+        model: 'r4'
+        expression: "%resource.repeat(item).where(linkId='decimal').answer.value.max()"
+        result:
+          - 5.5
+      - desc: 'avg() of decimal values from a resource with a model'
+        inputfile: questionnaireresponse-example.json
+        model: 'r4'
+        expression: "%resource.repeat(item).where(linkId='decimal').answer.value.avg()"
+        result:
+          - 3.75
+      - desc: 'sum() of integer values from a resource without a model'
+        inputfile: questionnaireresponse-example.json
+        expression: "QuestionnaireResponse.repeat(item).where(linkId='integer').answer.valueInteger.sum()"
+        result:
+          - 8
+      - desc: 'min() of integer values from a resource without a model'
+        inputfile: questionnaireresponse-example.json
+        expression: "QuestionnaireResponse.repeat(item).where(linkId='integer').answer.valueInteger.min()"
+        result:
+          - 1
+      - desc: 'max() of integer values from a resource without a model'
+        inputfile: questionnaireresponse-example.json
+        expression: "QuestionnaireResponse.repeat(item).where(linkId='integer').answer.valueInteger.max()"
+        result:
+          - 4
+      - desc: 'avg() of integer values from a resource without a model'
+        inputfile: questionnaireresponse-example.json
+        expression: "QuestionnaireResponse.repeat(item).where(linkId='integer').answer.valueInteger.avg() = 8 / 3"
+        result:
+          - true
+      - desc: 'sum() of resource values matches aggregate()'
+        inputfile: questionnaireresponse-example.json
+        model: 'r4'
+        expression: "%resource.repeat(item).answer.value.sum() = %resource.repeat(item).answer.value.aggregate($total + $this, 0)"
+        result:
+          - true
