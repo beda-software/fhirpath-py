@@ -13,7 +13,7 @@ from fhirpathpy.engine import nodes, util
 def check_macro_expr(expr, x):
     result = expr(x)
     if len(result) > 0:
-        return expr(x)[0]
+        return util.get_data(result[0])
 
     return False
 
