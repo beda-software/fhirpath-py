@@ -121,6 +121,16 @@ def filtering_functions_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
 
+def where_boolean_field_test():
+    patients = [
+        {"resourceType": "Patient", "id": "off", "active": False},
+        {"resourceType": "Patient", "id": "on", "active": True},
+        {"resourceType": "Patient", "id": "missing"},
+    ]
+
+    assert evaluate(patients, "where(active).id") == ["on"]
+
+
 @pytest.mark.parametrize(
     ("resource", "path", "expected"),
     [
