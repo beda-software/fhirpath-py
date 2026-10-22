@@ -14,11 +14,25 @@ def equality(ctx, x, y):
     if util.is_empty(x) or util.is_empty(y):
         return False
 
-    if type(x[0]) in DATETIME_NODES_LIST or type(y[0]) in DATETIME_NODES_LIST:
-        return datetime_equality(ctx, x, y)
+    x = remove_duplicate_extension(x)
+    y = remove_duplicate_extension(y)
 
     if len(x) != len(y):
         return False
+
+    result = True
+    for a, b in zip(x, y, strict=True):
+        item_result = item_equality(ctx, [a], [b])
+        if item_result is None:
+            result = None
+        elif not item_result:
+            return False
+    return result
+
+
+def item_equality(ctx, x, y):
+    if type(x[0]) in DATETIME_NODES_LIST or type(y[0]) in DATETIME_NODES_LIST:
+        return datetime_equality(ctx, x, y)
 
     a = util.parse_value(x[0])
     b = util.parse_value(y[0])
@@ -63,6 +77,27 @@ def equivalence(ctx, x, y):
     if util.is_empty(x) or util.is_empty(y):
         return False
 
+    x = remove_duplicate_extension(x)
+    y = remove_duplicate_extension(y)
+
+    if len(x) != len(y):
+        return False
+
+    if len(x) == 1:
+        return item_equivalence(ctx, x, y)
+
+    unmatched = list(y)
+    for a in x:
+        for i, b in enumerate(unmatched):
+            if item_equivalence(ctx, [a], [b]):
+                del unmatched[i]
+                break
+        else:
+            return False
+    return True
+
+
+def item_equivalence(ctx, x, y):
     a = util.get_data(x[0])
     b = util.get_data(y[0])
 

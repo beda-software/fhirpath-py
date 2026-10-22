@@ -129,6 +129,38 @@ tests:
       expression: "Ops.coll.a.first() = 1"
       result: [true]
 
+    - desc: '** each pair must be equal'
+      expression: "(1 | 2) = (1 | 3)"
+      result: [false]
+
+    - desc: '** each pair must be equal'
+      expression: "('a' | 'b') = ('a' | 'c')"
+      result: [false]
+
+    - desc: '** all pairs equal'
+      expression: "(1 | 2) = (1 | 2)"
+      result: [true]
+
+    - desc: '** each pair must be equal (dates)'
+      expression: "(@2019-01-01 | @2019-01-02) = (@2019-01-01 | @2019-05-05)"
+      result: [false]
+
+    - desc: '** a pair compares to empty, other pairs are equal'
+      expression: "(@2019-01-02 | @2019-01-01) = (@2019-01-02 | @2019-01)"
+      result: []
+
+    - desc: '** a pair compares to empty, another pair is not equal'
+      expression: "(@2019-01-01 | @2019-01-02) = (@2019-01 | @2019-01-03)"
+      result: [false]
+
+    - desc: '** length mismatch (dates)'
+      expression: "@2019-01-01 = (@2019-01-01 | @2019-01-02)"
+      result: [false]
+
+    - desc: '** each pair must be equal (quantities)'
+      expression: "(1 'cm').combine(2 'cm') = (10 'mm').combine(30 'mm')"
+      result: [false]
+
   # If one or both of the operands is the empty collection, this operation returns
   # an empty collection.
 
@@ -438,6 +470,22 @@ tests:
   # Note that this implies that if the collections have a different number of
   # items to compare, the result will be false.
 
+    - desc: '** each item must be equivalent'
+      expression: "('a' | 'b') ~ ('a' | 'c')"
+      result: [false]
+
+    - desc: '** comparison is not order dependent'
+      expression: "(1 | 2) ~ (2 | 1)"
+      result: [true]
+
+    - desc: '** comparison is not order dependent (strings)'
+      expression: "('a' | 'B') ~ ('b' | 'A')"
+      result: [true]
+
+    - desc: '** length mismatch'
+      expression: "'a' ~ ('a' | 'b')"
+      result: [false]
+
     - desc: '* For complex types, equivalence requires all child properties to be equivalent, recursively.'
       expression: "Ops.complex ~ Ops.complexsimilar"
       result: [true]
@@ -518,6 +566,18 @@ tests:
 
     - desc: '** propagate empty coll'
       expression: "true != Ops.unexists"
+      result: []
+
+    - desc: '** each pair must be equal'
+      expression: "(1 | 2) != (1 | 3)"
+      result: [true]
+
+    - desc: '** all pairs equal'
+      expression: "(1 | 2) != (1 | 2)"
+      result: [false]
+
+    - desc: '** a pair compares to empty, other pairs are equal'
+      expression: "(@2019-01-02 | @2019-01-01) != (@2019-01-02 | @2019-01)"
       result: []
 
     - 'group: Dates & Times':
@@ -650,6 +710,14 @@ tests:
     - desc: '* collections for equivalence { } !~ { } will result in true.'
       expression: "Ops.unexists !~ Ops.unexists"
       result: [false]
+
+    - desc: '** comparison is not order dependent'
+      expression: "(1 | 2) !~ (2 | 1)"
+      result: [false]
+
+    - desc: '** each item must be equivalent'
+      expression: "('a' | 'b') !~ ('a' | 'c')"
+      result: [true]
 
   # If both operands are collections with a single item:
 
