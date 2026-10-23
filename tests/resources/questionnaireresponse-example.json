@@ -1,0 +1,28 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "id": "example",
+  "status": "completed",
+  "item": [
+    {
+      "linkId": "scores",
+      "item": [
+        {
+          "linkId": "decimal",
+          "answer": [{"valueDecimal": 2}]
+        },
+        {
+          "linkId": "decimal",
+          "answer": [{"valueDecimal": 5.5}]
+        },
+        {
+          "linkId": "integer",
+          "answer": [{"valueInteger": 3}]
+        },
+        {
+          "linkId": "integer",
+          "answer": [{"valueInteger": 1}, {"valueInteger": 4}]
+        }
+      ]
+    }
+  ]
+}
