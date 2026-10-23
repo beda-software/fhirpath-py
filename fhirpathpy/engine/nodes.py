@@ -881,6 +881,8 @@ class ResourceNode:
         if cls:
             data = FP_TimeBase.check_string(cls, data) or data
         if isinstance(data, abc.Mapping) and data["system"] == "http://unitsofmeasure.org":
+            if "comparator" in data:
+                raise ValueError("Cannot convert a FHIR.Quantity that has a comparator")
             data = FP_Quantity(
                 data["value"],
                 FP_Quantity.timeUnitsToUCUM.get(data["code"], "'" + data["code"] + "'"),

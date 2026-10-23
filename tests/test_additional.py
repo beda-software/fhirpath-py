@@ -3,6 +3,8 @@ import copy
 import pytest
 
 from fhirpathpy import evaluate
+from fhirpathpy.models import models
+from tests.resources import resources
 
 
 @pytest.mark.parametrize(
@@ -57,3 +59,10 @@ def copy_deepcopy_test():
     assert copy_1[0] == "2018"
     assert copy_2[0] == "2018"
     assert deepcopy_1[0] == "2018"
+
+
+def to_quantity_with_comparator_test():
+    resource = resources["quantity-example.json"]
+    expression = "QuestionnaireResponse.item[3].answer.value.toQuantity()"
+    with pytest.raises(ValueError, match="Cannot convert a FHIR.Quantity"):
+        evaluate(resource, expression, {}, models["r4"])
