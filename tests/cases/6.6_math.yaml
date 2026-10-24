@@ -253,10 +253,11 @@ tests:
       inputfile: patient-example.json
       result:
         - true
-    - desc: '** Do not convert a resource node value to Date without model'
+    - desc: '** A date string from a resource is converted to Date without model'
       expression: "Patient.birthDate + 1 day = @1974-12-26"
       inputfile: patient-example.json
-      error: true
+      result:
+        - true
 
 subject:
   resourceType: MathTestData

@@ -20,10 +20,7 @@ def count_fn(ctx, value):
 
 
 def not_fn(ctx, x):
-    if len(x) != 1:
-        return []
-
-    data = util.get_data(x[0])
+    # singleton() returns [] for an empty input and raises for more than one item
     data = misc.singleton(x, "Boolean")
 
     if isinstance(data, bool):

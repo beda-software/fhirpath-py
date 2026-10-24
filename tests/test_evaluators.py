@@ -390,6 +390,30 @@ def mappings_test(resource, path, expected):
     assert evaluate(resource, path) == expected
 
 
+@pytest.mark.parametrize(
+    ("resource", "path"),
+    [
+        ({"a": [True, False]}, "a.not()"),
+        ({}, "(1 | 2).not()"),
+    ],
+)
+def not_on_multiple_items_fails_test(resource, path):
+    with pytest.raises(Exception, match="expected singleton of type Boolean"):
+        evaluate(resource, path)
+
+
+@pytest.mark.parametrize(
+    ("resource", "path", "expected"),
+    [
+        ({"a": []}, "a.not()", []),
+        ({"a": [False]}, "a.not()", [True]),
+        ({}, "(1).not()", [False]),
+    ],
+)
+def not_on_empty_or_single_item_test(resource, path, expected):
+    assert evaluate(resource, path) == expected
+
+
 def external_constant_test():
     assert evaluate({}, "%var", {"var": "value"}) == ["value"]
 

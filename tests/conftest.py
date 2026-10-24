@@ -92,8 +92,9 @@ class YamlItem(pytest.Item):
             variables.update(self.test["variables"])
 
         if "error" in self.test and self.test["error"] is True:
-            with pytest.raises(Exception) as exc:
-                raise Exception(self.test["desc"]) from exc
+            # The engine raises plain Exception for most invalid expressions
+            with pytest.raises(Exception):  # noqa: B017
+                evaluate(resource, expression, variables, model)
         else:
             result = evaluate(resource, expression, variables, model)
             compare(result, self.test["result"])
