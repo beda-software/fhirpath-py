@@ -120,6 +120,9 @@ def extension(ctx, data, url):
     res = []
     for d in data:
         element = util.get_data(d)
+        if isinstance(d, nodes.ResourceNode) and not isinstance(element, abc.Mapping):
+            # Extensions of a primitive are stored in its "_" element
+            element = d._data
         if isinstance(element, abc.Mapping):
             exts = [e for e in element.get("extension", []) if e["url"] == url]
             if len(exts) > 0:

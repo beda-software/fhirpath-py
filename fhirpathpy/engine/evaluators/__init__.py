@@ -205,6 +205,11 @@ def create_reduce_member_invocation(model, key):
                 childPath = "Extension"
         elif key == "length":
             toAdd = len(res.data)
+        elif isinstance(res._data, abc.Mapping):
+            # A primitive keeps its id and extensions in the "_" sibling element
+            toAdd = res._data.get(key)
+            if key == "extension":
+                childPath = "Extension"
 
         childPath = (
             model["path2Type"].get(childPath, childPath)
@@ -212,28 +217,23 @@ def create_reduce_member_invocation(model, key):
             else childPath
         )
 
-        if util.is_some(toAdd):
-            if isinstance(toAdd, list):
-                mapped = [
+        if isinstance(toAdd, list) or isinstance(toAdd_, list):
+            # Pair each primitive value with its "_" element (same index), so a
+            # primitive that has extensions is still a single item
+            values = toAdd if isinstance(toAdd, list) else []
+            elements = toAdd_ if isinstance(toAdd_, list) else []
+            for i in range(max(len(values), len(elements))):
+                value = values[i] if i < len(values) else None
+                element = elements[i] if i < len(elements) else None
+                acc.append(
                     nodes.ResourceNode.create_node(
-                        x, childPath, propName=f"{fullPath}[{i}]", index=i
+                        value, childPath, _data=element, propName=f"{fullPath}[{i}]", index=i
                     )
-                    for i, x in enumerate(toAdd)
-                ]
-                acc = acc + mapped
-            else:
-                acc.append(nodes.ResourceNode.create_node(toAdd, childPath, propName=fullPath))
-        if util.is_some(toAdd_):
-            if isinstance(toAdd_, list):
-                mapped = [
-                    nodes.ResourceNode.create_node(
-                        x, childPath, propName=f"{fullPath}[{i}]", index=i
-                    )
-                    for i, x in enumerate(toAdd_)
-                ]
-                acc = acc + mapped
-            else:
-                acc.append(nodes.ResourceNode.create_node(toAdd_, childPath, propName=fullPath))
+                )
+        elif util.is_some(toAdd) or util.is_some(toAdd_):
+            acc.append(
+                nodes.ResourceNode.create_node(toAdd, childPath, _data=toAdd_, propName=fullPath)
+            )
         return acc
 
     return func

@@ -22,6 +22,7 @@ invocation_registry = {
     "empty": {"fn": existence.empty_fn},
     "not": {"fn": existence.not_fn},
     "exists": {"fn": existence.exists_macro, "arity": {0: [], 1: ["Expr"]}},
+    "hasValue": {"fn": existence.has_value_fn},
     "all": {"fn": existence.all_macro, "arity": {1: ["Expr"]}},
     "union": {"fn": combining.union_op, "arity": {1: ["AnyAtRoot"]}},
     "exclude": {"fn": combining.exclude_fn, "arity": {1: ["AnyAtRoot"]}},

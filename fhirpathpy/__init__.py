@@ -60,6 +60,8 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None, options=No
             # even in this raw data mode (as they are not a part of the output)
             for item in node:
                 if isinstance(item, ResourceNode):
+                    if item.data is None and item._data is not None:
+                        continue
                     if isinstance(item.data, dict):
                         keys = list(item.data.keys())
                         if keys == ["extension"]:
@@ -75,6 +77,8 @@ def apply_parsed_path(resource, parsedPath, context=None, model=None, options=No
             res = []
             for item in data:
                 # Filter out intenal representation of primitive extensions
+                if isinstance(item, ResourceNode) and item.data is None and item._data is not None:
+                    continue
                 i = visit(item)
                 if isinstance(i, dict):
                     keys = list(i.keys())

@@ -1,3 +1,4 @@
+from collections import abc
 from decimal import Decimal
 
 from fhirpathpy.engine import nodes, util
@@ -38,6 +39,19 @@ def exists_macro(ctx, coll, expr=None):
         return exists_macro(ctx, filtering.where_macro(ctx, coll, expr))
 
     return not util.is_empty(vec)
+
+
+def has_value_fn(ctx, coll):
+    """
+    FHIR specific hasValue(), see https://hl7.org/fhir/fhirpath.html#functions
+    Returns true if the input is a single FHIR primitive that has a value
+    (as opposed to a primitive that only has extensions), otherwise false.
+    """
+    if len(coll) != 1:
+        return False
+
+    value = util.get_data(coll[0])
+    return value is not None and not isinstance(value, abc.Mapping | list | nodes.FP_Quantity)
 
 
 def all_macro(ctx, colls, expr):

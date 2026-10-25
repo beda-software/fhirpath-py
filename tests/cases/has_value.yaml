@@ -1,0 +1,132 @@
+tests:
+  # https://hl7.org/fhir/fhirpath.html#functions
+  - 'group: hasValue()':
+
+    - desc: '** primitive with a value'
+      expression: Functions.attrValue.hasValue()
+      result:
+        - true
+
+    - desc: '** primitive with a value and an extension'
+      expression: Functions.attrValueAndExt.hasValue()
+      result:
+        - true
+
+    - desc: '** primitive with only an extension'
+      expression: Functions.attrExtOnly.hasValue()
+      result:
+        - false
+
+    - desc: '** primitive with only an extension still exists'
+      expression: Functions.attrExtOnly.exists()
+      result:
+        - true
+
+    - desc: '** false boolean has a value'
+      expression: Functions.attrFalse.hasValue()
+      result:
+        - true
+
+    - desc: '** missing element'
+      expression: Functions.missing.hasValue()
+      result:
+        - false
+
+    - desc: '** complex element'
+      expression: Functions.coding.hasValue()
+      result:
+        - false
+
+    - desc: '** more than one item'
+      expression: Functions.list.hasValue()
+      result:
+        - false
+
+    - desc: '** single item of a list'
+      expression: Functions.list.first().hasValue()
+      result:
+        - true
+
+    - desc: '** list items with values and extensions'
+      expression: Functions.listWithExt.select($this.hasValue())
+      result:
+        - true
+        - false
+        - true
+
+    - desc: '** literal'
+      expression: "'abc'.hasValue()"
+      result:
+        - true
+
+    - desc: '** empty collection'
+      expression: '{}.hasValue()'
+      result:
+        - false
+
+    - desc: '** birthDate with an extension (without using FHIR model data)'
+      inputfile: patient-example.json
+      expression: Patient.birthDate.hasValue()
+      result:
+        - true
+
+    - desc: '** birthDate with an extension (using FHIR model data)'
+      inputfile: patient-example.json
+      model: r4
+      expression: Patient.birthDate.hasValue()
+      result:
+        - true
+
+  - 'group: Primitive with an extension is a single item':
+
+    - desc: '** count of a primitive with an extension'
+      expression: Functions.attrValueAndExt.count()
+      result:
+        - 1
+
+    - desc: '** count of list items with extensions'
+      expression: Functions.listWithExt.count()
+      result:
+        - 3
+
+    - desc: '** extension of a list item'
+      expression: Functions.listWithExt[1].extension.url
+      result:
+        - url2
+
+    - desc: '** extension() of a list item'
+      expression: Functions.listWithExt[2].extension('url3').exists()
+      result:
+        - true
+
+subject:
+  resourceType: Functions
+  attrValue: abc
+  attrValueAndExt: abc
+  _attrValueAndExt:
+    extension:
+      - url: url1
+        valueString: x
+  _attrExtOnly:
+    extension:
+      - url: url1
+        valueString: x
+  attrFalse: false
+  coding:
+    system: http://loinc.org
+    code: 1234-5
+  list:
+    - a
+    - b
+  listWithExt:
+    - a
+    - null
+    - c
+  _listWithExt:
+    - null
+    - extension:
+        - url: url2
+          valueString: y
+    - extension:
+        - url: url3
+          valueString: z
