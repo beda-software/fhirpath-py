@@ -1,0 +1,21 @@
+{
+  "resourceType": "Patient",
+  "name": [
+    {
+      "given": [
+        "A"
+      ]
+    },
+    {
+      "given": [
+        "B"
+      ],
+      "extension": [
+        {
+          "url": "http://example.org/nick",
+          "valueString": "b"
+        }
+      ]
+    }
+  ]
+}
